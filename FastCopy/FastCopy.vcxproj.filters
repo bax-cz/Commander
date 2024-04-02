@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{25493ef8-1517-41f3-b52d-ea07565d0143}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{d0de5a13-de33-44fd-8384-65770c4d1189}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TLib">
+      <UniqueIdentifier>{58f6fb34-fb5f-45c3-8466-ed4eb1681510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TLib">
+      <UniqueIdentifier>{e22095c1-c8df-4721-9f0d-93ec7673b8e4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FastCopy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="regexp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tapi32ex.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tapi32u8.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tapp.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tini.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tmisc.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tregist.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="shareinfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tdlg.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\twin.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tads.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tinet.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\texcept.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\ipdict.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="xxhash\xxhash.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tlib\tstr.cpp">
+      <Filter>Source Files\TLib</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcopyd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcopyr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcopyw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fastcopy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="regexp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tlib\tapi32ex.h">
+      <Filter>Header Files\TLib</Filter>
+    </ClInclude>
+    <ClInclude Include="tlib\tapi32u8.h">
+      <Filter>Header Files\TLib</Filter>
+    </ClInclude>
+    <ClInclude Include="tlib\tlib.h">
+      <Filter>Header Files\TLib</Filter>
+    </ClInclude>
+    <ClInclude Include="tlib\tmisc.h">
+      <Filter>Header Files\TLib</Filter>
+    </ClInclude>
+    <ClInclude Include="shareinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xxhash\xxhash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tlib\tstr.h">
+      <Filter>Header Files\TLib</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Utils">
+      <UniqueIdentifier>{9a9e51db-490d-4f70-a90e-91223d63185f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Dialogs">
+      <UniqueIdentifier>{30fb7cac-9724-4d8a-9700-ca1de6b12f5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ArchiverTypes">
+      <UniqueIdentifier>{8b0dfe1d-50b4-4a62-9932-7dd598cda591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Dialogs">
+      <UniqueIdentifier>{15dd7655-dfb6-47cd-b9b5-c1591cb13f84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GuiControls">
+      <UniqueIdentifier>{2cfde70a-5cf3-4d56-8c73-9ec5c4f29797}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GuiControls">
+      <UniqueIdentifier>{746881ca-45f2-481e-b53c-4d2e8bc2ac8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ArchiveTypes">
+      <UniqueIdentifier>{0820f137-ee68-4f86-9a75-bd882c32e230}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FsReaders">
+      <UniqueIdentifier>{a885e23d-8e68-4909-9f49-21d1ac591cbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FsReaders">
+      <UniqueIdentifier>{395e5d10-b116-48ae-98c3-d9bf2f8408f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Putty">
+      <UniqueIdentifier>{aa2d48ce-9b01-441f-abbd-255667693db0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Putty">
+      <UniqueIdentifier>{9b402bae-8320-4472-937a-fbf1e29dfc95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\7zip">
+      <UniqueIdentifier>{344bd9d1-8f35-46d2-a487-bad4b5926f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\7zip\7z">
+      <UniqueIdentifier>{e1b00552-8cc0-44ba-97a7-0104704dc16b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\7zip\Common">
+      <UniqueIdentifier>{be8b7769-8858-4906-8a03-859e65da96e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\7zip\Windows">
+      <UniqueIdentifier>{1bfeb4e7-0374-4512-a89d-98a3be7865bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\7zip\Register">
+      <UniqueIdentifier>{6ac54446-a733-4f0c-91b3-0a842f29a778}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComboBoxUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystemUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellContextMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MiscUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FastCopyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Panel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type7zip.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Archiver.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeRar.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeTar.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeZip.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TarLib.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseDialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="TarFileBase.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TarFileStream.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TarFileGzip.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TarFileBzip2.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TarFileXzip.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="DragDropUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="HistoryNavigator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.h">
+      <Filter>Header Files\GuiControls</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlListView.h">
+      <Filter>Header Files\GuiControls</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlStaticText.h">
+      <Filter>Header Files\GuiControls</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlTextBox.h">
+      <Filter>Header Files\GuiControls</Filter>
+    </ClInclude>
+    <ClInclude Include="FileViewer.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FileFinder.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="SortUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ArchiveTypes.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="BackgroundWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileProgress.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="DuplicateFinder.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeGzip.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeDmg.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedDirectories.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolBarUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeAttributes.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ChangeCase.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="MainConfiguration.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutBox.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="TextInput.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="IconUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlToolbar.h">
+      <Filter>Header Files\GuiControls</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeIso.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="CalculateChecksums.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeXzip.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FtpLogin.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseReader.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="DiskReader.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ReaderTypes.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="DataTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArchiveReader.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="FtpReader.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkReader.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="SshReader.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareDirectories.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="VerifyChecksums.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FilePacker.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUnpacker.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlTabView.h">
+      <Filter>Header Files\GuiControls</Filter>
+    </ClInclude>
+    <ClInclude Include="PanelTab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistryReader.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="TabViewUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PathUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="PuttyTools.h">
+      <Filter>Header Files\Putty</Filter>
+    </ClInclude>
+    <ClInclude Include="SecureShell.h">
+      <Filter>Header Files\Putty</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionData.h">
+      <Filter>Header Files\Putty</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionInfo.h">
+      <Filter>Header Files\Putty</Filter>
+    </ClInclude>
+    <ClInclude Include="SshTransfer.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FtpTransfer.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="MainToolbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainDrivesMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FindText.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageViewer.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DjvuViewer.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="XmlUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeViewUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ViewerTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseViewer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SshOutput.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="SshLogin.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="Commander.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommanderApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="LoggerLite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompareFiles.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ChecksumTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextFileReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WebBrowser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitFile.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="CombineFiles.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandLineParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileEditor.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="EditUtils.h">
+      <Filter>Header Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ArchiveDataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseDataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="DiskDataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="FtpDataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="PalmDataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistryDataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="SshDataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="MarkdownDataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="EpubViewer.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="HtmlViewer.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="FictionBook2DataProvider.h">
+      <Filter>Header Files\FsReaders</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeBzip2.h">
+      <Filter>Header Files\ArchiverTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="WebView2Browser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PuttyInterface.h">
+      <Filter>Header Files\Putty</Filter>
+    </ClInclude>
+    <ClInclude Include="PuttyConfiguration.h">
+      <Filter>Header Files\Putty</Filter>
+    </ClInclude>
+    <ClInclude Include="bcb_stuff.h">
+      <Filter>Header Files\Putty</Filter>
+    </ClInclude>
+    <ClInclude Include="OverlaysLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpDownloadFile.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellContextMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FastCopyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Panel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Archiver.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="Type7zip.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeRar.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeTar.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeZip.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TarLib.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TarFileStream.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TarFileGzip.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TarFileBzip2.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TarFileXzip.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="HistoryNavigator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.cpp">
+      <Filter>Source Files\GuiControls</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlListView.cpp">
+      <Filter>Source Files\GuiControls</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlStaticText.cpp">
+      <Filter>Source Files\GuiControls</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlTextBox.cpp">
+      <Filter>Source Files\GuiControls</Filter>
+    </ClCompile>
+    <ClCompile Include="FileViewer.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FileFinder.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="BackgroundWorker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileProgress.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="DuplicateFinder.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeGzip.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeDmg.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SharedDirectories.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeAttributes.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ChangeCase.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="MainConfiguration.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutBox.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="TextInput.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlToolbar.cpp">
+      <Filter>Source Files\GuiControls</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeIso.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="CalculateChecksums.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeXzip.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="FtpLogin.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskReader.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="ArchiveReader.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="FtpReader.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkReader.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="SshReader.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareDirectories.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="VerifyChecksums.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseReader.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="FilePacker.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FileUnpacker.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ControlTabView.cpp">
+      <Filter>Source Files\GuiControls</Filter>
+    </ClCompile>
+    <ClCompile Include="PanelTab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryReader.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="SecureShell.cpp">
+      <Filter>Source Files\Putty</Filter>
+    </ClCompile>
+    <ClCompile Include="SshTransfer.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FtpTransfer.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="MainToolbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainDrivesMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FindText.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\7zAes.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zCompressionMode.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zDecode.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zEncode.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zExtract.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zFolderInStream.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zHandlerOut.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zHeader.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zIn.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zOut.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zProperties.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zSpecStream.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zUpdate.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArchiveExports.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Base64Handler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Bcj2Coder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BcjCoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BitlDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BranchMisc.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ByteSwap.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BZip2Crc.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BZip2Decoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BZip2Encoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\CodecExports.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\CoderMixer2.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\CopyCoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\CreateCoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\CWrappers.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\DeflateDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\DeflateEncoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\DeltaFilter.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\DmgHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\FilePathAutoRename.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\FileStreams.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\FilterCoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\GzHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\HandlerCont.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\HandlerOut.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\HfsHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\HmacSha1.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ImplodeDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\InBuffer.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\InOutTempBuffer.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\InStreamWithCRC.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoHeader.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoIn.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\ItemNameUtils.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\LimitedStreams.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\LockedStream.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Lzma2Decoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Lzma2Encoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzmaDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzmaEncoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzOutWindow.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\MemBlocks.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\MethodId.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\MethodProps.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\MyAes.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\OffsetStream.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\OutBuffer.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\OutMemStream.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\OutStreamWithCRC.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\ParseProperties.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\Pbkdf2HmacSha1.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\PpmdDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\PpmdEncoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\PpmdZip.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\ProgressMt.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\ProgressUtils.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\PropId.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\RandGen.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ShrinkDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\StreamBinder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\StreamObjects.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\StreamUtils.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarHandlerOut.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarHeader.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarIn.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarOut.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarUpdate.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\UniqBlocks.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\VirtThread.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\WzAes.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\XzDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\XzEncoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipAddCommon.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\ZipCrypto.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipHandlerOut.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipIn.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipItem.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipOut.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\ZipStrong.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipUpdate.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZlibDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZlibEncoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\FileDir.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\FileFind.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\FileIO.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\FileName.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\PropVariant.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\PropVariantConv.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\PropVariantUtils.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\Synchronization.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\System.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Windows\TimeUtils.cpp">
+      <Filter>Source Files\7zip\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\IntToString.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\MyString.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\MyVector.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\NewHandler.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\StringConvert.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\StringToInt.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\UTFConvert.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\Wildcard.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\XzCrc64Init.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzfseDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\MyXml.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Bcj2Register.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BcjRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BranchRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BZip2Register.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\CopyRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Deflate64Register.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\DeflateRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Lzma2Register.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzmaRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\PpmdRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\7zAesRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\MyAesReg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\CrcReg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\Sha1Reg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\Sha256Reg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\XzCrc64Reg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\CRC.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ApmHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\GptHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Bz2Handler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\DummyOutStream.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageViewer.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="DjvuViewer.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\CksumReg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="SshOutput.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="SshLogin.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="Commander.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommanderApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\FatHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ExtHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\LzhHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzhDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="CompareFiles.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="TextFileReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WebBrowser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SplitFile.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="CombineFiles.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FileEditor.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="ArchiveDataProvider.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskDataProvider.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="FtpDataProvider.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="PalmDataProvider.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryDataProvider.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="SshDataProvider.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="MarkdownDataProvider.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="EpubViewer.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="HtmlViewer.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="FictionBook2DataProvider.cpp">
+      <Filter>Source Files\FsReaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabBlockInStream.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabHeader.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabIn.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzxDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\QuantumDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisDecode.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisIn.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimHandlerOut.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimIn.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimRegister.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzmsDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\XpressDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\OutStreamWithSha1.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeBzip2.cpp">
+      <Filter>Source Files\ArchiveTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\RpmHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\XarHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="WebView2Browser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArjHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ZHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\PpmdHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\LzmaHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\MultiOutStream.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\DllExports2.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="PuttyConfiguration.cpp">
+      <Filter>Source Files\Putty</Filter>
+    </ClCompile>
+    <ClCompile Include="PuttyInterface.cpp">
+      <Filter>Source Files\Putty</Filter>
+    </ClCompile>
+    <ClCompile Include="bcb_stuff.cpp">
+      <Filter>Source Files\Putty</Filter>
+    </ClCompile>
+    <ClCompile Include="OverlaysLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HttpDownloadFile.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Commander.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\parentdir.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\Commander.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\small.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\sharedir.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\toolbar.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\regedbin.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\regedtext.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\checkcomplete.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\checkdelete.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Commander.exe.manifest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,78 @@
+------------------------------------------------------------------------
+* File commander - todo list                                           *
+------------------------------------------------------------------------
+
+NEW FEATURES/FIXES/IMPROVEMENTS:
+- threaded modeless dialogs with its own message pump !!
+- layout manager (store window placement and size) - ??
+- configuration - settings manager (fast copy, etc.) - ??
+- implement splash screen when application starts - ??
+- simple hex-editor - ??
+- BreadcrumbBar Vista like - ??
+- mCtrl-0.11.5 integration - ??
+- HiDPI display support ??
+- SetThreadLocale ??
+- unicode strings normalization ??
+- look at Windows Search API (ISearchFolderItemFactory) ??
+- dark mode ??
+
+Version 0.2.8.3:
+----------------
+FEATURES:
+- discount (3.0.0d) - markdown support in html viewer - DONE
+- notepad-like text editor - DONE
+- compare files - winMerge like - PARTLY DONE
+- find entries by typing in panel as implemented in Salamander - DONE
+- logger-lite added for logging actions - DONE
+- split and combine files - DONE
+- calculate/verify checksums (CRC32, MD5, SHA1, SHA256, SHA512) - DONE
+- implement Secure shell's command and output window - PARTLY DONE
+- simple PalmDoc pdb, mobi, azw viewer - PARTLY DONE
+- simple html and epub ebook viewer using IWebBrowser2 - DONE
+- simple image viewer - djvulibre(3.5.28), tiff(4.4.0), jpeg(9f), OpenJPEG(2.5.2), pcx, tga - DONE
+- implement multiple tabs-view - DONE
+- implement drag & drop with mouse selection of items - PARTLY DONE (mouse selection)
+- FTP client and PuTTY(0.80) with changes from WinSCP(6.2.3) integration - DONE
+- main toolbar and menu commands - DONE
+- unrar(7.0.7), zlib(1.3.1), bzip2(1.0.8), 7-Zip(23.01), undmg, uniso libraries integration - DONE
+- file hex/text viewer - DONE
+- fast-copy(3.63) library by H. Shirouzu integration - PARTLY DONE (needs testing, currently not used) - https://ipmsg.org/tools/fastcopy.html.en
+- duplicate files finder - DONE
+- panel history navigation - DONE
+- mp3 info and id3 tags library integration - DONE
+- watch for file system changes (directories, removable media) - DONE
+- shell context menu integration - DONE
+- sorting items in panel by name, extension, date and size - DONE
+- load overlay icons and calculate directories size in threads - DONE
+- custom drawn list-view - DONE (spacing between rows is not possible with custom draw)
+- display disk free space - DONE
+
+BUGS:
+- when using quickfind, the drag & drop to external app/window does not work (WM_LBUTTONUP gets eaten) also double click does not work
+- list-view occasionally stays in quickfind mode
+- selections (marked items) are lost when panel reloads data
+- the focus rect is drawn for a short period at 0 index when changing directories
+- the list-view in panel-tab occasionally loses focus and produces blank window
+- DjVu viewer rarely crashes on Vista 32-bit (setlocale(LC_NUMERIC, "C") race condition??)
+- keyboard shortcuts (tab, esc,..) don't work when there is a modal dialog opened within modeless dialog (eg. MessageBox in fileviewer) - message pump per dialog is needed
+- rename files on disk sometimes doesn't work - probably filesystemwatcher fault ??
+- ftp client won't start copying files from server - probably connection limit ?? (happened on ftp.adobe.com)
+- ftp client ends up in an infinite loop when firewall blocks non-passive connection
+- ftp client's blocking socket randomly timeouts on 'select' function (ftp4.webzdarma.cz)
+
+- SHIFT + letter sometimes triggers quickfind - FIXED
+- crash when closing tabs while overlay icons are still loading - FIXED
+- crash in CDiskReader::stopFileSystemWatcher (on thread::join), happens occasionally on UNC paths - FIXED
+- ftp client crashes when closing tab with connection still open - FIXED
+- putty sometimes ends up in an infinite loop - FIXED
+- when woken from sleep panels are reset to the root of C:\ directory - FIXED
+- file-viewer won't find/highlight text split between lines - FIXED
+- only one IFileOperation at a time, the rest is serialized because of COM - FIXED
+- bugged 32-bit zlib's inffas32.asm code - FIXED (changes taken from https://github.com/madler/zlib/pull/369/files)
+- finding case-insensitive text in binary files fails - FIXED
+- SHA-512 checksums wrong results on files greater than 536 870 911 (0x1FFFFFFF) bytes - FIXED (version from GNU/CoreUtils)
+- uniso crashes in uniso.cpp, line: 884 on FreeImage(IsoImage* image) - FIXED
+- use DeferWindowPos functions to prevent flickering when resizing - ??
+- fix scrolling back to selected item when mouse wheel is used - http://forum.sysinternals.com/topic18639.html
+- fix keyboard focus - panels are losing focus when deactivated - FIXED
+- fix listview column width autosize after application starts - FIXED

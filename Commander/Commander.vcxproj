@@ -1,0 +1,700 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{64DB8FD2-60E9-47FA-88CF-D0B3EE51BB5D}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Commander</RootNamespace>
+    <ProjectName>Commander</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)build_$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build_$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <CustomBuildAfterTargets>
+    </CustomBuildAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>$(SolutionDir)build_$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)build_$(Platform)\$(Configuration)\</OutDir>
+    <CodeAnalysisRuleSet>C:\Program Files (x86)\Microsoft Visual Studio 14.0\Team Tools\Static Analysis Tools\Rule Sets\NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CustomBuildAfterTargets>
+    </CustomBuildAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)build_$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)build_$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <CustomBuildAfterTargets>
+    </CustomBuildAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IntDir>$(SolutionDir)build_$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)build_$(Platform)\$(Configuration)\</OutDir>
+    <CustomBuildAfterTargets>
+    </CustomBuildAfterTargets>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>FC_ENABLE_LOGGING;OPJ_STATIC;USE_MSVC_TLS;HAVE_NAMESPACES;DJVUAPI=;DDJVUAPI=;MINILISPAPI=;HAVE_STRTOUMAX;WINSCP;MPEXT;WIN_LONG_PATH;ZLIB_WINAPI;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../lzma/CPP;../lzma/C;../Putty/windows;../diffutils;../</AdditionalIncludeDirectories>
+      <ShowIncludes>false</ShowIncludes>
+      <ExceptionHandling>Sync</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ws2_32.lib;Wininet.lib;gdiplus.lib;Propsys.lib;Netapi32.lib;Version.lib;UxTheme.lib;Crypt32.lib;Mpr.lib;Winmm.lib;Shlwapi.lib;comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <Profile>true</Profile>
+    </Link>
+    <PreBuildEvent>
+      <Command>_prebuild.cmd</Command>
+      <Message>Embedding 'fb2.xsl' and Touching 'version.h'</Message>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>FC_ENABLE_LOGGING;OPJ_STATIC;USE_MSVC_TLS;HAVE_NAMESPACES;DJVUAPI=;DDJVUAPI=;MINILISPAPI=;HAVE_STRTOUMAX;WINSCP;MPEXT;WIN_LONG_PATH;ZLIB_WINAPI;_CRT_SECURE_NO_WARNINGS;WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../lzma/CPP;../lzma/C;../Putty/windows;../diffutils;../</AdditionalIncludeDirectories>
+      <EnablePREfast>false</EnablePREfast>
+      <ShowIncludes>false</ShowIncludes>
+      <ExceptionHandling>Sync</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>ws2_32.lib;Wininet.lib;gdiplus.lib;Propsys.lib;Netapi32.lib;Version.lib;UxTheme.lib;Crypt32.lib;Mpr.lib;Winmm.lib;Shlwapi.lib;comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <Profile>false</Profile>
+    </Link>
+    <PreBuildEvent>
+      <Command>_prebuild.cmd</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Embedding 'fb2.xsl' and Touching 'version.h'</Message>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>FC_ENABLE_LOGGING;OPJ_STATIC;USE_MSVC_TLS;HAVE_NAMESPACES;DJVUAPI=;DDJVUAPI=;MINILISPAPI=;HAVE_STRTOUMAX;WINSCP;MPEXT;WIN_LONG_PATH;ZLIB_WINAPI;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../lzma/CPP;../lzma/C;../Putty/windows;../diffutils;../</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <ShowIncludes>false</ShowIncludes>
+      <ExceptionHandling>Sync</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>ws2_32.lib;Wininet.lib;gdiplus.lib;Propsys.lib;Netapi32.lib;Version.lib;UxTheme.lib;Crypt32.lib;Mpr.lib;Winmm.lib;Shlwapi.lib;comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PreBuildEvent>
+      <Command>_prebuild.cmd</Command>
+      <Message>Embedding 'fb2.xsl' and Touching 'version.h'</Message>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>FC_ENABLE_LOGGING;OPJ_STATIC;USE_MSVC_TLS;HAVE_NAMESPACES;DJVUAPI=;DDJVUAPI=;MINILISPAPI=;HAVE_STRTOUMAX;WINSCP;MPEXT;WIN_LONG_PATH;ZLIB_WINAPI;_CRT_SECURE_NO_WARNINGS;WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../lzma/CPP;../lzma/C;../Putty/windows;../diffutils;../</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <ShowIncludes>false</ShowIncludes>
+      <ExceptionHandling>Sync</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>ws2_32.lib;Wininet.lib;gdiplus.lib;Propsys.lib;Netapi32.lib;Version.lib;UxTheme.lib;Crypt32.lib;Mpr.lib;Winmm.lib;Shlwapi.lib;comctl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <PreBuildEvent>
+      <Command>_prebuild.cmd</Command>
+      <Message>Embedding 'fb2.xsl' and Touching 'version.h'</Message>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="TODO.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AboutBox.h" />
+    <ClInclude Include="ArchiveDataProvider.h" />
+    <ClInclude Include="ArchiveReader.h" />
+    <ClInclude Include="ArchiveTypes.h" />
+    <ClInclude Include="BackgroundWorker.h" />
+    <ClInclude Include="BaseDataProvider.h" />
+    <ClInclude Include="BaseDialog.h" />
+    <ClInclude Include="BaseReader.h" />
+    <ClInclude Include="BaseViewer.h" />
+    <ClInclude Include="bcb_stuff.h" />
+    <ClInclude Include="CalculateChecksums.h" />
+    <ClInclude Include="ChangeAttributes.h" />
+    <ClInclude Include="ChangeCase.h" />
+    <ClInclude Include="ChecksumTypes.h" />
+    <ClInclude Include="CombineFiles.h" />
+    <ClInclude Include="CommandLineParser.h" />
+    <ClInclude Include="CompareDirectories.h" />
+    <ClInclude Include="CompareFiles.h" />
+    <ClInclude Include="ControlTabView.h" />
+    <ClInclude Include="DataTypes.h" />
+    <ClInclude Include="DiskDataProvider.h" />
+    <ClInclude Include="DiskReader.h" />
+    <ClInclude Include="DjvuViewer.h" />
+    <ClInclude Include="DuplicateFinder.h" />
+    <ClInclude Include="DragDropUtils.h" />
+    <ClInclude Include="EditUtils.h" />
+    <ClInclude Include="FictionBook2DataProvider.h" />
+    <ClInclude Include="FileEditor.h" />
+    <ClInclude Include="FileUnpacker.h" />
+    <ClInclude Include="FileFinder.h" />
+    <ClInclude Include="FilePacker.h" />
+    <ClInclude Include="FileProgress.h" />
+    <ClInclude Include="FindText.h" />
+    <ClInclude Include="FtpDataProvider.h" />
+    <ClInclude Include="FtpLogin.h" />
+    <ClInclude Include="FtpReader.h" />
+    <ClInclude Include="FtpTransfer.h" />
+    <ClInclude Include="HistoryNavigator.h" />
+    <ClInclude Include="EpubViewer.h" />
+    <ClInclude Include="IconUtils.h" />
+    <ClInclude Include="ImageTypes.h" />
+    <ClInclude Include="ImageViewer.h" />
+    <ClInclude Include="HttpDownloadFile.h" />
+    <ClInclude Include="LoggerLite.h" />
+    <ClInclude Include="MainConfiguration.h" />
+    <ClInclude Include="MainDrivesMenu.h" />
+    <ClInclude Include="MainToolbar.h" />
+    <ClInclude Include="MarkdownDataProvider.h" />
+    <ClInclude Include="MenuUtils.h" />
+    <ClInclude Include="HtmlViewer.h" />
+    <ClInclude Include="NetworkReader.h" />
+    <ClInclude Include="NetworkUtils.h" />
+    <ClInclude Include="OverlaysLoader.h" />
+    <ClInclude Include="PalmDataProvider.h" />
+    <ClInclude Include="PanelTab.h" />
+    <ClInclude Include="PathUtils.h" />
+    <ClInclude Include="PuttyConfiguration.h" />
+    <ClInclude Include="PuttyInterface.h" />
+    <ClInclude Include="PuttyTools.h" />
+    <ClInclude Include="ReaderTypes.h" />
+    <ClInclude Include="RegistryDataProvider.h" />
+    <ClInclude Include="RegistryReader.h" />
+    <ClInclude Include="SecureShell.h" />
+    <ClInclude Include="SessionData.h" />
+    <ClInclude Include="SessionInfo.h" />
+    <ClInclude Include="SharedDirectories.h" />
+    <ClInclude Include="SortUtils.h" />
+    <ClInclude Include="SplitFile.h" />
+    <ClInclude Include="SshLogin.h" />
+    <ClInclude Include="SshDataProvider.h" />
+    <ClInclude Include="SshOutput.h" />
+    <ClInclude Include="SshReader.h" />
+    <ClInclude Include="SshTransfer.h" />
+    <ClInclude Include="SystemUtils.h" />
+    <ClInclude Include="TabViewUtils.h" />
+    <ClInclude Include="TarFileBase.h" />
+    <ClInclude Include="TarFileBzip2.h" />
+    <ClInclude Include="TarFileGzip.h" />
+    <ClInclude Include="TarFileStream.h" />
+    <ClInclude Include="TarFileXzip.h" />
+    <ClInclude Include="TarLib.h" />
+    <ClInclude Include="FileViewer.h" />
+    <ClInclude Include="TextFileReader.h" />
+    <ClInclude Include="TextInput.h" />
+    <ClInclude Include="ToolBarUtils.h" />
+    <ClInclude Include="TreeViewUtils.h" />
+    <ClInclude Include="Type7zip.h" />
+    <ClInclude Include="Archiver.h" />
+    <ClInclude Include="TypeBzip2.h" />
+    <ClInclude Include="TypeDmg.h" />
+    <ClInclude Include="TypeGzip.h" />
+    <ClInclude Include="TypeIso.h" />
+    <ClInclude Include="TypeRar.h" />
+    <ClInclude Include="TypeTar.h" />
+    <ClInclude Include="TypeXzip.h" />
+    <ClInclude Include="TypeZip.h" />
+    <ClInclude Include="ComboBoxUtils.h" />
+    <ClInclude Include="Commands.h" />
+    <ClInclude Include="FastCopyManager.h" />
+    <ClInclude Include="FileSystemUtils.h" />
+    <ClInclude Include="ListViewUtils.h" />
+    <ClInclude Include="MiscUtils.h" />
+    <ClInclude Include="ShellContextMenu.h" />
+    <ClInclude Include="ShellUtils.h" />
+    <ClInclude Include="StringUtils.h" />
+    <ClInclude Include="Control.h" />
+    <ClInclude Include="CommanderApp.h" />
+    <ClInclude Include="Commander.h" />
+    <ClInclude Include="DataManager.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="ControlToolbar.h" />
+    <ClInclude Include="ControlListView.h" />
+    <ClInclude Include="ControlStaticText.h" />
+    <ClInclude Include="ControlTextBox.h" />
+    <ClInclude Include="Panel.h" />
+    <ClInclude Include="VerifyChecksums.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="ViewerTypes.h" />
+    <ClInclude Include="WebBrowser.h" />
+    <ClInclude Include="WebView2Browser.h" />
+    <ClInclude Include="XmlUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zCompressionMode.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zDecode.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zEncode.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zExtract.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zFolderInStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zHandlerOut.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zHeader.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zIn.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zOut.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zProperties.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zSpecStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\7z\7zUpdate.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ApmHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArchiveExports.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArjHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Base64Handler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Bz2Handler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabBlockInStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabHeader.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabIn.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\CoderMixer2.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\DummyOutStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\HandlerOut.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\InStreamWithCRC.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\ItemNameUtils.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\OutStreamWithCRC.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\OutStreamWithSha1.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\ParseProperties.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\DllExports2.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\DmgHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ExtHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\FatHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\GptHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\GzHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\HandlerCont.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\HfsHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoHeader.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoIn.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\LzhHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\LzmaHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisDecode.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisIn.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\PpmdHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\RpmHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarHandlerOut.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarHeader.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarIn.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarOut.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarUpdate.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimHandlerOut.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimIn.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\XarHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ZHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipAddCommon.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipHandlerOut.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipIn.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipItem.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipOut.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipUpdate.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\CreateCoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\CWrappers.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\FilePathAutoRename.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\FileStreams.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\FilterCoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\InBuffer.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\InOutTempBuffer.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\LimitedStreams.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\LockedStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\MemBlocks.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\MethodId.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\MethodProps.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\MultiOutStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\OffsetStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\OutBuffer.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\OutMemStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\ProgressMt.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\ProgressUtils.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\PropId.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\StreamBinder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\StreamObjects.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\StreamUtils.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\UniqBlocks.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Common\VirtThread.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Bcj2Coder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Bcj2Register.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BcjCoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BcjRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BitlDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BranchMisc.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BranchRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ByteSwap.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BZip2Crc.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BZip2Decoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BZip2Encoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\BZip2Register.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\CodecExports.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\CopyCoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\CopyRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Deflate64Register.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\DeflateDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\DeflateEncoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\DeflateRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\DeltaFilter.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ImplodeDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzfseDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzhDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Lzma2Decoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Lzma2Encoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\Lzma2Register.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzmaDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzmaEncoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzmaRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzmsDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzOutWindow.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\LzxDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\PpmdDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\PpmdEncoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\PpmdRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\PpmdZip.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\QuantumDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ShrinkDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\XpressDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\XzDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\XzEncoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZlibDecoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZlibEncoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\7zAes.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\7zAesRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\HmacSha1.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\MyAes.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\MyAesReg.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\Pbkdf2HmacSha1.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\RandGen.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\WzAes.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\ZipCrypto.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Crypto\ZipStrong.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\CksumReg.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\CRC.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\CrcReg.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\IntToString.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\MyString.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\MyVector.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\MyXml.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\NewHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\Sha1Reg.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\Sha256Reg.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\StringConvert.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\StringToInt.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\UTFConvert.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\Wildcard.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\XzCrc64Init.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\XzCrc64Reg.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\FileDir.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\FileFind.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\FileIO.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\FileName.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\PropVariant.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\PropVariantConv.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\PropVariantUtils.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\Synchronization.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\System.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Windows\TimeUtils.cpp" />
+    <ClCompile Include="AboutBox.cpp" />
+    <ClCompile Include="ArchiveDataProvider.cpp" />
+    <ClCompile Include="ArchiveReader.cpp" />
+    <ClCompile Include="BackgroundWorker.cpp" />
+    <ClCompile Include="BaseReader.cpp" />
+    <ClCompile Include="bcb_stuff.cpp" />
+    <ClCompile Include="CalculateChecksums.cpp" />
+    <ClCompile Include="ChangeAttributes.cpp" />
+    <ClCompile Include="ChangeCase.cpp" />
+    <ClCompile Include="CombineFiles.cpp" />
+    <ClCompile Include="CommandHandler.cpp" />
+    <ClCompile Include="CompareDirectories.cpp" />
+    <ClCompile Include="CompareFiles.cpp" />
+    <ClCompile Include="ControlTabView.cpp" />
+    <ClCompile Include="DiskDataProvider.cpp" />
+    <ClCompile Include="DiskReader.cpp" />
+    <ClCompile Include="DjvuViewer.cpp" />
+    <ClCompile Include="DuplicateFinder.cpp" />
+    <ClCompile Include="FictionBook2DataProvider.cpp" />
+    <ClCompile Include="FileEditor.cpp" />
+    <ClCompile Include="FileUnpacker.cpp" />
+    <ClCompile Include="FileFinder.cpp" />
+    <ClCompile Include="FilePacker.cpp" />
+    <ClCompile Include="FileProgress.cpp" />
+    <ClCompile Include="FindText.cpp" />
+    <ClCompile Include="FtpDataProvider.cpp" />
+    <ClCompile Include="FtpLogin.cpp" />
+    <ClCompile Include="FtpReader.cpp" />
+    <ClCompile Include="FtpTransfer.cpp" />
+    <ClCompile Include="HistoryNavigator.cpp" />
+    <ClCompile Include="EpubViewer.cpp" />
+    <ClCompile Include="ImageViewer.cpp" />
+    <ClCompile Include="HttpDownloadFile.cpp" />
+    <ClCompile Include="MainConfiguration.cpp" />
+    <ClCompile Include="MainDrivesMenu.cpp" />
+    <ClCompile Include="MainToolbar.cpp" />
+    <ClCompile Include="MarkdownDataProvider.cpp" />
+    <ClCompile Include="MenuHandler.cpp" />
+    <ClCompile Include="HtmlViewer.cpp" />
+    <ClCompile Include="NetworkReader.cpp" />
+    <ClCompile Include="OverlaysLoader.cpp" />
+    <ClCompile Include="PalmDataProvider.cpp" />
+    <ClCompile Include="PanelTab.cpp" />
+    <ClCompile Include="PuttyConfiguration.cpp" />
+    <ClCompile Include="PuttyInterface.cpp" />
+    <ClCompile Include="RegistryDataProvider.cpp" />
+    <ClCompile Include="RegistryReader.cpp" />
+    <ClCompile Include="SecureShell.cpp" />
+    <ClCompile Include="SharedDirectories.cpp" />
+    <ClCompile Include="SplitFile.cpp" />
+    <ClCompile Include="SshLogin.cpp" />
+    <ClCompile Include="SshDataProvider.cpp" />
+    <ClCompile Include="SshOutput.cpp" />
+    <ClCompile Include="SshReader.cpp" />
+    <ClCompile Include="SshTransfer.cpp" />
+    <ClCompile Include="TarFileBzip2.cpp" />
+    <ClCompile Include="TarFileGzip.cpp" />
+    <ClCompile Include="TarFileStream.cpp" />
+    <ClCompile Include="TarFileXzip.cpp" />
+    <ClCompile Include="TarLib.cpp" />
+    <ClCompile Include="FileViewer.cpp" />
+    <ClCompile Include="TextFileReader.cpp" />
+    <ClCompile Include="Type7zip.cpp" />
+    <ClCompile Include="Archiver.cpp" />
+    <ClCompile Include="TypeBzip2.cpp" />
+    <ClCompile Include="TypeDmg.cpp" />
+    <ClCompile Include="TypeGzip.cpp" />
+    <ClCompile Include="TypeIso.cpp" />
+    <ClCompile Include="TypeRar.cpp" />
+    <ClCompile Include="TypeTar.cpp" />
+    <ClCompile Include="TypeXzip.cpp" />
+    <ClCompile Include="TypeZip.cpp" />
+    <ClCompile Include="FastCopyManager.cpp" />
+    <ClCompile Include="ShellContextMenu.cpp" />
+    <ClCompile Include="TextInput.cpp" />
+    <ClCompile Include="Control.cpp" />
+    <ClCompile Include="CommanderApp.cpp" />
+    <ClCompile Include="Commander.cpp" />
+    <ClCompile Include="DataManager.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ControlToolbar.cpp" />
+    <ClCompile Include="ControlListView.cpp" />
+    <ClCompile Include="ControlStaticText.cpp" />
+    <ClCompile Include="ControlTextBox.cpp" />
+    <ClCompile Include="Panel.cpp" />
+    <ClCompile Include="VerifyChecksums.cpp" />
+    <ClCompile Include="WebBrowser.cpp" />
+    <ClCompile Include="WebView2Browser.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Commander.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\checkcomplete.ico" />
+    <Image Include="Resources\checkdelete.ico" />
+    <Image Include="resources\Commander.ico" />
+    <Image Include="resources\parentdir.ico" />
+    <Image Include="Resources\regedbin.ico" />
+    <Image Include="Resources\regedtext.ico" />
+    <Image Include="resources\sharedir.ico" />
+    <Image Include="resources\small.ico" />
+    <Image Include="Resources\toolbar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Commander.exe.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Checksum\Checksum.vcxproj">
+      <Project>{420aa482-df54-43b8-88fe-6355a9ef35ff}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\diffutils\diffutils.vcxproj">
+      <Project>{cc259842-d516-487e-b11b-993a08fe9857}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\discount\discount.vcxproj">
+      <Project>{55eecbd7-8348-452f-8240-949ac0715f16}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Djvu\Djvu.vcxproj">
+      <Project>{c021a2e3-a0cf-4da7-8db8-f89c1ac883ff}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FastCopy\FastCopy.vcxproj">
+      <Project>{d6ff3145-1a10-4739-8e42-c5327bf51584}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\FtpClient\FtpClient.vcxproj">
+      <Project>{9c3c1f76-b654-40ce-9bbe-c1e182b4a66c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Lzma\Lzma.vcxproj">
+      <Project>{4e62e1de-d5ed-4cef-a4df-03233cb7e984}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenJPEG\OpenJPEG.vcxproj">
+      <Project>{d1e9885e-4707-4235-9899-deec2d1e933c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\PalmDump\PalmDump.vcxproj">
+      <Project>{33ec0f2e-bb7f-440a-b29b-e7d40437ede7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Pcx\Pcx.vcxproj">
+      <Project>{458a0aeb-dd8b-49fa-9bca-c998ed29e3c6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Putty\Putty.vcxproj">
+      <Project>{90da4553-e386-42f9-8a7d-2d6f890a3791}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Tga\Tga.vcxproj">
+      <Project>{27a5f162-b0ca-4723-8c9f-f20d713a3a8b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Undmg\Undmg.vcxproj">
+      <Project>{ddac1a7f-7e64-45cc-949f-a8d01ee47df2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Uniso\Uniso.vcxproj">
+      <Project>{7b33c3f9-9eeb-4762-8b72-c2f1c4a35b95}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Unrar\UnRarDll.vcxproj">
+      <Project>{e815c46c-36c4-499f-bbc2-e772c6b17971}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\WinMerge\WinMerge.vcxproj">
+      <Project>{c105212c-a113-464a-9707-aca153f9ea2f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xdiff\xdiff.vcxproj">
+      <Project>{30da61e4-a609-4798-9cfb-e553496ec6d3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Zlib\Zlib.vcxproj">
+      <Project>{8fd826f8-3739-44e6-8cc8-997122e53b8d}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="Commander.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

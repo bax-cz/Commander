@@ -1,0 +1,678 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\windows">
+      <UniqueIdentifier>{9a858308-d85b-4c7e-b82f-a2d4316e526a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\windows">
+      <UniqueIdentifier>{07a41fd3-80ad-4bf9-89d7-c49c061b1ebc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\crypto">
+      <UniqueIdentifier>{38fda2ae-8cda-46db-98b8-a4f6b143581b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\proxy">
+      <UniqueIdentifier>{accbc453-6e50-46ff-9a93-0a0569199d4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ssh">
+      <UniqueIdentifier>{8435d7e0-01de-456e-b32f-3036fe21065e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stubs">
+      <UniqueIdentifier>{a8747790-5b38-4eb4-9ce4-5e736db71e91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{6a29165b-6bab-4163-90cf-c7c2313a9efc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{676c7acb-c2f8-4aa9-b906-7fde6989f7af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ssh">
+      <UniqueIdentifier>{513a4704-c624-4346-bc1a-07c6baf858b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\proxy">
+      <UniqueIdentifier>{f9816d44-5fa1-46f3-8604-9a2e3d8383a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\crypto">
+      <UniqueIdentifier>{66e1aa35-6129-4b84-8ee2-1a145599e49e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\windows\utils">
+      <UniqueIdentifier>{a473e659-59bb-4567-829c-d302125eab17}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="crypto\aes.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\blowfish.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\ecc.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\mpint_i.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\sha1.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\sha256.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\sha512.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="proxy\cproxy.h">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="proxy\proxy.h">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="proxy\socks.h">
+      <Filter>Header Files\proxy</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\bpp.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\connection2.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\gss.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\gssc.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\channel.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\pgssapi.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\ppl.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\signal-list.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\transport2.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh\ttymode-list.h">
+      <Filter>Header Files\ssh</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\utils.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="windows\cryptoapi.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="windows\platform.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="windows\security-api.h">
+      <Filter>Header Files\windows</Filter>
+    </ClInclude>
+    <ClInclude Include="defs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="marshal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="misc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mpint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pageant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="putty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="puttyexp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="puttymem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ssh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sshcr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="storage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tree234.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\aesgcm.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\aesgcm-footer.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="crypto\ntru.h">
+      <Filter>Header Files\crypto</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="crypto\aes-common.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\aes-ni.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\aesold.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\aes-select.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\aes-sw.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\arcfour.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\argon2.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\bcrypt.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\blake2.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\blowfish.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\des.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\diffie-hellman.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\dsa.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\ecc-arithmetic.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\ecc-ssh.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\hash_simple.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\hmac.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\chacha20-poly1305.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\mac.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\mac_simple.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\md5.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\mpint.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\prng.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\pubkey-pem.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\pubkey-ppk.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\rsa.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha1-common.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha1-select.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha1-sw.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha3.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha256-common.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha256-select.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha256-sw.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha512-common.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha512-select.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\sha512-sw.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\cproxy.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\http_p.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\interactor.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\local.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\nosshproxy.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\proxy.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\socks4.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\socks5.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="proxy\telnet.c">
+      <Filter>Source Files\proxy</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\agentf.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\bpp2.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\bpp-bare.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\censor2.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\common_p.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\connection2.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\connection2-client.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\gssc.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\kex2-client.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\mainchan.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\nosharing.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\pgssapi.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\portfwd.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\sharing.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\ssh.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\transient-hostkey-cache.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\transport2.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\userauth2-client.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\verstring.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="ssh\zlib.c">
+      <Filter>Source Files\ssh</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\antispoof.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\backend_socket_log.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\base64_decode_atom.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\base64_encode_atom.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\bufchain.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\burnstr.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\conf.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\conf_launchable.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ctrlparse.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\default_description.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\dup_mb_to_wc.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\dupcat.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\dupprintf.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\dupstr.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\host_strcspn.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\host_strduptrim.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\host_strchr.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\host_strchr_internal.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\host_strrchr.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\log_proxy_stderr.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\make_spr_sw_abort_static.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\marshal.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\memory.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\memxor.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\nullstrcmp.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\out_of_memory.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\parse_blocksize.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\prompts.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ptrlen.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\seat_connection_fatal.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\sk_free_peer_info.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\smemclr.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\smemeq.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\spr_get_error_message.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ssh2_pick_fingerprint.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\sshutils.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\strbuf.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\string_length_for_printf.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\stripctrl.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\tempseat.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\tree234.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\version.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\wildcard.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\write_c_string_literal.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\agent-client.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\gss.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\handle-io.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\handle-socket.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\handle-wait.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\local-proxy.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\named-pipe-client.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\network.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\noise.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\no-jump-list.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\storage.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\unicode.c">
+      <Filter>Source Files\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="be_list.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="callback.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="errsock.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="import.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="logging.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sshpubk.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sshrand.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\agent_named_pipe_name.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\cryptoapi.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\defaults.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\escape_registry_key.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\filename.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\fontspec.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\get_system_dir.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\get_username.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\load_system32_dll.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\ltime.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\open_for_write_would_lose_data.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\security_p.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\win_strerror.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="stubs\null-plug.c">
+      <Filter>Source Files\stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="stubs\null-cipher.c">
+      <Filter>Source Files\stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="stubs\null-key.c">
+      <Filter>Source Files\stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="stubs\null-lp.c">
+      <Filter>Source Files\stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="stubs\null-mac.c">
+      <Filter>Source Files\stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="stubs\null-opener.c">
+      <Filter>Source Files\stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="stubs\null-seat.c">
+      <Filter>Source Files\stubs</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\base64_decode.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\base64_encode.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\base64_valid.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\cert-expr.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\conf_dest.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\host_ca_new_free.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\seat_dialog_text.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\percent_decode.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\percent_encode.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\key_components.c">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\aesgcm-common.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\aesgcm-ref-poly.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\aesgcm-select.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\aesgcm-sw.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\ntru.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="crypto\openssh-certs.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="windows\utils\registry.c">
+      <Filter>Source Files\windows\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

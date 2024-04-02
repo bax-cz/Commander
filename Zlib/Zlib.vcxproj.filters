@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="bzip2\blocksort.c">
+      <Filter>bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="bzip2\bzlib.c">
+      <Filter>bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="bzip2\crctable.c">
+      <Filter>bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="bzip2\huffman.c">
+      <Filter>bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="bzip2\randtable.c">
+      <Filter>bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="minizip\ioapi.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="minizip\iowin32.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="minizip\zip.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="minizip\unzip.c">
+      <Filter>minizip</Filter>
+    </ClCompile>
+    <ClCompile Include="adler32.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="compress.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="crc32.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="gzclose.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="gzlib.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="gzread.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="gzwrite.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="infback.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="inffast.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="inflate.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="inftrees.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="trees.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="uncompr.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="zutil.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="masmx64\inffas8664.c">
+      <Filter>inffastx64</Filter>
+    </ClCompile>
+    <ClCompile Include="bzip2\bzcompress.c">
+      <Filter>bzip2</Filter>
+    </ClCompile>
+    <ClCompile Include="bzip2\bzdecompress.c">
+      <Filter>bzip2</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bzip2\bzlib.h">
+      <Filter>bzip2</Filter>
+    </ClInclude>
+    <ClInclude Include="bzip2\bzlib_private.h">
+      <Filter>bzip2</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="infblock.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="infcodes.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="inffast.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="inftrees.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="infutil.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zconf.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="zutil.h">
+      <Filter>zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="FcZlib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="bzip2">
+      <UniqueIdentifier>{8ace26d0-b217-48f2-9474-65d5ed411490}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="minizip">
+      <UniqueIdentifier>{0e59c079-02f1-4bf9-98d3-5c4d2be03a8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="zlib">
+      <UniqueIdentifier>{10841a59-4c43-4b77-b626-631ea4a1ae2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inffastx64">
+      <UniqueIdentifier>{074ba27c-0344-4082-bbef-5712f0a6bf66}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
