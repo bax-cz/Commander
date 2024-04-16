@@ -16,7 +16,7 @@ NEW FEATURES/FIXES/IMPROVEMENTS:
 - look at Windows Search API (ISearchFolderItemFactory) ??
 - dark mode ??
 
-Version 0.2.8.3:
+Version 0.2.8.4:
 ----------------
 FEATURES:
 - discount (3.0.0d) - markdown support in html viewer - DONE
@@ -32,7 +32,7 @@ FEATURES:
 - simple image viewer - djvulibre(3.5.28), tiff(4.4.0), jpeg(9f), OpenJPEG(2.5.2), pcx, tga - DONE
 - implement multiple tabs-view - DONE
 - implement drag & drop with mouse selection of items - PARTLY DONE (mouse selection)
-- FTP client and PuTTY(0.80) with changes from WinSCP(6.2.3) integration - DONE
+- FTP client and PuTTY(0.81) with changes from WinSCP(6.2.3) integration - DONE
 - main toolbar and menu commands - DONE
 - unrar(7.0.7), zlib(1.3.1), bzip2(1.0.8), 7-Zip(23.01), undmg, uniso libraries integration - DONE
 - file hex/text viewer - DONE

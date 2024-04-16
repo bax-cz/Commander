@@ -397,3 +397,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /Commander/Resources/fb2_xsl.h
+/Zlib/masmx64/gvmat64.lst
+/Zlib/masmx64/inffasx64.lst

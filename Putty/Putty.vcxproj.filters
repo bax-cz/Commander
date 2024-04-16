@@ -674,5 +674,8 @@
     <ClCompile Include="windows\utils\registry.c">
       <Filter>Source Files\windows\utils</Filter>
     </ClCompile>
+    <ClCompile Include="crypto\rfc6979.c">
+      <Filter>Source Files\crypto</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
