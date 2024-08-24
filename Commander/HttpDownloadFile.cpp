@@ -412,11 +412,6 @@ namespace Commander
 
 	bool CHttpDownloadFile::getHeader( DWORD& code )
 	{
-		//_rqstHeaders = L"Authorization: Bearer tnTfAwZjwcuQu9sgVTZwgal9plDvCExV\r\n";
-		//_rqstHeaders += L"Cookie: accountToken=tnTfAwZjwcuQu9sgVTZwgal9plDvCExV\r\n";
-		//_rqstHeaders += L"Host: store4.gofile.io\r\n";
-		//_rqstHeaders += L"Referer: https://gofile.io/";
-
 		if( tryOpenUrl( L"HEAD" ) )
 		{
 			// read response
@@ -479,9 +474,6 @@ namespace Commander
 				_verifyBytes = sizeof( _buff );
 				updateRangeRequest( _rqstHeaders, _offset - _verifyBytes );
 			}
-
-			// TODO: just testing the account creation
-		//	_rqstHeaders = L"Authorization: Bearer tnTfAwZjwcuQu9sgVTZwgal9plDvCExV\r\n";
 
 			if( tryOpenUrl( L"GET" ) )
 			{
@@ -961,11 +953,6 @@ namespace Commander
 			{
 			case IDC_DOWNLOADFILE_CHOOSEFILE:
 				onChooseFileName();
-				break;
-			case IDA_PREVTAB:
-			case IDA_NEXTTAB:
-				//switchHeaderTabs();
-				PrintDebug("accelerator triggered");
 				break;
 			case IDE_DOWNLOADFILE_URL:
 			case IDE_DOWNLOADFILE_FILENAME:
