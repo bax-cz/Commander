@@ -29,9 +29,26 @@ namespace Commander
 			WCHAR urlOut[INTERNET_MAX_URL_LENGTH];
 			DWORD urlOutLen = INTERNET_MAX_URL_LENGTH;
 
-			if( FAILED( UrlEscape( url.c_str(), urlOut, &urlOutLen, URL_ESCAPE_PERCENT ) ) )
+			if( FAILED( UrlEscapeW( url.c_str(), urlOut, &urlOutLen, URL_ESCAPE_PERCENT ) ) )
 			{
 			//	PrintDebug("Error encoding URL: %ls", url.c_str());
+				return url;
+			}
+
+			return urlOut;
+		}
+
+		//
+		// Encode URL string - ANSI
+		//
+		static std::string urlEncode( const std::string& url )
+		{
+			CHAR urlOut[INTERNET_MAX_URL_LENGTH];
+			DWORD urlOutLen = INTERNET_MAX_URL_LENGTH;
+
+			if( FAILED( UrlEscapeA( url.c_str(), urlOut, &urlOutLen, URL_ESCAPE_PERCENT ) ) )
+			{
+			//	PrintDebug("Error encoding URL: %s", url.c_str());
 				return url;
 			}
 
@@ -47,7 +64,25 @@ namespace Commander
 			DWORD urlOutLen = INTERNET_MAX_URL_LENGTH;
 
 			// UrlUnescape requires non-const string (we don't use URL_UNESCAPE_INPLACE flag)
-			if( FAILED( UrlUnescape( const_cast<PWSTR>( &url[0] ), urlOut, &urlOutLen, 0 ) ) )
+			if( FAILED( UrlUnescapeW( const_cast<PWSTR>( &url[0] ), urlOut, &urlOutLen, 0 ) ) )
+			{
+			//	PrintDebug("Error decoding URL: %ls", url.c_str());
+				return url;
+			}
+
+			return urlOut;
+		}
+
+		//
+		// Decode URL string - ANSI
+		//
+		static std::string urlDecode( const std::string& url )
+		{
+			CHAR urlOut[INTERNET_MAX_URL_LENGTH];
+			DWORD urlOutLen = INTERNET_MAX_URL_LENGTH;
+
+			// UrlUnescape requires non-const string (we don't use URL_UNESCAPE_INPLACE flag)
+			if( FAILED( UrlUnescapeA( const_cast<PSTR>( &url[0] ), urlOut, &urlOutLen, 0 ) ) )
 			{
 			//	PrintDebug("Error decoding URL: %ls", url.c_str());
 				return url;

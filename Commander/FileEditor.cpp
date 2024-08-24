@@ -1454,6 +1454,7 @@ namespace Commander
 		case IDM_VIEWER_ENCODING_CP1251:
 		case IDM_VIEWER_ENCODING_ISO88595:
 		case IDM_VIEWER_ENCODING_KOI8:
+		case IDM_VIEWER_ENCODING_IBM437:
 			viewFileAnsi( menuId );
 			break;
 		}
@@ -1470,6 +1471,7 @@ namespace Commander
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_ISO88592, _useCodePage == 28592 );
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_ISO88595, _useCodePage == 28595 );
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_KOI8, _useCodePage == 20866 );
+		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_IBM437, _useCodePage == 437 );
 
 		// check current encoding
 		CheckMenuRadioItem( hMenu4, IDM_VIEWER_ENCODING_AUTO, IDM_VIEWER_ENCODING_ANSI,
@@ -1500,6 +1502,9 @@ namespace Commander
 			break;
 		case IDM_VIEWER_ENCODING_KOI8:
 			_useCodePage = 20866;
+			break;
+		case IDM_VIEWER_ENCODING_IBM437:
+			_useCodePage = 437;
 			break;
 		}
 

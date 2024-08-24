@@ -1283,7 +1283,6 @@ namespace Commander
 		case 0x44: // "D - unselect all"
 			_pParentTab->processCommand( EFcCommand::UnselectAll );
 			break;
-		case VK_F9:
 		case 0x49: // "I - combine file"
 			_pParentTab->processCommand( EFcCommand::CombineFile );
 			break;
@@ -1296,6 +1295,7 @@ namespace Commander
 		case 0x4F: // "O - compare two files content"
 			_pParentTab->processCommand( EFcCommand::CompareFiles );
 			break;
+		case VK_F9:
 		case 0x52: // "R - refresh"
 			_pParentTab->refresh();
 			break;
@@ -1647,7 +1647,7 @@ namespace Commander
 	LRESULT CALLBACK CListView::wndProc( UINT message, WPARAM wParam, LPARAM lParam )
 	{
 		// forward messages from workers first (filesytem timer messages as well)
-		if( ( message >= ( UM_FIRSTMESSAGE ) && message <= ( UM_LASTMESSAGE ) ) || message == WM_TIMER )
+		if( ( message >= ( UM_FIRSTMESSAGE ) && message <= ( UM_LAST_MESSAGE ) ) || message == WM_TIMER )
 		{
 			// notify reader worker (the timer message is CFtpReader specific)
 			if( message != WM_TIMER || ( message == WM_TIMER && wParam == FC_TIMER_KEEPALIVE_ID ) )

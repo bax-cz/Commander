@@ -16,7 +16,7 @@ namespace Commander
 		static const int BYTES_ROW = 16; // bytes per row in hex-view
 
 	public:
-		virtual bool viewFile( const std::wstring& dirName, const std::wstring& fileName, std::shared_ptr<CPanelTab> spPanel = nullptr ) override;
+		virtual bool viewFile( const std::wstring& path, const std::wstring& fileName, std::shared_ptr<CPanelTab> spPanel = nullptr ) override;
 
 		virtual void onInit() override;
 		virtual bool onClose() override;

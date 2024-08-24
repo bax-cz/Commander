@@ -63,7 +63,7 @@ namespace Commander
 				result = createWebView2Controller();
 			}
 			else
-				SendNotifyMessage( _hWndParent, UM_STATUSNOTIFY, 0, 0 );
+				SendNotifyMessage( _hWndParent, UM_WEBVW2NOTIFY, 0, 0 );
 
 			return result;
 		}).Get() );
@@ -102,7 +102,7 @@ namespace Commander
 						if( SUCCEEDED( args->get_VirtualKey( &key ) ) )
 						{
 							if( key == VK_ESCAPE )
-								SendNotifyMessage( _hWndParent, UM_STATUSNOTIFY, 2, 0 );
+								SendNotifyMessage( _hWndParent, UM_WEBVW2NOTIFY, 2, 0 );
 						}
 					}
 
@@ -132,7 +132,7 @@ namespace Commander
 				_webv2Ctl->MoveFocus( reason );
 			}
 
-			SendNotifyMessage( _hWndParent, UM_STATUSNOTIFY, ctl && _webView2, 0 );
+			SendNotifyMessage( _hWndParent, UM_WEBVW2NOTIFY, ctl && _webView2, 0 );
 
 			return result;
 		}).Get() );

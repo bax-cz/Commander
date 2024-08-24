@@ -10,6 +10,7 @@ namespace Commander
 		static const UINT resouceIdTemplate = IDD_PROGRESS;
 
 	public:
+		void extract( const std::vector<std::wstring>& items, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
 		void extract( const std::wstring& fileName, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
 		void extract( const std::wstring& archiveName, const std::wstring& localPath, const std::wstring& targetDir, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
 
@@ -31,8 +32,8 @@ namespace Commander
 
 		CArchiver::EExtractAction _action;
 
+		std::vector<std::wstring> _archiveNames;
 		std::vector<std::wstring> _entries;
-		std::wstring _archiveName;
 		std::wstring _targetDir;
 
 		std::wstring _processingPath;

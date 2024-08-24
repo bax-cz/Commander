@@ -22,6 +22,7 @@ namespace Commander
 			FMT_PNG,
 			FMT_TGA,
 			FMT_TIFF,
+			FMT_WEBP,
 			FMT_UNKNOWN
 		};
 
@@ -56,6 +57,8 @@ namespace Commander
 				return EImageType::FMT_TGA;
 			else if( StringUtils::endsWith( fileName, L".tif" ) || StringUtils::endsWith( fileName, L".tiff" ) )
 				return EImageType::FMT_TIFF;
+			else if( StringUtils::endsWith( fileName, L".webp" ) )
+				return EImageType::FMT_WEBP;
 
 			return EImageType::FMT_UNKNOWN;
 		}

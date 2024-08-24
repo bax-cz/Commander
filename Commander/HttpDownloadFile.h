@@ -10,17 +10,23 @@ namespace Commander
 	public:
 		static const UINT resouceIdTemplate = IDD_DOWNLOADFILE;
 
+	private:
+		static constexpr int FailedAttemptsMax = 10; // max consecutive download attempts
+
 	public:
 		virtual void onInit() override;
 		virtual bool onOk() override;
+		virtual bool onClose() override;
 		virtual void onDestroy() override;
 
 		virtual INT_PTR CALLBACK dialogProc( UINT message, WPARAM wParam, LPARAM lParam ) override;
+		LRESULT CALLBACK wndProcControls( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
 	private:
-		void updateDialogTitle( const std::wstring& status );
+		void updateDialogTitle( const std::wstring& status = L"" );
 		void updateGuiStatus( bool enable = true );
 		void updateLayout( int width, int height );
+		void updateHeaders( bool selChanged = true );
 		void onChooseFileName();
 		void startDownload();
 
@@ -29,13 +35,14 @@ namespace Commander
 		bool tryOpenUrl( const std::wstring& verb );
 		bool openUrlSecurityFlags( const std::wstring& verb, DWORD flags );
 		bool getHeader( DWORD& code );
-		bool downloadFile( DWORD& code );
-		bool downloadFileCore( int mode );
+		bool downloadFile( DWORD& code, LONGLONG& total );
+		bool downloadFileCore( int mode, LONGLONG& total );
 		void closeUrl();
 		bool checkFileOnDisk();
-		void readHeaders();
 		void parseUrl();
-		void parseHeaders();
+		void queryResponseHeaders();
+		void parseResponseHeaders();
+		std::wstring getStatusText( LONGLONG total );
 
 	private:
 		CBackgroundWorker _worker;
@@ -48,18 +55,24 @@ namespace Commander
 
 		std::wstring _hostName;
 		std::wstring _urlPath;
-		std::wstring _headers;
+		std::wstring _respHeaders;
+		std::wstring _rqstHeaders;
 		INTERNET_PORT _port;
 		DWORD _service;
 
 		bool _initialized;
 		bool _canceled;
+		bool _dataCorrupted;
+		bool _zeroBytesReceived;
+
+		int _attemptCount; // consecutive download attempts counter
 
 		WIN32_FIND_DATA _wfd;
 		DWORD _errorId;
 
-		LONGLONG _fileSize;
+		LONGLONG _contentLength; // original content length
 		ULONGLONG _offset; // offset from which to start download
+		ULONGLONG _verifyBytes; // bytes to verify when resume
 		bool _fileTypeText; // file is a text file
 
 		std::wstring _url;
@@ -67,5 +80,13 @@ namespace Commander
 		std::wstring _fileName;
 		std::wstring _errorMsg;
 		std::wstring _dialogTitle;
+
+		char _buff[32768];
+
+	private:
+		static LRESULT CALLBACK wndProcControlsSubclass( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR subclassId, DWORD_PTR data )
+		{
+			return reinterpret_cast<CHttpDownloadFile*>( data )->wndProcControls( hWnd, message, wParam, lParam );
+		}
 	};
 }

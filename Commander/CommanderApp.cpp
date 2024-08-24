@@ -406,6 +406,9 @@ namespace Commander
 		InitInstanceForLoadStr( FCS::inst().getFcInstance() );
 		TSetDefaultLCID();
 
+		// seeding pseudo-random number generator
+		srand( (unsigned int)time( NULL ) );
+
 		// init PuTTY
 		bcb::PuttyInitialize();
 

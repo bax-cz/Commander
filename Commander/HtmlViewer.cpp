@@ -20,7 +20,7 @@ namespace Commander
 
 		SetWindowText( _hDlg, L"Html Viewer" );
 
-		// try to initialize WebView2 browser - sends UM_STATUSNOTIFY when initialized
+		// try to initialize WebView2 browser - sends UM_WEBVW2NOTIFY when initialized
 		_upWebView2Browser = std::make_unique<CWebView2Browser>( _hDlg );
 		_webView2Initialized = false;
 
@@ -128,7 +128,7 @@ namespace Commander
 			}
 			break;
 
-		case UM_STATUSNOTIFY:
+		case UM_WEBVW2NOTIFY:
 			if( wParam != 2 )
 			{
 				if( wParam == 0 )

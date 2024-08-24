@@ -36,7 +36,7 @@ namespace Commander
 		inline HWND getHwnd() const { return _hWndNotify; }
 
 	private:
-		bool _workerThreadProc();
+		void _workerThreadProc();
 
 	private:
 		ULONGLONG _workerId;

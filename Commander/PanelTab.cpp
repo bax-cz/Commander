@@ -445,6 +445,7 @@ namespace Commander
 		bool isReadOnly = _dataManager.isInReadOnlyMode();
 		bool isMarked = !_dataManager.getMarkedEntries().empty();
 		bool isEmpty = !_dataManager.getEntryCount();
+		bool isArchive = isFile && ArchiveType::isKnownType( itemName );
 		bool canGoUp = !PathUtils::getParentDirectory( _dataManager.getCurrentDirectory() ).empty();
 
 		bool canCompareFiles = false;
@@ -466,7 +467,7 @@ namespace Commander
 		_availableCommands[EFcCommand::SetAlwaysOnTop] = true;
 		_availableCommands[EFcCommand::ExecuteItem] = true;
 		_availableCommands[EFcCommand::PackItem] = (!isFixed || isMarked) && !isReadOnly;
-		_availableCommands[EFcCommand::UnpackItem] = isFile && ArchiveType::isKnownType( itemName );
+		_availableCommands[EFcCommand::UnpackItem] = ((!isFixed || isMarked) && _dataManager.isInArchiveMode()) || ((isArchive || isMarked) && !_dataManager.isInArchiveMode());
 		_availableCommands[EFcCommand::RenameItem] = !isFixed && !isReadOnly;
 		_availableCommands[EFcCommand::CopyItems] = (!isFixed || isMarked) && !_dataManager.isInNetworkMode();
 		_availableCommands[EFcCommand::MoveItems] = (!isFixed || isMarked) && !isReadOnly;
@@ -905,7 +906,7 @@ namespace Commander
 	{
 		if( _dataManager.isInArchiveMode() )
 		{
-			extractArchiveGui( _dataManager.getRootPath(), false );
+			extractArchiveGui( getSelectedItemsPathFull( false )[0] );
 		}
 		else if( _dataManager.isInFtpMode() )
 		{
@@ -1388,18 +1389,50 @@ bool testThreadProc( const std::wstring& dirName, const std::wstring& fileName )
 	}
 
 	//
-	// Extract archive (rar, zip, tar, gz, bz2, 7z, xz)
+	// Extract (from) archive (rar, zip, tar, gz, bz2, 7z, xz)
 	//
-	bool CPanelTab::extractArchiveGui( const std::wstring& archiveName, bool extractAll )
+	bool CPanelTab::extractArchiveGui( const std::wstring& fileName )
 	{
-		if( ArchiveType::isKnownType( archiveName ) )
-		{
-			std::wstring title = L"Extract", caption;
+		std::wstring title = L"Extract", caption;
 
-			if( extractAll )
-				caption = L"Extract archive \"" + PathUtils::stripPath( archiveName ) + L"\" to:";
+		if( !_dataManager.isInArchiveMode() && !_dataManager.getMarkedEntries().empty() ) // extract multiple archives
+		{
+			std::vector<std::wstring> items;
+			auto& markedItems = _dataManager.getMarkedEntries();
+
+			for( auto it = markedItems.begin(); it != markedItems.end(); ++it )
+			{
+				if( ArchiveType::isKnownType( _dataManager.getEntryName( *it ) ) )
+					items.push_back( _dataManager.getEntryPathFull( *it ) );
+			}
+
+			if( !items.empty() )
+			{
+				caption = title + L" " + FsUtils::getFormatStrItemsCount( static_cast<int>( items.size() ), 0 ) + L" to:";
+
+				CTextInput::CParams params( title, caption, getOppositeDir(), true, false, 400 );
+				auto result = MiscUtils::showTextInputBox( params );
+
+				if( !result.empty() )
+				{
+					auto outDir = PathIsRelative( result.c_str() ) ? getOppositeDir() + result : result;
+
+					// extract known archives
+					CBaseDialog::createModeless<CFileExtractor>()->extract( items, PathUtils::addDelimiter( outDir ), _pParentPanel->getActiveTab() );
+				}
+			}
 			else
+			{
+				MessageBox( FCS::inst().getFcWindow(), L"No known archive has been selected.", title.c_str(), MB_ICONEXCLAMATION | MB_OK );
+				return false;
+			}
+		}
+		else if( _dataManager.isInArchiveMode() || ArchiveType::isKnownType( fileName ) ) // extract just this one
+		{
+			if( !_dataManager.getMarkedEntries().empty() )
 				caption = getSelectedItemsString( _dataManager.getMarkedEntries(), title, false );
+			else
+				caption = L"Extract \"" + PathUtils::stripPath( fileName ) + L"\" to:";
 
 			CTextInput::CParams params( title, caption, getOppositeDir(), true, false, 400 );
 			auto result = MiscUtils::showTextInputBox( params );
@@ -1411,7 +1444,7 @@ bool testThreadProc( const std::wstring& dirName, const std::wstring& fileName )
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	//

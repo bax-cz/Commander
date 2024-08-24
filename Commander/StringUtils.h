@@ -400,7 +400,7 @@ namespace Commander
 				return convertChar2Upr( ch1 ) == ch2;
 			} );
 
-			return ( it != str.end() ? ( it - str.begin() ) : std::string::npos );
+			return ( it != str.end() ? ( it - str.begin() ) : std::wstring::npos );
 		}
 
 		//

@@ -10,22 +10,24 @@
 #include "../OpenJPEG/convert.h"
 #include "../Pcx/pcx.h"
 #include "../Tga/tga.h"
+#include "../WebP/src/webp/decode.h"
+#include "../WebP/src/webp/demux.h"
 
 namespace Commander
 {
-
 	// Sample quiet callback expecting no client object
-	static void quiet_callback( const char *msg, void *client_data )
+	void jp2_callback( const char *msg, void *client_data )
 	{
 		(void)msg;
 		(void)client_data;
+		PrintDebug("Jp2 Error: %ls", StringUtils::convert2W( msg ).c_str());
 	}
 
-	HGLOBAL decodeJp2( const std::wstring& fileName )
+	HGLOBAL readJp2( const std::wstring& fileName )
 	{
 		HGLOBAL hDataBuf = nullptr;
 
-		opj_stream_t *l_stream = opj_stream_create_default_file_stream( fileName.c_str(), OPJ_TRUE );
+		opj_stream_t *l_stream = opj_stream_create_default_file_stream( PathUtils::getExtendedPath( fileName ).c_str(), OPJ_TRUE );
 
 		if( l_stream )
 		{
@@ -33,9 +35,9 @@ namespace Commander
 			opj_codec_t *l_codec = opj_create_decompress( StringUtils::endsWith( fileName, L".j2k" ) ? OPJ_CODEC_J2K : OPJ_CODEC_JP2 );
 
 			/* Set all callbacks to quiet */
-			opj_set_info_handler( l_codec, quiet_callback, nullptr );
-			opj_set_warning_handler( l_codec, quiet_callback, nullptr );
-			opj_set_error_handler( l_codec, quiet_callback, nullptr );
+			opj_set_info_handler( l_codec, jp2_callback, nullptr );
+			opj_set_warning_handler( l_codec, jp2_callback, nullptr );
+			opj_set_error_handler( l_codec, jp2_callback, nullptr );
 
 			opj_dparameters params;
 			opj_set_default_decoder_parameters( &params );
@@ -91,17 +93,176 @@ namespace Commander
 		return hDataBuf;
 	}
 
-	void TGAError_callback(TGA *tga, int err)
+	HGLOBAL readWebP( const std::wstring& fileName, std::vector<std::pair<HGLOBAL, UINT>>& frames, CBackgroundWorker *pWorker )
+	{
+		HGLOBAL hDataBuf = nullptr;
+
+		// webp types declarations
+		WebPDecoderConfig config;
+
+		// get image file info and initialize webp decoder
+		WIN32_FIND_DATA wfd = { 0 };
+		if( FsUtils::getFileInfo( fileName, wfd ) && WebPInitDecoderConfig( &config ) )
+		{
+			FILE *f = _wfopen( PathUtils::getExtendedPath( fileName ).c_str(), L"rb" );
+			if( f )
+			{
+				// initialize data buffer
+				size_t data_size = FsUtils::getFileSize( &wfd );
+				uint8_t *data = (uint8_t*)WebPMalloc( data_size );
+
+				// read image file data into the buffer
+				fread( data, 1, data_size, f );
+
+				// get image features
+				VP8StatusCode status = WebPGetFeatures( data, data_size, &config.input );
+				if( status == VP8_STATUS_OK )
+				{
+					config.options.use_threads = 1;
+
+					if( config.input.has_animation )
+					{
+						WebPData webp_data{ data, data_size };
+						WebPAnimDecoderOptions dec_options;
+						WebPAnimDecoderOptionsInit( &dec_options );
+						dec_options.color_mode = config.input.has_alpha ? MODE_BGRA : MODE_BGR;
+						dec_options.use_threads = 1;
+
+						// Tune 'dec_options' as needed.
+						WebPAnimDecoder *dec = WebPAnimDecoderNew( &webp_data, &dec_options );
+						WebPAnimInfo anim_info;
+						if( WebPAnimDecoderGetInfo( dec, &anim_info ) )
+						{
+							bool notificationSent = false;
+							int timestamp = 0, timestamp_prev = 0;
+							// TODO: for now ignore anim_info.loop_count
+							while( WebPAnimDecoderHasMoreFrames( dec ) && pWorker->isRunning() )
+							{
+								uint8_t *buf;
+								WebPAnimDecoderGetNext( dec, &buf, &timestamp ); // 'buf' is owned by 'dec'
+
+								// construct a bitmap from the canvas
+								int header_size = BMP_HEADER_SIZE + BMP_HEADER_ALPHA_EXTRA_SIZE;
+								int width = anim_info.canvas_width;
+								int height = anim_info.canvas_height;
+								int line_size = 4 * width;
+								int total_size = line_size * height + header_size;
+
+								// allocate memory for the output bitmap
+								hDataBuf = GlobalAlloc( GMEM_MOVEABLE, static_cast<SIZE_T>( total_size ) );
+
+								unsigned char *pBuffer = nullptr;
+								if( hDataBuf && ( pBuffer = static_cast<unsigned char*>( GlobalLock( hDataBuf ) ) ) )
+								{
+									// write the decoded bitmap header and data (32bit, non-padded)
+									BYTE *p = IconUtils::writeBmpHeader( pBuffer, width, height );
+
+									// write pixel array, bottom to top
+									for( int y = 0; y < height; ++y )
+									{
+										// write line
+										memcpy( p, buf + (uint64_t)( height - 1 - y ) * line_size, line_size );
+										p += line_size;
+									}
+
+									// unlock global data object
+									GlobalUnlock( hDataBuf );
+
+									// store the frames' bitmap data and the time delays
+									frames.push_back( std::make_pair( hDataBuf, ( timestamp - timestamp_prev ) ) );
+
+									// send the first frame data buffer to the UI thread
+									if( !notificationSent )
+									{
+										pWorker->sendNotify( 2, reinterpret_cast<LPARAM>( hDataBuf ) );
+										notificationSent = true;
+									}
+
+									timestamp_prev = timestamp;
+								}
+							}
+
+							WebPAnimDecoderReset( dec );
+						}
+
+						WebPAnimDecoderDelete( dec );
+					}
+					else
+					{
+						// decode image data
+						config.output.colorspace = config.input.has_alpha ? MODE_BGRA : MODE_BGR;
+						status = WebPDecode( data, data_size, &config );
+
+						if( status == VP8_STATUS_OK )
+						{
+							// make bmp header
+							bool has_alpha = !!WebPIsAlphaMode( config.output.colorspace );
+							int header_size = BMP_HEADER_SIZE + ( has_alpha ? BMP_HEADER_ALPHA_EXTRA_SIZE : 0 );
+							int width = config.output.width;
+							int height = config.output.height;
+							int stride = config.output.u.RGBA.stride;
+							int bytes_per_px = has_alpha ? 4 : 3;
+							int line_size = bytes_per_px * width;
+							int bmp_stride = (line_size + 3) & ~3;  // pad to 4
+							int image_size = bmp_stride * height;
+							int total_size = image_size + header_size;
+
+							// allocate memory for the output bitmap
+							hDataBuf = GlobalAlloc( GMEM_MOVEABLE, static_cast<SIZE_T>( total_size ) );
+
+							unsigned char *pBuffer = nullptr;
+							if( hDataBuf && ( pBuffer = static_cast<unsigned char*>( GlobalLock( hDataBuf ) ) ) )
+							{
+								// write the decoded bitmap data
+								BYTE *p = IconUtils::writeBmpHeader( pBuffer, width, height, has_alpha );
+
+								// write pixel array, bottom to top
+								for( int y = 0; y < height; ++y )
+								{
+									// write line
+									memcpy( p, config.output.u.RGBA.rgba + (uint64_t)( height - 1 - y ) * stride, line_size );
+									p += line_size;
+
+									// write padding zeroes
+									if( bmp_stride != line_size )
+									{
+										int padding = bmp_stride - line_size;
+										memset( p, 0, padding );
+										p += padding;
+									}
+								}
+
+								// free decoder memory buffer
+								WebPFreeDecBuffer( &config.output );
+							}
+						}
+					}
+				}
+
+				// clean up
+				WebPFree( data );
+				fclose( f );
+			}
+		}
+		else
+		{
+			PrintDebug("WebP: Library version mismatch!");
+		}
+
+		return hDataBuf;
+	}
+
+	void tga_callback( TGA *tga, int err )
 	{
 		PrintDebug("TGA Error: %ls", StringUtils::convert2W( TGAStrError( err ) ).c_str());
 	}
 
-	size_t writeBmp(TGA *tga, TGAData *data, tbyte *pbuf)
+	size_t tga_writeBmp( TGA *tga, TGAData *data, tbyte *pbuf )
 	{
 		int w = (int)tga->hdr.width;
 		int h = (int)tga->hdr.height;
 
-		tbyte *p = IconUtils::writeBmpHeader24b( pbuf, w, h );
+		tbyte *p = IconUtils::writeBmpHeader( pbuf, w, h, false );
 
 		int bpp = (tga->hdr.depth == 15) ? 2 : tga->hdr.depth / 8;
 
@@ -165,17 +326,17 @@ namespace Commander
 	{
 		HGLOBAL hDataBuf = nullptr;
 
-		TGA *tga = TGAOpen( fileName.c_str(), L"rb" );
+		TGA *tga = TGAOpen( PathUtils::getExtendedPath( fileName ).c_str(), L"rb" );
 		if( tga )
 		{
-			tga->error = TGAError_callback;
+			tga->error = tga_callback;
 
 			TGAData data = { nullptr, nullptr, nullptr, TGA_IMAGE_ID | TGA_IMAGE_DATA | TGA_RGB };
 
 			if( TGAReadImage( tga, &data ) == TGA_OK )
 			{
 				int bpp = 3; // always generate 24bit bmp instead of tga->hdr.depth / 8;
-				auto fSize = 54 + tga->hdr.width * tga->hdr.height * bpp;
+				auto fSize = BMP_HEADER_SIZE + tga->hdr.width * tga->hdr.height * bpp;
 
 				if( ( bpp * tga->hdr.width ) % 4 ) // row padding
 					fSize += ( 4 - ( bpp * tga->hdr.width ) % 4 ) * tga->hdr.height;
@@ -185,12 +346,13 @@ namespace Commander
 				unsigned char *pBuffer = nullptr;
 				if( hDataBuf && ( pBuffer = static_cast<unsigned char*>( GlobalLock( hDataBuf ) ) ) )
 				{
-					auto ret = writeBmp( tga, &data, pBuffer );
+					auto ret = tga_writeBmp( tga, &data, pBuffer );
 					_ASSERTE( ret == fSize );
 				}
 
 				TGAFreeData( &data );
 			}
+
 			TGAClose( tga );
 		}
 
@@ -201,7 +363,7 @@ namespace Commander
 	{
 		HGLOBAL hDataBuf = nullptr;
 
-		PCXContext *ctx = PCXOpen( fileName.c_str() );
+		PCXContext *ctx = PCXOpen( PathUtils::getExtendedPath( fileName ).c_str() );
 		if( ctx )
 		{
 			unsigned char *imgData = PCXReadImage( ctx );
@@ -213,7 +375,7 @@ namespace Commander
 				if( rowsize % 4 ) // row padding
 					rowsize += ( 4 - (rowsize) % 4 );
 
-				auto bmpsize = 54 + rowsize * ctx->imageHeight; // 54 bmp header length
+				auto bmpsize = BMP_HEADER_SIZE + rowsize * ctx->imageHeight;
 
 				hDataBuf = GlobalAlloc( GMEM_MOVEABLE, static_cast<SIZE_T>( bmpsize ) );
 
@@ -223,7 +385,7 @@ namespace Commander
 					const char white = (const char)0xFF;
 					int w = ctx->imageWidth, h = ctx->imageHeight;
 
-					BYTE *p = IconUtils::writeBmpHeader24b( pBuffer, w, h );
+					BYTE *p = IconUtils::writeBmpHeader( pBuffer, w, h, false );
 
 					int bpp = ctx->pcxHdr.BitsPerPixel * ctx->pcxHdr.NumBitPlanes;
 
@@ -378,6 +540,41 @@ namespace Commander
 		return hDataBuf;
 	}
 
+	HGLOBAL readGeneric( const std::wstring& fileName )
+	{
+		HGLOBAL hDataBuf = nullptr;
+
+		WIN32_FIND_DATA wfd;
+		if( FsUtils::getFileInfo( fileName, wfd ) )
+		{
+			auto fSize = FsUtils::getFileSize( &wfd );
+
+			// load image data into memory
+			HANDLE hFile = CreateFile( PathUtils::getExtendedPath( fileName ).c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL );
+			if( hFile != INVALID_HANDLE_VALUE )
+			{
+				hDataBuf = GlobalAlloc( GMEM_MOVEABLE, static_cast<SIZE_T>( fSize ) );
+
+				void *pBuffer = nullptr;
+				if( hDataBuf && ( pBuffer = GlobalLock( hDataBuf ) ) )
+				{
+					DWORD read = 0;
+					ReadFile( hFile, pBuffer, static_cast<DWORD>( fSize ), &read, NULL );
+
+					if( read != static_cast<DWORD>( fSize ) )
+					{
+						DWORD errId = GetLastError();
+						PrintDebug("ReadFile error: %u", errId);
+					}
+				}
+
+				CloseHandle( hFile );
+			}
+		}
+
+		return hDataBuf;
+	}
+
 	void CImageViewer::onInit()
 	{
 		SendMessage( _hDlg, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>( IconUtils::getStock( SIID_IMAGEFILES ) ) );
@@ -391,11 +588,14 @@ namespace Commander
 		Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 		Gdiplus::GdiplusStartup( &_gdiplusToken, &gdiplusStartupInput, NULL );
 
-		_pBrush = new Gdiplus::SolidBrush( Gdiplus::Color::Black );
-		_pGraph = nullptr;
-		_pBitmap = nullptr;
+		_upBrush = std::make_unique<Gdiplus::SolidBrush>( Gdiplus::Color::Black );
+		_upImage = nullptr;
 		_pStream = nullptr;
 		_hDataBuf = nullptr;
+		_upGraphics = nullptr;
+		_isPlaying = false;
+		_isAnimated = false;
+		_frameIdx = 0;
 
 		// get dialog menu handle
 		//_hMenu = GetMenu( _hDlg );
@@ -416,7 +616,8 @@ namespace Commander
 	{
 		cleanUp();
 
-		delete _pBrush;
+		_upBrush = nullptr;
+		_upFrameBuffer = nullptr;
 
 		Gdiplus::GdiplusShutdown( _gdiplusToken );
 
@@ -426,61 +627,60 @@ namespace Commander
 
 	void CImageViewer::cleanUp()
 	{
+		// release data stream
+		ShellUtils::safeRelease( &_pStream );
+
+		// clean up gdiplus objects
+		_upGraphics = nullptr;
+		_upImage = nullptr;
+
+		// clean up the WebP animation frames memory
+		if( !_frames.empty() )
+		{
+			for( const auto& frame : _frames )
+			{
+				if( frame.first != nullptr && frame.first != _hDataBuf )
+					GlobalFree( frame.first );
+			}
+
+			_frames.clear();
+		}
+
+		// reset animation
+		_frameIdx = 0;
+		_isAnimated = false;
+
 		// free memory
 		if( _hDataBuf )
 		{
-			if( _pBitmap )
-				delete _pBitmap;
-
-			if( _pStream )
-				_pStream->Release();
-
 			GlobalUnlock( _hDataBuf );
 			GlobalFree( _hDataBuf );
 
-			_pBitmap = nullptr;
-			_pStream = nullptr;
 			_hDataBuf = nullptr;
 		}
 	}
 
 	bool CImageViewer::_loadImageData()
 	{
-		// testing - convert jp2, pcx, tga to bmp
-		if( ImageType::getType( _tempName ) == ImageType::EImageType::FMT_JP2K )
-			_hDataBuf = decodeJp2( PathUtils::getExtendedPath( _tempName ) );
-		else if( ImageType::getType( _tempName ) == ImageType::EImageType::FMT_PCX )
-			_hDataBuf = readPcx( PathUtils::getExtendedPath( _tempName ) );
-		else if( ImageType::getType( _tempName ) == ImageType::EImageType::FMT_TGA )
-			_hDataBuf = readTga( PathUtils::getExtendedPath( _tempName ) );
-		else
+		auto imgType = ImageType::getType( _tempName );
+
+		switch( imgType )
 		{
-			WIN32_FIND_DATA wfd;
-			if( FsUtils::getFileInfo( _tempName, wfd ) )
-			{
-				auto fSize = FsUtils::getFileSize( &wfd );
-
-				// load image data into memory
-				HANDLE hFile = CreateFile( PathUtils::getExtendedPath( _tempName ).c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL );
-				if( hFile != INVALID_HANDLE_VALUE )
-				{
-					_hDataBuf = GlobalAlloc( GMEM_MOVEABLE, static_cast<SIZE_T>( fSize ) );
-
-					bool ret = false;
-					void *pBuffer = nullptr;
-					if( _hDataBuf && ( pBuffer = GlobalLock( _hDataBuf ) ) )
-					{
-						DWORD read = 0;
-						ReadFile( hFile, pBuffer, static_cast<DWORD>( fSize ), &read, NULL );
-
-						ret = ( read == static_cast<DWORD>( fSize ) );
-					}
-
-					CloseHandle( hFile );
-
-					return ret;
-				}
-			}
+		case ImageType::EImageType::FMT_JP2K:
+			_hDataBuf = readJp2( _tempName );
+			break;
+		case ImageType::EImageType::FMT_PCX:
+			_hDataBuf = readPcx( _tempName );
+			break;
+		case ImageType::EImageType::FMT_TGA:
+			_hDataBuf = readTga( _tempName );
+			break;
+		case ImageType::EImageType::FMT_WEBP:
+			_hDataBuf = readWebP( _tempName, _frames, &_worker );
+			break;
+		default:
+			_hDataBuf = readGeneric( _tempName );
+			break;
 		}
 
 		return !!_hDataBuf;
@@ -511,6 +711,9 @@ namespace Commander
 
 	void CImageViewer::viewFileCore( const std::wstring& fileName )
 	{
+		// stop the animation timer
+		KillTimer( _hDlg, FC_TIMER_GUI_ID );
+
 		_tempName = fileName;
 
 		_worker.stop();
@@ -548,47 +751,102 @@ namespace Commander
 		}
 	}
 
-	void CImageViewer::displayImage()
+	void CImageViewer::selectActiveFrame()
 	{
-		if( _pBitmap && _pBitmap->GetLastStatus() == Gdiplus::Status::Ok )
+		_ASSERTE( !_frames.empty() );
+
+		if( _frames[_frameIdx].first != nullptr )
+		{
+			ShellUtils::safeRelease( &_pStream );
+
+			_upImage = nullptr;
+
+			if( SUCCEEDED( CreateStreamOnHGlobal( _frames[_frameIdx].first, FALSE, &_pStream ) ) )
+			{
+				_upImage = std::unique_ptr<Gdiplus::Image>( Gdiplus::Image::FromStream( _pStream ) );
+			}
+		}
+		else
+			_upImage->SelectActiveFrame( &Gdiplus::FrameDimensionTime, _frameIdx );
+	}
+
+	void CImageViewer::generateFrame()
+	{
+		if( _upImage && _upImage->GetLastStatus() == Gdiplus::Status::Ok )
 		{
 			//Gdiplus::ImageAttributes attr;
 			//attr.SetColorKey( Gdiplus::Color::Magenta, Gdiplus::Color::Magenta );
 			//attr.Reset();
 
-			auto imgRect = IconUtils::calcRectFit( _hDlg, _pBitmap->GetWidth(), _pBitmap->GetHeight() );
+			auto imgRect = IconUtils::calcRectFit( _hDlg, _upImage->GetWidth(), _upImage->GetHeight() );
 
 			RECT wndRect;
 			GetClientRect( _hDlg, &wndRect );
 
 			// border strips width and height
-			int w = ( wndRect.right - imgRect.Width ) / 2;
-			int h = ( wndRect.bottom - imgRect.Height ) / 2;
+		//	int w = ( wndRect.right - imgRect.Width ) / 2;
+		//	int h = ( wndRect.bottom - imgRect.Height ) / 2;
 
-			_pGraph = Gdiplus::Graphics::FromHWND( _hDlg );
+			_upGraphics = std::unique_ptr<Gdiplus::Graphics>( Gdiplus::Graphics::FromImage( _upFrameBuffer.get() ) );
 
 			// draw border strips
-			_pGraph->FillRectangle( _pBrush, 0, 0, wndRect.right, h ); // top
-			_pGraph->FillRectangle( _pBrush, 0, h + imgRect.Height - 1, wndRect.right, h + 2 ); // bottom
-			_pGraph->FillRectangle( _pBrush, 0, h, w, imgRect.Height ); // left
-			_pGraph->FillRectangle( _pBrush, w + imgRect.Width - 1, h, w + 2, imgRect.Height ); // right
+		//	_pGraphics->FillRectangle( _upBrush.get(), 0, 0, wndRect.right, h ); // top
+		//	_pGraphics->FillRectangle( _upBrush.get(), 0, h + imgRect.Height - 1, wndRect.right, h + 2 ); // bottom
+		//	_pGraphics->FillRectangle( _upBrush.get(), 0, h, w, imgRect.Height ); // left
+		//	_pGraphics->FillRectangle( _upBrush.get(), w + imgRect.Width - 1, h, w + 2, imgRect.Height ); // right
 
 			// redraw entire window
-		//	_pGraph->FillRectangle( _pBrush, 0, 0, wndRect.right, wndRect.bottom );
+			_upGraphics->FillRectangle( _upBrush.get(), 0, 0, wndRect.right, wndRect.bottom );
 
-			_pGraph->DrawImage(
-				_pBitmap,
+			_upGraphics->DrawImage(
+				_upImage.get(),
 				imgRect,
-				0, 0, _pBitmap->GetWidth(), _pBitmap->GetHeight(),
+				0, 0, _upImage->GetWidth(), _upImage->GetHeight(),
 				Gdiplus::UnitPixel,
 				nullptr );
 				//&attr );
 		}
 	}
 
+	bool CImageViewer::loadGifInfo()
+	{
+		// animated gifs should only have 1 frame dimension
+		int dimensionCnt = _upImage->GetFrameDimensionsCount();
+		if( dimensionCnt != 1 )
+			return false;
+
+		// the "dimension" being the frame count, but I could be wrong about this
+		GUID dimensionIds;
+		if( _upImage->GetFrameDimensionsList( &dimensionIds, dimensionCnt ) != Gdiplus::Status::Ok )
+			return false;
+
+		// get frames count
+		int frameCnt = _upImage->GetFrameCount( &dimensionIds );
+
+		auto propSize = _upImage->GetPropertyItemSize( PropertyTagFrameDelay );
+		if( propSize == 0 )
+			return false;
+
+		// get the frame delay property which is an array of unsigned ints
+		Gdiplus::PropertyItem *propItems = new Gdiplus::PropertyItem[propSize];
+		_upImage->GetPropertyItem( PropertyTagFrameDelay, propSize, propItems );
+
+		_ASSERTE( propSize > frameCnt * sizeof( int ) );
+		_ASSERTE( _frames.empty() );
+
+		// push the delay values into the frames array while converting it to milliseconds
+		for( int i = 0; i < frameCnt; i++ )
+			_frames.push_back( std::make_pair( nullptr, *( reinterpret_cast<UINT*>( propItems[0].value ) + i ) * 10 ) );
+
+		// clean up
+		delete[] propItems;
+
+		return !_frames.empty();
+	}
+
 	void CImageViewer::saveImage()
 	{
-		if( _worker.isFinished() && _pStream )
+		if( _worker.isFinished() && _upImage )
 		{
 			UINT encodersCnt = 0, encodersSize = 0;
 			if( Gdiplus::GetImageEncodersSize( &encodersCnt, &encodersSize ) != Gdiplus::Status::Ok )
@@ -634,8 +892,6 @@ namespace Commander
 				{
 					if( ofn.nFilterIndex > 0 && ofn.nFilterIndex <= encodersCnt )
 					{
-						_ASSERTE( _pBitmap );
-
 						std::wstring outName = szFileName;
 						const CLSID clsid = encoders[ofn.nFilterIndex - 1].Clsid;
 						auto extArray = StringUtils::split( encoders[ofn.nFilterIndex - 1].FilenameExtension, L";" );
@@ -646,7 +902,7 @@ namespace Commander
 							outName = PathUtils::stripFileExtension( outName ) + StringUtils::convert2Lwr( ext );
 						}
 
-						_pBitmap->Save( PathUtils::getExtendedPath( outName ).c_str(), &clsid );
+						_upImage->Save( PathUtils::getExtendedPath( outName ).c_str(), &clsid );
 					}
 				}
 
@@ -786,11 +1042,41 @@ namespace Commander
 			SetCursor( NULL );
 			if( wParam )
 			{
+				ShellUtils::safeRelease( &_pStream );
+
+				_upImage = nullptr;
+
+				// display the first animation frame immediately while decoding
+				HGLOBAL hDataBuf = ( wParam == 2 ? reinterpret_cast<HGLOBAL>( lParam ) : _hDataBuf );
+
 				// create IStream from global data buffer
-				if( CreateStreamOnHGlobal( _hDataBuf, FALSE, &_pStream ) == S_OK )
+				if( SUCCEEDED( CreateStreamOnHGlobal( hDataBuf, FALSE, &_pStream ) ) )
 				{
-					_pBitmap = Gdiplus::Bitmap::FromStream( _pStream );
-					displayImage();
+					_upImage = std::unique_ptr<Gdiplus::Image>( Gdiplus::Image::FromStream( _pStream ) );
+
+					// check for animated images when decoding has finished
+					if( wParam == 1 )
+					{
+						auto imgType = ImageType::getType( _tempName );
+						_isAnimated = ( imgType == ImageType::EImageType::FMT_GIF ? loadGifInfo() : _frames.size() > 1 );
+					}
+
+					// create new frame buffer
+					RECT rct; GetClientRect( _hDlg, &rct );
+					_upFrameBuffer = std::make_unique<Gdiplus::Bitmap>( rct.right - rct.left, rct.bottom - rct.top );
+
+					if( _isAnimated )
+					{
+						// reset to the beginning
+						selectActiveFrame();
+						generateFrame();
+
+						SetTimer( _hDlg, FC_TIMER_GUI_ID, _frames[_frameIdx].second, NULL );
+					}
+					else
+						generateFrame();
+
+					InvalidateRect( _hDlg, nullptr, FALSE );
 				}
 			}
 			else
@@ -824,10 +1110,52 @@ namespace Commander
 			handleContextMenu( POINT { GET_X_LPARAM( lParam ), GET_Y_LPARAM( lParam ) } );
 			break;
 
-		case WM_PAINT:
-		case WM_SIZE:
-			displayImage();
+		case WM_TIMER:
+			KillTimer( _hDlg, FC_TIMER_GUI_ID );
+
+			// select active frame
+			_frameIdx = ( _frameIdx + 1 < _frames.size() ? _frameIdx + 1 : 0 );
+
+			selectActiveFrame();
+			generateFrame();
+
+			// restart timer
+			SetTimer( _hDlg, FC_TIMER_GUI_ID, _frames[_frameIdx].second, NULL );
+			InvalidateRect( _hDlg, nullptr, FALSE );
 			break;
+
+		case WM_PAINT:
+			if( _upFrameBuffer )
+			{
+				PAINTSTRUCT ps;
+				HDC hdc = BeginPaint( _hDlg, &ps );
+
+				// TODO: LockBits to access the raw bitmap data, create a BITMAPINFO structure, then SetDIBitsToDevice
+			//	_upFrameBuffer->LockBits();
+			//	BITMAPINFO bi;
+			//	SetDIBitsToDevice(hdc, 0, 0, _upFrameBuffer->GetWidth(), _upFrameBuffer->GetHeight(), 0, 0, 0, 0, );
+
+				Gdiplus::Graphics graphics( hdc );
+				graphics.DrawImage( _upFrameBuffer.get(), 0, 0 );
+
+				EndPaint( _hDlg, &ps );
+			}
+			break;
+
+		case WM_ERASEBKGND:
+			return (INT_PTR)( _upFrameBuffer != nullptr );
+
+		case WM_SIZE:
+		{
+			// create new frame buffer
+			RECT rct; GetClientRect( _hDlg, &rct );
+			_upFrameBuffer = std::make_unique<Gdiplus::Bitmap>( rct.right - rct.left, rct.bottom - rct.top );
+
+			// re-generate frame
+			generateFrame();
+			InvalidateRect( _hDlg, nullptr, FALSE );
+			break;
+		}
 		}
 
 		return (INT_PTR)false;

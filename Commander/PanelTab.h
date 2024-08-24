@@ -82,7 +82,7 @@ namespace Commander
 		void fileViewerGui( const std::wstring& dirName, const std::wstring& fileName, bool viewHex );
 		void fileEditorGui( const std::wstring& dirName, const std::wstring& fileName );
 		bool createArchiveGui( const std::wstring& fileName );
-		bool extractArchiveGui( const std::wstring& archiveName, bool extractAll = true );
+		bool extractArchiveGui( const std::wstring& fileName );
 		bool makeNewFileGui( const std::wstring& curPath );
 		bool makeDirectoryGui( const std::wstring& curPath );
 		bool makeDiskImageGui( const std::wstring& curPath );

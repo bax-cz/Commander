@@ -182,6 +182,12 @@
     <ClCompile Include="C\SwapBytes.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C\ZstdDec.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C\Xxh64.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C\7z.h">
@@ -308,6 +314,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C\XzEnc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C\Xxh64.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C\ZstdDec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -340,6 +340,17 @@ namespace Commander
 		}
 
 		//
+		// Generate a random number within given interval
+		//
+		static int getRand( int numMin, int numMax )
+		{
+			int range = numMax - numMin + 1;
+			int numOut = rand() % range + numMin;
+
+			return numOut;
+		}
+
+		//
 		// Calculate round value
 		//
 		static double round( double num )

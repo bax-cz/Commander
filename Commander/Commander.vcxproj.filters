@@ -1235,6 +1235,36 @@
     <ClCompile Include="HttpDownloadFile.cpp">
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\Xxh64Reg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZstdDecoder.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\AvbHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\LvmHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ZstdHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\FindSignature.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\MbrHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Udf\UdfHandler.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Udf\UdfIn.cpp">
+      <Filter>Source Files\7zip\7z</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\MyMap.cpp">
+      <Filter>Source Files\7zip\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Commander.rc">

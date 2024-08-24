@@ -3,6 +3,8 @@
 #include "Commander.h"
 #include "HttpDownloadFile.h"
 #include "MiscUtils.h"
+#include "NetworkUtils.h"
+#include "TabViewUtils.h"
 
 namespace Commander
 {
@@ -15,7 +17,14 @@ namespace Commander
 		SendDlgItemMessage( _hDlg, IDE_DOWNLOADFILE_URL, EM_SETLIMITTEXT, (WPARAM)INTERNET_MAX_URL_LENGTH, 0 );
 		SendDlgItemMessage( _hDlg, IDE_DOWNLOADFILE_FILENAME, EM_SETLIMITTEXT, (WPARAM)MAX_WPATH, 0 );
 
-		//SetWindowText( _hDlg, L"Download file from URL" );
+		// subclass all the controls just to receive an accelerator key notification :(
+		SetWindowSubclass( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ),        wndProcControlsSubclass, 0, reinterpret_cast<DWORD_PTR>( this ) );
+		SetWindowSubclass( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ),    wndProcControlsSubclass, 1, reinterpret_cast<DWORD_PTR>( this ) );
+		SetWindowSubclass( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ),    wndProcControlsSubclass, 2, reinterpret_cast<DWORD_PTR>( this ) );
+		SetWindowSubclass( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ),   wndProcControlsSubclass, 3, reinterpret_cast<DWORD_PTR>( this ) );
+		SetWindowSubclass( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_CHOOSEFILE ), wndProcControlsSubclass, 4, reinterpret_cast<DWORD_PTR>( this ) );
+		SetWindowSubclass( GetDlgItem( _hDlg, IDOK ),                        wndProcControlsSubclass, 5, reinterpret_cast<DWORD_PTR>( this ) );
+		SetWindowSubclass( GetDlgItem( _hDlg, IDCANCEL ),                    wndProcControlsSubclass, 6, reinterpret_cast<DWORD_PTR>( this ) );
 
 		_hInternet = nullptr;
 		_hSession = nullptr;
@@ -23,8 +32,12 @@ namespace Commander
 		_initialized = false;
 		_canceled = false;
 		_fileTypeText = false;
-		_fileSize = -1ll;
+		_dataCorrupted = false;
+		_zeroBytesReceived = false;
+		_contentLength = -1ll;
 		_offset = 0ull;
+		_verifyBytes = 0ull;
+		_attemptCount = FailedAttemptsMax; // 10 consecutive failed attempts stops the download process
 		_errorId = NO_ERROR;
 		_service = INTERNET_SERVICE_HTTP;
 		_port = INTERNET_DEFAULT_HTTPS_PORT;
@@ -39,6 +52,9 @@ namespace Commander
 		SendDlgItemMessage( _hDlg, IDC_DOWNLOADFILE_PROGRESS, PBM_SETMARQUEE, 1, 0 );
 		SendDlgItemMessage( _hDlg, IDC_DOWNLOADFILE_PROGRESS, PBM_SETRANGE, 0, MAKELPARAM( 0, 100 ) );
 		SendDlgItemMessage( _hDlg, IDC_DOWNLOADFILE_PROGRESS, PBM_SETPOS, 0, 0 );
+
+		TabUtils::insertItem( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ), L"Response Headers" );
+		TabUtils::insertItem( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ), L"Request Headers" );
 
 		MiscUtils::getWindowText( _hDlg, _dialogTitle );
 		MiscUtils::centerOnWindow( FCS::inst().getFcWindow(), _hDlg );
@@ -64,7 +80,6 @@ namespace Commander
 		updateGuiStatus( false );
 
 		_canceled = false;
-		_headers.clear();
 
 		_worker.start();
 	}
@@ -74,26 +89,60 @@ namespace Commander
 	//
 	bool CHttpDownloadFile::onOk()
 	{
-		if( !_initialized && MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ), _dlgResult ) )
-			_url = _dlgResult;
+		if( !_worker.isRunning() )
+		{
+			if( !_initialized && MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ), _dlgResult ) )
+				_url = _dlgResult;
 
-		if( _initialized && MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), _dlgResult ) )
-			_fileName = _dlgResult;
+			if( _initialized && MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), _dlgResult ) )
+				_fileName = _dlgResult;
 
-		startDownload();
+			// update the request headers content when the request tab is selected
+			if( TabCtrl_GetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ) ) == 1 )
+			{
+				MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ), _rqstHeaders );
+			}
+
+			startDownload();
+		}
+		else
+		{
+			// stop downloading
+			EnableWindow( GetDlgItem( _hDlg, IDOK ), FALSE );
+			_worker.stop_async( true );
+		}
 
 		return false;
 	}
 
-	void CHttpDownloadFile::onDestroy()
+	bool CHttpDownloadFile::onClose()
 	{
+		if( _worker.isRunning() && MessageBox( _hDlg, L"Cancel downloading file?", _dialogTitle.c_str(), MB_ICONQUESTION | MB_YESNO ) == IDNO )
+			return false;
+
+		KillTimer( _hDlg, FC_TIMER_KEEPALIVE_ID );
+
 		closeUrl();
 
+		return true;
+	}
+
+	void CHttpDownloadFile::onDestroy()
+	{
 		if( _hInternet )
 		{
 			InternetCloseHandle( _hInternet );
 			_hInternet = nullptr;
 		}
+
+		// remove subclass from all the controls
+		RemoveWindowSubclass( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ),        wndProcControlsSubclass, 0 );
+		RemoveWindowSubclass( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ),    wndProcControlsSubclass, 1 );
+		RemoveWindowSubclass( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ),    wndProcControlsSubclass, 2 );
+		RemoveWindowSubclass( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ),   wndProcControlsSubclass, 3 );
+		RemoveWindowSubclass( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_CHOOSEFILE ), wndProcControlsSubclass, 4 );
+		RemoveWindowSubclass( GetDlgItem( _hDlg, IDOK ),                        wndProcControlsSubclass, 5 );
+		RemoveWindowSubclass( GetDlgItem( _hDlg, IDCANCEL ),                    wndProcControlsSubclass, 6 );
 	}
 
 	void CHttpDownloadFile::updateDialogTitle( const std::wstring& status )
@@ -101,7 +150,12 @@ namespace Commander
 		std::wostringstream sstrTitle;
 
 		if( !status.empty() )
+		{
 			sstrTitle << L"[" << status << L"] - " << _dialogTitle;
+
+			if( _attemptCount != FailedAttemptsMax )
+				sstrTitle << L" [" << FailedAttemptsMax - _attemptCount << L"/" << FailedAttemptsMax << L"]";
+		}
 		else
 			sstrTitle << _dialogTitle;
 		
@@ -126,7 +180,25 @@ namespace Commander
 		EnableWindow( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), enable && _initialized );
 		EnableWindow( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_CHOOSEFILE ), enable && _initialized );
 
+		auto tabId = TabCtrl_GetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ) );
+		Edit_SetReadOnly( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ), !enable || tabId == 0 );
+
+		SetDlgItemText( _hDlg, IDC_DOWNLOADFILE_STATUSTEXT, L"" );
 		SetDlgItemText( _hDlg, IDOK, _initialized ? L"Download" : L"Get HEAD" );
+	}
+
+	void CHttpDownloadFile::updateHeaders( bool selChanged )
+	{
+		auto id = TabCtrl_GetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ) );
+
+		// store the request headers text when changing to response headers
+		if( selChanged && !_worker.isRunning() && id == 0 )
+		{
+			MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ), _rqstHeaders );
+		}
+
+		Edit_SetReadOnly( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ), _worker.isRunning() || id == 0 );
+		SetDlgItemText( _hDlg, IDE_DOWNLOADFILE_HEADERS, id ? _rqstHeaders.c_str() : _respHeaders.c_str() );
 	}
 
 	void CHttpDownloadFile::onChooseFileName()
@@ -181,7 +253,7 @@ namespace Commander
 					InternetSetOption( _hUrl, INTERNET_OPTION_SECURITY_FLAGS, &dwFlags, sizeof( dwFlags ) );
 				}
 
-				if( HttpSendRequest( _hUrl, _headers.c_str(), static_cast<DWORD>( _headers.length() ), NULL, 0 ) )
+				if( HttpSendRequest( _hUrl, _rqstHeaders.c_str(), static_cast<DWORD>( _rqstHeaders.length() ), NULL, 0 ) )
 					return true;
 			}
 		}
@@ -194,9 +266,9 @@ namespace Commander
 		bool ret = true;
 
 		// open url
-		_hUrl = InternetOpenUrl( _hInternet, &_url[0], _headers.c_str(), static_cast<DWORD>( _headers.length() ), 0, INTERNET_NO_CALLBACK );
+		_hUrl = InternetOpenUrl( _hInternet, &_url[0], _rqstHeaders.c_str(), static_cast<DWORD>( _rqstHeaders.length() ), 0, INTERNET_NO_CALLBACK );
 
-		if( !_hUrl ) // TODO: test and handle errora
+		if( !_hUrl ) // TODO: test and handle errors
 		{
 			_errorId = GetLastError();
 
@@ -304,19 +376,55 @@ namespace Commander
 			delete[] buf;
 		}
 
-		return strOut;
+		return strOut.c_str();
+	}
+
+	void updateRangeRequest( std::wstring& rqstHeaders, ULONGLONG offset )
+	{
+		bool found = false;
+
+		if( !rqstHeaders.empty() )
+		{
+			auto entries = StringUtils::split( rqstHeaders, L"\r\n" );
+			size_t off = 0;
+
+			for( auto& entry : entries )
+			{
+				if( StringUtils::startsWith( entry, L"Range:" ) )
+				{
+					found = true;
+					entry = L"Range: bytes=" + std::to_wstring( offset ) + L"-";
+				}
+			}
+
+			if( found )
+				rqstHeaders = StringUtils::join( entries, L"\r\n" );
+		}
+
+		if( !found )
+		{
+			if( !rqstHeaders.empty() && !StringUtils::endsWith( rqstHeaders, L"\r\n" ) )
+				rqstHeaders += L"\r\n";
+
+			rqstHeaders += L"Range: bytes=" + std::to_wstring( offset ) + L"-";
+		}
 	}
 
 	bool CHttpDownloadFile::getHeader( DWORD& code )
 	{
+		//_rqstHeaders = L"Authorization: Bearer tnTfAwZjwcuQu9sgVTZwgal9plDvCExV\r\n";
+		//_rqstHeaders += L"Cookie: accountToken=tnTfAwZjwcuQu9sgVTZwgal9plDvCExV\r\n";
+		//_rqstHeaders += L"Host: store4.gofile.io\r\n";
+		//_rqstHeaders += L"Referer: https://gofile.io/";
+
 		if( tryOpenUrl( L"HEAD" ) )
 		{
 			// read response
 			if( queryStatusCode( _hUrl, code ) )
 			{
-				// read and parse headers
-				readHeaders();
-				parseHeaders();
+				// read and parse response headers
+				queryResponseHeaders();
+				parseResponseHeaders();
 
 				if( code >= HTTP_STATUS_OK && code <= HTTP_STATUS_PARTIAL_CONTENT )
 					return true;
@@ -331,39 +439,61 @@ namespace Commander
 		return false;
 	}
 
-	bool CHttpDownloadFile::downloadFile( DWORD& code )
+	bool CHttpDownloadFile::downloadFile( DWORD& code, LONGLONG& total )
 	{
 		int mode = std::ios::out;
 
+		// shall we resume download or overwrite the existing file
 		if( checkFileOnDisk() )
 		{
-			// file already exists, ask user what to do
-			mode = ( _fileSize != _offset ) ? 0 : 1;
-			_worker.sendMessage( 2, reinterpret_cast<LPARAM>( &mode ) );
+			// is this the first attempt?
+			if( _attemptCount == FailedAttemptsMax )
+			{
+				// file already exists and is in (in)complete state
+				int state = ( _contentLength > _offset ) ? 0 : 1;
 
-			if( _fileSize != _offset )
-				mode = ( mode == IDYES ) ? std::ios::app : ( mode == IDNO ) ? std::ios::out : -1; // yes-append, no-overwrite, cancel-cancel
+				// ask user what to do
+				_worker.sendMessage( 2, reinterpret_cast<LPARAM>( &state ) );
+
+				if( _contentLength > _offset )
+					mode = ( state == IDYES ) ? std::ios::app : ( state == IDNO ) ? std::ios::out : -1; // yes-append, no-overwrite, cancel-cancel
+				else
+					mode = ( state == IDYES ) ? std::ios::out : -1; // yes-overwrite, no-cancel
+			}
 			else
-				mode = ( mode == IDYES ) ? std::ios::out : -1; // yes-overwrite, no-cancel
+				mode = std::ios::app;
 		}
 
 		if( mode != -1 )
 		{
-			// reset offset when overwriting file
-			if( mode != std::ios::app )
-				_offset = 0ull;
-			else
-				_headers = L"Range: bytes=" + std::to_wstring( _offset ) + L"-";
+			// reset offset when overwriting file or file is smaller than the buffer size
+			if( mode != std::ios::app || _offset < sizeof( _buff ) )
+			{
+				mode = std::ios::out;
+				_offset = _verifyBytes = 0ull;
+			}
+			else if( mode == std::ios::app )
+			{
+				// move offset to redownload and verify previously downloaded data
+				mode |= std::ios::in;
+				_verifyBytes = sizeof( _buff );
+				updateRangeRequest( _rqstHeaders, _offset - _verifyBytes );
+			}
+
+			// TODO: just testing the account creation
+		//	_rqstHeaders = L"Authorization: Bearer tnTfAwZjwcuQu9sgVTZwgal9plDvCExV\r\n";
 
 			if( tryOpenUrl( L"GET" ) )
 			{
 				// read response
+				queryResponseHeaders();
+
 				if( queryStatusCode( _hUrl, code ) )
 				{
 					if( code >= HTTP_STATUS_OK && code <= HTTP_STATUS_PARTIAL_CONTENT )
 					{
 						// finally download the file
-						return downloadFileCore( mode );
+						return downloadFileCore( mode, total );
 					}
 				}
 				else
@@ -377,38 +507,83 @@ namespace Commander
 		return false;
 	}
 
-	bool CHttpDownloadFile::downloadFileCore( int mode )
+	bool verifyContent( std::fstream& fs, char *buff, std::streamsize buff_len )
+	{
+		bool ret = false;
+
+		if( fs.is_open() )
+		{
+			// read data from the end of the file
+			fs.seekg( buff_len * -1, std::ios::end );
+
+			if( fs.good() )
+			{
+				// alloc memory for data buffer
+				std::string fdata; fdata.resize( buff_len );
+
+				// read data
+				if( fs.read( &fdata[0], buff_len ).gcount() == buff_len )
+				{
+					// compare the data buffers
+					ret = !memcmp( &fdata[0], buff, buff_len );
+				}
+
+				fs.seekg( 0, std::ios::end );
+			}
+		}
+
+		return ret;
+	}
+
+	bool CHttpDownloadFile::downloadFileCore( int mode, LONGLONG& total )
 	{
 		if( _hUrl )
 		{
-			char data[32768];
 			DWORD dwBytesRead = 0;
-			LONGLONG total = _offset;
+			total = _offset;
 
-			// is binary file
-			mode |= _fileTypeText ? 0 : std::ios::binary;
-			std::ofstream fs( PathUtils::getExtendedPath( _curDir + _fileName ), mode );
+			// always download as a binary file (even when _fileTypeText)
+			mode |= std::ios::binary;
+			std::fstream fs( PathUtils::getExtendedPath( _curDir + _fileName ), mode );
 
 			ULONGLONG ticks = GetTickCount64();
-			BOOL ret = FALSE;
+			BOOL verify = ( mode & std::ios::app ), ret = FALSE;
 
 			// read the data and store it in a file
-			while( ( ret = InternetReadFile( _hUrl, data, sizeof( data ), &dwBytesRead ) ) && dwBytesRead > 0 )
+			while( ( ret = InternetReadFile( _hUrl, _buff, sizeof( _buff ), &dwBytesRead ) ) && dwBytesRead != 0 )
 			{
+				if( verify ) // verify the first data buffer
+				{
+					if( _verifyBytes != dwBytesRead || !verifyContent( fs, _buff, dwBytesRead ) )
+					{
+						_dataCorrupted = true;
+						return false;
+					}
+
+					verify = FALSE;
+					continue;
+				}
+
 				total += dwBytesRead;
 
-				if( _fileSize > 0ll && ticks + 200 < GetTickCount64() )
+				if( _contentLength > 0ll && ticks + 200 < GetTickCount64() )
 				{
 					// report progress every 200ms
-					_worker.sendNotify( 3, (LPARAM)( ( (double)total / (double)_fileSize ) * 100.0 ) );
+					_worker.sendNotify( 3, static_cast<LPARAM>( total ) );
 					ticks = GetTickCount64();
+
+					// reset failed attempts counter
+					_attemptCount = FailedAttemptsMax;
 				}
 
 				// write data to file
-				fs.write( data, dwBytesRead );
+				fs.write( _buff, dwBytesRead );
 
 				if( !_worker.isRunning() )
+				{
+					_canceled = true;
 					return false;
+				}
 			}
 
 			// reading data has been interrupted
@@ -418,31 +593,60 @@ namespace Commander
 				return false;
 			}
 
-			if( _worker.isRunning() ) // report the last "100 %"
-				_worker.sendNotify( 3, (LPARAM)100.0 );
+			if( dwBytesRead == 0 )
+				_zeroBytesReceived = true;
 
-			return _fileSize > 0ll ? ( total == _fileSize ) : true;
+			if( _worker.isRunning() && total == _contentLength ) // report the last "100 %"
+				_worker.sendNotify( 3, static_cast<LPARAM>( total ) );
+
+			return _contentLength > 0ll ? ( total == _contentLength ) : true;
 		}
 
 		return false;
 	}
 
-	void CHttpDownloadFile::readHeaders()
+	void CHttpDownloadFile::queryResponseHeaders()
 	{
 		WCHAR *buf = nullptr;
 		DWORD bufLen = 0;
 		DWORD idx = 0;
 
-		_headers = queryRawHeader( _hUrl, &buf, &bufLen, &idx );
+		_respHeaders = queryRawHeader( _hUrl, &buf, &bufLen, &idx );
 
 		while( idx != 0 )
 		{
-			_headers += L"\r\n\r\n";
-			_headers += queryRawHeader( _hUrl, &buf, &bufLen, &idx );
+			_respHeaders += L"\r\n\r\n";
+			_respHeaders += queryRawHeader( _hUrl, &buf, &bufLen, &idx );
 		}
 
 		if( buf )
 			delete[] buf;
+	}
+
+	std::wstring getInternetLastResponse()
+	{
+		DWORD errNetId = NO_ERROR, errNetDescLen = 0;
+		InternetGetLastResponseInfo( &errNetId, NULL, &errNetDescLen );
+
+		if( errNetDescLen++ > 0 )
+		{
+			std::wstring errNetDesc( errNetDescLen, L'\0' );
+			if( InternetGetLastResponseInfo( &errNetId, &errNetDesc[0], &errNetDescLen ) )
+				return errNetDesc.c_str();
+		}
+
+		return L"";
+	}
+
+	std::wstring getHttpStatusText( HINTERNET hUrl, DWORD status )
+	{
+		std::wstring statusCode = std::to_wstring( status );
+		std::wstring statusText = queryStatusText( hUrl );
+
+		if( !statusText.empty() )
+			return statusCode + L" - " + statusText;
+
+		return statusCode;
 	}
 
 	bool CHttpDownloadFile::_workerProc()
@@ -463,7 +667,10 @@ namespace Commander
 
 		if( _hInternet )
 		{
+			LONGLONG bytesTotal = -1ll;
 			DWORD status = 0;
+			_dataCorrupted = false;
+			_zeroBytesReceived = false;
 			_errorId = NO_ERROR;
 
 			if( !_initialized )
@@ -476,15 +683,30 @@ namespace Commander
 			else
 			{
 				// get the data from the file at a given url
-				ret = downloadFile( status );
+				ret = downloadFile( status, bytesTotal );
 			}
 
 			if( ret == false )
 			{
 				if( _errorId != NO_ERROR )
 					_errorMsg = SysUtils::getErrorMessage( _errorId, GetModuleHandle( L"wininet.dll" ) );
+				else if( _dataCorrupted )
+					_errorMsg = L"Unable to resume download because of data corruption.";
 				else
-					_errorMsg = std::to_wstring( status ) + L": " + queryStatusText( _hUrl );
+				{
+					_errorMsg.clear();
+
+					if( status >= HTTP_STATUS_OK && status <= HTTP_STATUS_PARTIAL_CONTENT )
+						_errorMsg = getInternetLastResponse();
+
+					if( bytesTotal != -1ll && bytesTotal != _contentLength )
+					{
+						_errorMsg += L"\r\nExpected: " + FsUtils::bytesToString2( _contentLength ) + L" bytes";
+						_errorMsg += L"\r\nReceived: " + FsUtils::bytesToString2( bytesTotal ) + L" bytes";
+					}
+
+					_errorMsg += L"\r\nHttp Status: " + getHttpStatusText( _hUrl, status );
+				}
 			}
 
 			closeUrl();
@@ -496,6 +718,7 @@ namespace Commander
 	bool CHttpDownloadFile::checkFileOnDisk()
 	{
 		ZeroMemory( &_wfd, sizeof( _wfd ) );
+		_offset = 0ull;
 
 		if( FsUtils::getFileInfo( _curDir + _fileName, _wfd ) )
 		{
@@ -520,7 +743,7 @@ namespace Commander
 		uc.lpszUrlPath = urlPathBuf;
 		uc.dwUrlPathLength = INTERNET_MAX_URL_LENGTH;
 
-		if( InternetCrackUrl( &_url[0], static_cast<DWORD>( _url.length() ), ICU_ESCAPE, &uc ) )
+		if( InternetCrackUrl( &_url[0], static_cast<DWORD>( _url.length() ), 0, &uc ) )
 		{
 			std::wstring fname = PathUtils::stripPath( uc.lpszUrlPath, L'/' );
 			fname = StringUtils::cutToChar( fname, L'?' );
@@ -531,15 +754,15 @@ namespace Commander
 			_port = uc.nPort;
 			_service = ( uc.nScheme == INTERNET_SCHEME_HTTPS ? INTERNET_SERVICE_HTTP : uc.nScheme );
 			_urlPath = uc.lpszUrlPath;
-			_fileName = PathUtils::sanitizeFileName( fname );
+			_fileName = PathUtils::sanitizeFileName( NetUtils::urlDecode( fname ) );
 		}
 	}
 
-	void CHttpDownloadFile::parseHeaders()
+	void CHttpDownloadFile::parseResponseHeaders()
 	{
-		if( !_headers.empty() )
+		if( !_respHeaders.empty() )
 		{
-			auto entries = StringUtils::split( _headers, L"\r\n" );
+			auto entries = StringUtils::split( _respHeaders, L"\r\n" );
 			size_t off = 0;
 
 			for( const auto& entry : entries )
@@ -547,27 +770,45 @@ namespace Commander
 				if( StringUtils::startsWith( entry, L"Content-Type:" ) )
 				{
 					if( entry.find( L"text/plain" ) != std::wstring::npos )
-						_fileTypeText = true;
+						_fileTypeText = true; // the _fileTypeText is currently ignored
 				}
 				else if( StringUtils::startsWith( entry, L"Content-Length:" ) )
 				{
 					try {
-						_fileSize = std::stoll( entry.substr( 15 ) );
+						_contentLength = std::stoll( entry.substr( 15 ) );
 					}
 					catch( std::invalid_argument ) {
 						PrintDebug("Invalid %ls", entry.c_str());
-						_fileSize = 0ll;
+						_contentLength = 0ll;
 					}
 					catch( std::out_of_range ) {
 						PrintDebug("OutOfRange %ls", entry.c_str());
-						_fileSize = 0ll;
+						_contentLength = 0ll;
 					}
 				}
 				else if( StringUtils::startsWith( entry, L"Content-Disposition:" ) )
 				{
-					if( ( off = entry.find( L"filename=" ) ) != std::wstring::npos )
+					std::wstring fname;
+
+					if( ( off = StringUtils::findCaseInsensitive( entry, L"FILENAME*=" ) ) != std::wstring::npos ) // utf-8
 					{
-						std::wstring fname;
+						fname = entry.substr( off + 10 );
+						auto encoding = StringUtils::cutToChar( fname, L'\'' );
+						StringUtils::cutToChar( fname, L'\'' );
+
+						// convert the filename to UTF-8
+						if( StringUtils::findCaseInsensitive( encoding, L"UTF-8" ) != std::wstring::npos )
+						{
+							std::string tmpName = StringUtils::convert2A( fname/*, 28591*/ ); // TODO: codepage 8859-1
+							tmpName = NetUtils::urlDecode( tmpName );
+							fname = StringUtils::convert2W( tmpName );
+						}
+						else
+							fname = NetUtils::urlDecode( fname );
+					}
+
+					if( fname.empty() && ( off = StringUtils::findCaseInsensitive( entry, L"FILENAME=" ) ) != std::wstring::npos )
+					{
 						// strip quotes off the filename
 						if( entry[off + 9] == L'\"' )
 						{
@@ -575,13 +816,54 @@ namespace Commander
 							fname = entry.substr( off + 10, offEnd != std::wstring::npos ? offEnd - off - 10 : offEnd );
 						}
 						else
-							fname = entry.substr( off + 9 );
+						{
+							size_t offEnd = entry.find_last_of( L';' );
+							fname = entry.substr( off + 9, offEnd != std::wstring::npos ? offEnd - off - 9 : offEnd );
+						}
 
-						_fileName = PathUtils::sanitizeFileName( fname );
+						StringUtils::trim( fname );
+						fname = NetUtils::urlDecode( fname );
 					}
+
+					// sanitize the filename
+					_fileName = fname.empty() ? fname : PathUtils::sanitizeFileName( fname );
 				}
 			}
 		}
+	}
+
+	std::wstring CHttpDownloadFile::getStatusText( LONGLONG total )
+	{
+		std::wostringstream sstr;
+		sstr << FsUtils::bytesToString( total );
+
+		if( _contentLength > 0ll )
+			sstr << L"/" << FsUtils::bytesToString( _contentLength );
+
+		return sstr.str();
+	}
+
+	LRESULT CALLBACK CHttpDownloadFile::wndProcControls( HWND hWnd, UINT message, WPARAM wp, LPARAM lp )
+	{
+		switch( message )
+		{
+		case WM_COMMAND:
+			switch( LOWORD( wp ) )
+			{
+			case IDA_PREVTAB:
+			case IDA_NEXTTAB:
+			{
+				int tabId = TabCtrl_GetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ) );
+				TabCtrl_SetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ), !tabId ? 1 : 0 );
+
+				updateHeaders();
+				break;
+			}
+			}
+			break;
+		}
+
+		return DefSubclassProc( hWnd, message, wp, lp );
 	}
 
 	//
@@ -603,11 +885,11 @@ namespace Commander
 				else
 					_initialized = true;
 
-				SetDlgItemText( _hDlg, IDE_DOWNLOADFILE_HEADERS, _headers.c_str() );
 				SetDlgItemText( _hDlg, IDE_DOWNLOADFILE_FILENAME, _fileName.c_str() );
 
+				updateHeaders( false );
 				updateGuiStatus();
-				updateDialogTitle( L"" );
+				updateDialogTitle();
 			}
 			else
 			{
@@ -625,27 +907,49 @@ namespace Commander
 				else if( wParam == 3 )
 				{
 					// update progress
-					updateDialogTitle( std::to_wstring( lParam ) + L" %" );
-					SendDlgItemMessage( _hDlg, IDC_DOWNLOADFILE_PROGRESS, PBM_SETPOS, static_cast<WPARAM>( lParam ), 0 );
+					double pct = (double)lParam / (double)_contentLength * 100.0;
+					updateDialogTitle( std::to_wstring( static_cast<int>( pct ) ) + L" %" );
+					SetDlgItemText( _hDlg, IDC_DOWNLOADFILE_STATUSTEXT, getStatusText( static_cast<LONGLONG>( lParam ) ).c_str() );
+					SendDlgItemMessage( _hDlg, IDC_DOWNLOADFILE_PROGRESS, PBM_SETPOS, static_cast<WPARAM>( pct ), 0 );
+
+					// change the download button caption
+					if( !IsWindowEnabled( GetDlgItem( _hDlg, IDOK ) ) )
+					{
+						EnableWindow( GetDlgItem( _hDlg, IDOK ), TRUE );
+						SetDlgItemText( _hDlg, IDOK, L"Stop" );
+						updateHeaders( false );
+					}
 					break;
 				}
 
 				if( wParam == FC_ARCHDONEFAIL && !_canceled )
 				{
-					std::wostringstream sstr;
-					sstr << L"File download error from given URL.\r\n" << _errorMsg;
-					MessageBox( _hDlg, sstr.str().c_str(), L"Download File Error", MB_ICONEXCLAMATION | MB_OK );
+					// retry on error and/or when zero bytes received
+					if( _attemptCount && !_dataCorrupted && ( _zeroBytesReceived || _errorId != NO_ERROR ) )
+					{
+						_attemptCount--;
+
+						updateDialogTitle( L"Retrying.." );
+						SetTimer( _hDlg, FC_TIMER_KEEPALIVE_ID, MiscUtils::getRand( 4500, 5500 ), NULL );
+						break;
+					}
+					else
+					{
+						std::wostringstream sstr;
+						sstr << L"File download error from given URL.\r\n" << _errorMsg;
+						MessageBox( _hDlg, sstr.str().c_str(), L"Download File Error", MB_ICONEXCLAMATION | MB_OK );
+
+						// reset failed attempts counter
+						_attemptCount = FailedAttemptsMax;
+					}
 				}
 				else if( wParam == FC_ARCHDONEOK )
 					MessageBox( _hDlg, L"File successfully downloaded.", L"Download File", MB_ICONINFORMATION | MB_OK );
 
-				if( _canceled ) // when canceled stay initialized
-					_canceled = false;
-			//	else
-			//		_initialized = false;
+				_canceled = false;
 
 				updateGuiStatus();
-				updateDialogTitle( L"" );
+				updateDialogTitle();
 
 				if( wParam == FC_ARCHDONEOK )
 					close(); // close the dialog
@@ -658,14 +962,28 @@ namespace Commander
 			case IDC_DOWNLOADFILE_CHOOSEFILE:
 				onChooseFileName();
 				break;
+			case IDA_PREVTAB:
+			case IDA_NEXTTAB:
+				//switchHeaderTabs();
+				PrintDebug("accelerator triggered");
+				break;
 			case IDE_DOWNLOADFILE_URL:
 			case IDE_DOWNLOADFILE_FILENAME:
 				if( HIWORD( wParam ) == EN_CHANGE )
 				{
 					if( _initialized && LOWORD( wParam ) == IDE_DOWNLOADFILE_URL )
 					{
-						// url has been changed - reinit
-						_initialized = false;
+						std::wstring url;
+						MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ), url );
+
+						if( url != _url )
+						{
+							// url has been changed - reinit
+							_initialized = false;
+
+							_rqstHeaders.clear();
+							updateHeaders( false );
+						}
 					}
 
 					updateGuiStatus();
@@ -675,6 +993,19 @@ namespace Commander
 			default:
 				break;
 			}
+			break;
+
+		case WM_NOTIFY:
+			if( LOWORD( wParam ) == IDC_DOWNLOADFILE_HEADERS && ((LPNMHDR)lParam)->code == TCN_SELCHANGE )
+			{
+				updateHeaders();
+			}
+			break;
+
+		case WM_TIMER:
+			// restart the failed download
+			startDownload();
+			KillTimer( _hDlg, FC_TIMER_KEEPALIVE_ID );
 			break;
 
 		case WM_SIZE:
@@ -693,6 +1024,7 @@ namespace Commander
 		MoveWindow( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), 11, height - 72, width - 57, 23, true );
 		MoveWindow( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_CHOOSEFILE ), width - 39, height - 73, 27, 23, true );
 		MoveWindow( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_PROGRESS ), 11, height - 31, 92, 15, true );
+		MoveWindow( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_STATUSTEXT ), 107, height - 30, 190, 13, true );
 		MoveWindow( GetDlgItem( _hDlg, IDOK ), width - 168, height - 34, 75, 23, true );
 		MoveWindow( GetDlgItem( _hDlg, IDCANCEL ), width - 86, height - 34, 75, 23, true );
 	}

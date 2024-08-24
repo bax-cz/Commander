@@ -362,6 +362,7 @@
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArchiveExports.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\ArjHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\AvbHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Base64Handler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Bz2Handler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabBlockInStream.cpp" />
@@ -371,6 +372,7 @@
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabRegister.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\CoderMixer2.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\DummyOutStream.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\FindSignature.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\HandlerOut.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\InStreamWithCRC.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Common\ItemNameUtils.cpp" />
@@ -389,8 +391,10 @@
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoHeader.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoIn.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Iso\IsoRegister.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\LvmHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\LzhHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\LzmaHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\MbrHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisDecode.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Nsis\NsisIn.cpp" />
@@ -404,6 +408,8 @@
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarOut.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarRegister.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Tar\TarUpdate.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Udf\UdfHandler.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\Udf\UdfIn.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimHandlerOut.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Wim\WimIn.cpp" />
@@ -418,6 +424,7 @@
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipOut.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipRegister.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Zip\ZipUpdate.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Archive\ZstdHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Common\CreateCoder.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Common\CWrappers.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Common\FilePathAutoRename.cpp" />
@@ -486,6 +493,7 @@
     <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZDecoder.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZlibDecoder.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZlibEncoder.cpp" />
+    <ClCompile Include="..\Lzma\CPP\7zip\Compress\ZstdDecoder.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Crypto\7zAes.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Crypto\7zAesRegister.cpp" />
     <ClCompile Include="..\Lzma\CPP\7zip\Crypto\HmacSha1.cpp" />
@@ -500,6 +508,7 @@
     <ClCompile Include="..\Lzma\CPP\Common\CRC.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\CrcReg.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\IntToString.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\MyMap.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\MyString.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\MyVector.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\MyXml.cpp" />
@@ -510,6 +519,7 @@
     <ClCompile Include="..\Lzma\CPP\Common\StringToInt.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\UTFConvert.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\Wildcard.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\Xxh64Reg.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\XzCrc64Init.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\XzCrc64Reg.cpp" />
     <ClCompile Include="..\Lzma\CPP\Windows\FileDir.cpp" />
@@ -678,6 +688,9 @@
     </ProjectReference>
     <ProjectReference Include="..\Unrar\UnRarDll.vcxproj">
       <Project>{e815c46c-36c4-499f-bbc2-e772c6b17971}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\WebP\WebP.vcxproj">
+      <Project>{105fa9a3-ecb5-48fd-915d-c0a729e7af44}</Project>
     </ProjectReference>
     <ProjectReference Include="..\WinMerge\WinMerge.vcxproj">
       <Project>{c105212c-a113-464a-9707-aca153f9ea2f}</Project>

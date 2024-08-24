@@ -139,22 +139,19 @@ namespace Commander
 		if( rowsize % 4 ) // row padding
 			rowsize += ( 4 - (rowsize) % 4 );
 
-		auto bmpsize = 54 + rowsize * rrect.h; // 54 means BMP header length
+		auto bmpsize = BMP_HEADER_SIZE + rowsize * rrect.h;
 
 		_hDataBuf = GlobalAlloc( GMEM_MOVEABLE, static_cast<SIZE_T>( bmpsize ) );
 
 		if( _hDataBuf && ( _pBuff = static_cast<BYTE*>( GlobalLock( _hDataBuf ) ) ) )
 		{
-			const char white = (const char)0xFF;
-			int w = rrect.w, h = rrect.h;
-
 			/* Make BMP header */
-			BYTE *p = IconUtils::writeBmpHeader24b( _pBuff, w, h );
+			BYTE *p = IconUtils::writeBmpHeader( _pBuff, rrect.w, rrect.h, false );
 			_buffLen = bmpsize;
 
 			/* Render page */
 			if( !ddjvu_page_render( page, mode, &prect, &rrect, fmt, rowsize, (char*)p ) )
-				memset( p, white, rowsize * rrect.h );
+				memset( p, (BYTE)0xFF/*white*/, rowsize * rrect.h );
 		}
 
 		/* Free */

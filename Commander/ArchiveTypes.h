@@ -134,7 +134,7 @@ namespace Commander
 			case EArchType::FMT_CAB:
 			case EArchType::FMT_WIM:
 		//	case EArchType::FMT_DMG:
-		//	case EArchType::FMT_ISO:
+			case EArchType::FMT_ISO:
 			case EArchType::FMT_XAR:
 			case EArchType::FMT_RPM:
 			case EArchType::FMT_DEB:
@@ -155,9 +155,9 @@ namespace Commander
 			case EArchType::FMT_DMG:
 				upArchiver = std::make_unique<CArchDmg>();
 				break;
-			case EArchType::FMT_ISO:
-				upArchiver = std::make_unique<CArchIso>();
-				break;
+		//	case EArchType::FMT_ISO:
+		//		upArchiver = std::make_unique<CArchIso>();
+		//		break;
 			case EArchType::FMT_TAR:
 				upArchiver = std::make_unique<CArchTar>( TarLib::ECompressionType::tarNone );
 				break;

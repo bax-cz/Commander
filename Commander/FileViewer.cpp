@@ -286,15 +286,20 @@ namespace Commander
 		SendMessage( _hStatusBar, SB_SETTEXT, MAKEWORD( 3, SBT_NOBORDERS ), (LPARAM)bom.c_str() );
 	}
 
-	bool CFileViewer::viewFile( const std::wstring& dirName, const std::wstring& fileName, std::shared_ptr<CPanelTab> spPanel )
+	bool CFileViewer::viewFile( const std::wstring& path, const std::wstring& fileName, std::shared_ptr<CPanelTab> spPanel )
 	{
 		_worker.stop();
 
-		_fileName = PathUtils::addDelimiter( dirName ) + fileName;
+		// user specified ansi codepage (or hexview) and an encoding
+		WORD codePage = LOWORD( _dlgUserDataPtr );
+		WORD encoding = HIWORD( _dlgUserDataPtr );
+
+		_fileName = PathUtils::addDelimiter( path ) + fileName;
 		_findFromIdxBeg = _findFromIdxEnd = 0;
 		_findFromOffset = 0ll;
-		_isHex = static_cast<bool>( !!LOWORD( _dlgUserDataPtr ) );
-		_useEncoding = static_cast<StringUtils::EUtfBom>( HIWORD( _dlgUserDataPtr ) );
+		_isHex = static_cast<bool>( codePage == 1 ); // 1 means view as hex
+		_useCodePage = ( codePage > 1 ) ? static_cast<UINT>( codePage ) : _useCodePage;
+		_useEncoding = static_cast<StringUtils::EUtfBom>( encoding );
 		_outText = L"Please wait..";
 
 		if( spPanel )
@@ -325,13 +330,13 @@ namespace Commander
 		}
 		else
 		{
-			if( _spPanel == nullptr && ArchiveType::isKnownType( dirName ) )
+			if( _spPanel == nullptr && ArchiveType::isKnownType( path ) )
 			{
 				_tempFileName = FCS::inst().getTempPath() + PathUtils::stripPath( fileName );
 
 				// file extractor sends UM_READERNOTIFY notification when done
 				CBaseDialog::createModeless<CFileExtractor>( _hDlg )->extract(
-					dirName, fileName, FCS::inst().getTempPath(), CArchiver::EExtractAction::Overwrite );
+					path, fileName, FCS::inst().getTempPath(), CArchiver::EExtractAction::Overwrite );
 			}
 			else // read file directly
 				SendMessage( _hDlg, UM_READERNOTIFY, FC_ARCHDONEOK, 0 );
@@ -1750,6 +1755,7 @@ namespace Commander
 		case IDM_VIEWER_ENCODING_CP1251:
 		case IDM_VIEWER_ENCODING_ISO88595:
 		case IDM_VIEWER_ENCODING_KOI8:
+		case IDM_VIEWER_ENCODING_IBM437:
 			viewFileAnsi( menuId );
 			break;
 		}
@@ -1766,6 +1772,7 @@ namespace Commander
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_ISO88592, _useCodePage == 28592 );
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_ISO88595, _useCodePage == 28595 );
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_KOI8, _useCodePage == 20866 );
+		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_IBM437, _useCodePage == 437 );
 
 		// update word wrap menu item state
 		HMENU hMenu3 = GetSubMenu( _hMenu, 3 );
@@ -1803,6 +1810,9 @@ namespace Commander
 			break;
 		case IDM_VIEWER_ENCODING_KOI8:
 			_useCodePage = 20866;
+			break;
+		case IDM_VIEWER_ENCODING_IBM437:
+			_useCodePage = 437;
 			break;
 		}
 

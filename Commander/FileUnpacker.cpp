@@ -16,7 +16,25 @@ namespace Commander
 
 		ShellUtils::CComInitializer _com( COINIT_APARTMENTTHREADED );
 
-		return _upArchiver->extractEntries( _entries, _targetDir );
+		// extract the first archive
+		bool ret = _upArchiver->extractEntries( _entries, _targetDir );
+
+		// extract others when there is more of them
+		if( _archiveNames.size() > 1 )
+		{
+			for( auto it = _archiveNames.begin() + 1; it != _archiveNames.end(); ++it )
+			{
+				auto upArchiver = ArchiveType::createArchiver( *it );
+				upArchiver->init( *it, nullptr, nullptr, &_worker, _action );
+
+				ret = ret && upArchiver->extractEntries( { *it }, _targetDir );
+
+				if( !_worker.isRunning() )
+					break;
+			}
+		}
+
+		return ret;
 	}
 
 	void CFileExtractor::onInit()
@@ -74,6 +92,18 @@ namespace Commander
 		SelectObject( hdc, original );
 	}
 
+	void CFileExtractor::extract( const std::vector<std::wstring>& items, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action )
+	{
+		_archiveNames = items;
+		_targetDir = targetDir;
+		_action = action;
+		_bytesTotal = spPanel->getDataManager()->getMarkedEntriesSize();
+		_bytesProcessed = 0ull;
+		_entries.push_back( items[0] );
+
+		extractCore();
+	}
+
 	void CFileExtractor::extract( const std::wstring& fileName, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action )
 	{
 		_targetDir = targetDir;
@@ -86,22 +116,17 @@ namespace Commander
 		else
 			_entries.push_back( fileName );
 
-		_archiveName = _entries[0];
-
-		if( spPanel->getDataManager()->isInArchiveMode() )
-		{
-			_archiveName = spPanel->getDataManager()->getRootPath();
-		}
+		_archiveNames.push_back( spPanel->getDataManager()->isInArchiveMode() ? spPanel->getDataManager()->getRootPath() : _entries[0] );
 
 		extractCore();
 	}
 
 	void CFileExtractor::extract( const std::wstring& archiveName, const std::wstring& localPath, const std::wstring& targetDir, CArchiver::EExtractAction action )
 	{
-		_archiveName = archiveName;
+		_archiveNames.push_back( archiveName );
 		_targetDir = targetDir;
 		_action = action;
-		_bytesTotal = 0ull; // TODO ?
+		_bytesTotal = 0ull; // TODO: calculating would slow the whole process down (.tar archives especially)
 		_bytesProcessed = 0ull;
 
 		_entries.push_back( PathUtils::addDelimiter( archiveName ) + localPath );
@@ -111,10 +136,12 @@ namespace Commander
 
 	void CFileExtractor::extractCore()
 	{
-		_upArchiver = ArchiveType::createArchiver( _archiveName );
-		_upArchiver->init( _archiveName, nullptr, nullptr, &_worker, _action );
+		_ASSERTE( !_archiveNames.empty() );
 
-		_processingVolume = _archiveName;
+		_upArchiver = ArchiveType::createArchiver( _archiveNames[0] );
+		_upArchiver->init( _archiveNames[0], nullptr, nullptr, &_worker, _action );
+
+		_processingVolume = _archiveNames[0];
 
 		auto textFrom = MiscUtils::makeCompactPath( GetDlgItem( _hDlg, IDC_TEXTFROM ), _entries[0] );
 		auto textTo = MiscUtils::makeCompactPath( GetDlgItem( _hDlg, IDC_TEXTTO ), _targetDir );

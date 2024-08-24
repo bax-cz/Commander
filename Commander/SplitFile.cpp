@@ -267,7 +267,7 @@ namespace Commander
 		if( hFile != INVALID_HANDLE_VALUE )
 		{
 			LARGE_INTEGER pos; pos.QuadPart = min( _fileSize - _bytesProcessed, _partSize );
-			if( !!SetFilePointer( hFile, pos.LowPart, &pos.HighPart, FILE_BEGIN ) && SetEndOfFile( hFile ) )
+			if( SetFilePointerEx( hFile, pos, NULL, FILE_BEGIN ) && SetEndOfFile( hFile ) )
 			{
 				SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
 				std::streamsize written = 0ll, read = 0ll, remainder = _partSize;
@@ -287,13 +287,13 @@ namespace Commander
 					written += static_cast<std::streamsize>( bytesWritten );
 					_bytesProcessed += static_cast<ULONGLONG>( bytesWritten );
 
-					if( written == _partSize )
-						break; // finished writing this file part
-
 					if( written + sizeof( _dataBuf ) > _partSize )
 						remainder = _partSize - written;
 
 					retVal = ( read == static_cast<std::streamsize>( bytesWritten ) );
+
+					if( written == _partSize )
+						break; // finished writing the file part
 				}
 			}
 			else

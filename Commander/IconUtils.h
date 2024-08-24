@@ -7,6 +7,9 @@
 #include <gdiplus.h>
 #include <Uxtheme.h>
 
+#define BMP_HEADER_SIZE             54
+#define BMP_HEADER_ALPHA_EXTRA_SIZE 16  /* for alpha info */
+
 namespace Commander
 {
 	struct IconUtils
@@ -542,38 +545,63 @@ namespace Commander
 		}
 
 		//
-		// Create and write BMP header with given Width and Height for 24-bit bitmap into the memory buffer
+		// Helper function to put 2 byte value (little endian) into the memory buffer
 		//
-		static BYTE *writeBmpHeader24b( BYTE *buf, int w, int h )
+		static void put16LE( BYTE *buf, UINT value )
 		{
-			BYTE *p = buf;
-			memcpy( p, "BM", 2 ); p += 2;
+			buf[0] = ( value >> 0 ) & 0xFF;
+			buf[1] = ( value >> 8 ) & 0xFF;
+		}
 
-			/* BMP File header */
-			*p++ = (BYTE)(h * w * 3 + 3 * h * (w % 2) + 54) & 0xFF;
-			*p++ = (BYTE)((h * w * 3 + 3 * h * (w % 2) + 54) >> 8) & 0xFF;
-			*p++ = (BYTE)((h * w * 3 + 3 * h * (w % 2) + 54) >> 16) & 0xFF;
-			*p++ = (BYTE)((h * w * 3 + 3 * h * (w % 2) + 54) >> 24) & 0xFF;
-			*p++ = (0) & 0xFF; *p++ = ((0) >> 8) & 0xFF; *p++ = ((0) >> 16) & 0xFF; *p++ = ((0) >> 24) & 0xFF;
-			*p++ = (54) & 0xFF; *p++ = ((54) >> 8) & 0xFF; *p++ = ((54) >> 16) & 0xFF; *p++ = ((54) >> 24) & 0xFF;
+		//
+		// Helper function to put 4 byte value (little endian) into the memory buffer
+		//
+		static void put32LE( BYTE *buf, UINT value )
+		{
+			put16LE( buf + 0, ( value >> 0  ) & 0xFFFF );
+			put16LE( buf + 2, ( value >> 16 ) & 0xFFFF );
+		}
 
-			/* BMP Info header */
-			*p++ = (40) & 0xFF; *p++ = ((40) >> 8) & 0xFF; *p++ = ((40) >> 16) & 0xFF; *p++ = ((40) >> 24) & 0xFF;
-			*p++ = (BYTE)((w) & 0xFF); *p++ = (BYTE)((w) >> 8) & 0xFF; *p++ = (BYTE)((w) >> 16) & 0xFF; *p++ = (BYTE)((w) >> 24) & 0xFF;
-			*p++ = (BYTE)((h) & 0xFF); *p++ = (BYTE)((h) >> 8) & 0xFF; *p++ = (BYTE)((h) >> 16) & 0xFF; *p++ = (BYTE)((h) >> 24) & 0xFF;
-			*p++ = (1) & 0xFF; *p++ = ((1) >> 8) & 0xFF;
-			*p++ = (24) & 0xFF; *p++ = ((24) >> 8) & 0xFF;
-			*p++ = (0) & 0xFF; *p++ = ((0) >> 8) & 0xFF; *p++ = ((0) >> 16) & 0xFF; *p++ = ((0) >> 24) & 0xFF;
-			*p++ = (BYTE)(3 * h * w + 3 * h * (w % 2)) & 0xFF;
-			*p++ = (BYTE)((h * w * 3 + 3 * h * (w % 2)) >> 8) & 0xFF;
-			*p++ = (BYTE)((h * w * 3 + 3 * h * (w % 2)) >> 16) & 0xFF;
-			*p++ = (BYTE)((h * w * 3 + 3 * h * (w % 2)) >> 24) & 0xFF;
-			*p++ = (7834) & 0xFF; *p++ = ((7834) >> 8) & 0xFF; *p++ = ((7834) >> 16) & 0xFF; *p++ = ((7834) >> 24) & 0xFF;
-			*p++ = (7834) & 0xFF; *p++ = ((7834) >> 8) & 0xFF; *p++ = ((7834) >> 16) & 0xFF; *p++ = ((7834) >> 24) & 0xFF;
-			*p++ = (0) & 0xFF; *p++ = ((0) >> 8) & 0xFF; *p++ = ((0) >> 16) & 0xFF; *p++ = ((0) >> 24) & 0xFF;
-			*p++ = (0) & 0xFF; *p++ = ((0) >> 8) & 0xFF; *p++ = ((0) >> 16) & 0xFF; *p++ = ((0) >> 24) & 0xFF;
+		//
+		// Create and write BMP header with given Width and Height for 24/32-bit bitmap into the memory buffer
+		//
+		static BYTE *writeBmpHeader( BYTE *buf, int width, int height, bool has_alpha = true )
+		{
+			int header_size = BMP_HEADER_SIZE + ( has_alpha ? BMP_HEADER_ALPHA_EXTRA_SIZE : 0 );
+			int bytes_per_px = has_alpha ? 4 : 3;
+			int line_size = bytes_per_px * width;
+			int bmp_stride = ( line_size + 3 ) & ~3;  // pad to 4
+			int image_size = bmp_stride * height;
+			int total_size = image_size + header_size;
 
-			return p;
+			// bitmap file header
+			put16LE( buf + 0, 0x4D42 );                // signature 'BM'
+			put32LE( buf + 2, total_size );            // size including header
+			put32LE( buf + 6, 0 );                     // reserved
+			put32LE( buf + 10, header_size );          // offset to pixel array
+
+			// bitmap info header
+			put32LE( buf + 14, header_size - 14 );     // DIB header size
+			put32LE( buf + 18, width );                // dimensions
+			put32LE( buf + 22, height );               // no vertical flip
+			put16LE( buf + 26, 1 );                    // number of planes
+			put16LE( buf + 28, bytes_per_px * 8 );     // bits per pixel
+			put32LE( buf + 30, has_alpha ? BI_BITFIELDS : BI_RGB );
+			put32LE( buf + 34, image_size );
+			put32LE( buf + 38, 2400 );                 // x pixels/meter
+			put32LE( buf + 42, 2400 );                 // y pixels/meter
+			put32LE( buf + 46, 0 );                    // number of palette colors
+			put32LE( buf + 50, 0 );                    // important color count
+
+			if( has_alpha ) // BITMAPV3INFOHEADER complement
+			{
+				put32LE( buf + 54, 0x00FF0000 );       // red mask
+				put32LE( buf + 58, 0x0000FF00 );       // green mask
+				put32LE( buf + 62, 0x000000FF );       // blue mask
+				put32LE( buf + 66, 0xFF000000 );       // alpha mask
+			}
+
+			return buf + header_size;
 		}
 
 		//

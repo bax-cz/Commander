@@ -33,13 +33,10 @@ namespace Commander
 		// start worker thread
 		_isRunning = true;
 		_isFinished = false;
+		_notifyFinished = false;
 
 		_upWorkerThread = std::make_unique<std::thread>( [this] {
-
-			bool retVal = _workerThreadProc();
-
-			if( _notifyFinished )
-				sendNotify( static_cast<WPARAM>( retVal ), static_cast<LPARAM>( _workerId ) );
+			_workerThreadProc();
 		} );
 
 		return _upWorkerThread != nullptr;
@@ -63,23 +60,25 @@ namespace Commander
 		_isRunning = false;
 	}
 
-	bool CBackgroundWorker::_workerThreadProc()
+	void CBackgroundWorker::_workerThreadProc()
 	{
 		std::stringstream sstr;
 		sstr << std::this_thread::get_id();
 
 		_workerId = std::stoull( sstr.str() );
 
+		// execute the user function
 		bool retVal = _funcToExecute();
 
-		if( _isRunning )
+		if( _isRunning || _notifyFinished )
 		{
 			_isRunning = false;
+			_isFinished = true;
+
+			// send notification
 			sendNotify( static_cast<WPARAM>( retVal ), static_cast<LPARAM>( _workerId ) );
 		}
-
-		_isFinished = true;
-
-		return retVal;
+		else
+			_isFinished = true;
 	}
 }

@@ -79,12 +79,14 @@
     <ClCompile Include="C\Sort.c" />
     <ClCompile Include="C\SwapBytes.c" />
     <ClCompile Include="C\Threads.c" />
+    <ClCompile Include="C\Xxh64.c" />
     <ClCompile Include="C\Xz.c" />
     <ClCompile Include="C\XzCrc64.c" />
     <ClCompile Include="C\XzCrc64Opt.c" />
     <ClCompile Include="C\XzDec.c" />
     <ClCompile Include="C\XzEnc.c" />
     <ClCompile Include="C\XzIn.c" />
+    <ClCompile Include="C\ZstdDec.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C\7z.h" />
@@ -126,9 +128,11 @@
     <ClInclude Include="C\Sha256.h" />
     <ClInclude Include="C\Sort.h" />
     <ClInclude Include="C\Threads.h" />
+    <ClInclude Include="C\Xxh64.h" />
     <ClInclude Include="C\Xz.h" />
     <ClInclude Include="C\XzCrc64.h" />
     <ClInclude Include="C\XzEnc.h" />
+    <ClInclude Include="C\ZstdDec.h" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="Asm\x86\LzFindOpt.asm">

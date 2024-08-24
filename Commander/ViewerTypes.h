@@ -29,7 +29,8 @@ namespace Commander
 			FMT_PALM,
 			FMT_MOBI,
 			FMT_FCBK2,
-			FMT_MARKD
+			FMT_MARKD,
+			FMT_NFO
 		};
 
 		//
@@ -53,6 +54,8 @@ namespace Commander
 				return EViewType::FMT_FCBK2;
 			else if( StringUtils::endsWith( fileName, L".md" ) )
 				return EViewType::FMT_MARKD;
+			else if( StringUtils::endsWith( fileName, L".nfo" ) )
+				return EViewType::FMT_NFO;
 			else if( ImageType::isKnownType( fileName ) )
 				return EViewType::FMT_IMAGE;
 
@@ -64,6 +67,8 @@ namespace Commander
 		//
 		static CBaseViewer *createViewer( const std::wstring& fileName, bool viewHex )
 		{
+			LPARAM param = MAKELPARAM( viewHex, StringUtils::NOBOM );
+
 			if( !viewHex )
 			{
 				switch( getType( fileName ) )
@@ -79,6 +84,8 @@ namespace Commander
 					return CBaseDialog::createModeless<CHtmlViewer>();
 				case EViewType::FMT_IMAGE:
 					return CBaseDialog::createModeless<CImageViewer>();
+				case EViewType::FMT_NFO:
+					param = viewHex ? param : MAKELPARAM( 437, StringUtils::NOBOM ); /* codepage IBM437 */
 				case EViewType::FMT_PALM:
 				case EViewType::FMT_TEXT:
 				case EViewType::FMT_BINARY:
@@ -87,7 +94,7 @@ namespace Commander
 				}
 			}
 
-			return CBaseDialog::createModeless<CFileViewer>( nullptr, MAKELPARAM( viewHex, StringUtils::NOBOM ) );
+			return CBaseDialog::createModeless<CFileViewer>( nullptr, param );
 		}
 
 		// do not instantiate this class/struct

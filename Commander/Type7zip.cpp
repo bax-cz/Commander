@@ -56,6 +56,7 @@ namespace Commander
 	DEFINE_GUID( CLSID_CFormatLzma,0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0x0A, 0x00, 0x00 );
 	DEFINE_GUID( CLSID_CFormatXz,  0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0x0C, 0x00, 0x00 );
 	DEFINE_GUID( CLSID_CFormatPpmd,0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0x0D, 0x00, 0x00 );
+	DEFINE_GUID( CLSID_CFormatUdf, 0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0xE0, 0x00, 0x00 );
 	DEFINE_GUID( CLSID_CFormatXar, 0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0xE1, 0x00, 0x00 );
 	DEFINE_GUID( CLSID_CFormatDmg, 0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0xE4, 0x00, 0x00 );
 	DEFINE_GUID( CLSID_CFormatWim, 0x23170F69, 0x40C1, 0x278A, 0x10, 0x00, 0x00, 0x01, 0x10, 0xE6, 0x00, 0x00 );
@@ -278,23 +279,23 @@ namespace Commander
 		{
 			// Create folders for file
 			int slashPos = _filePath.ReverseFind_PathSepar();
-			if (slashPos >= 0)
-				CreateComplexDir(_directoryPath + us2fs(_filePath.Left(slashPos)));
+			if( slashPos >= 0 )
+				CreateComplexDir( _directoryPath + us2fs( _filePath.Left( slashPos ) ) );
 		}
 
-		FString fullProcessedPath = _directoryPath + us2fs(_filePath);
+		FString fullProcessedPath = _directoryPath + us2fs( _filePath );
 		_diskFilePath = fullProcessedPath;
 
-		if (_processedFileInfo.isDir)
+		if( _processedFileInfo.isDir )
 		{
-			CreateComplexDir(fullProcessedPath);
+			CreateComplexDir( fullProcessedPath );
 		}
 		else
 		{
 			NFind::CFileInfo fi;
-			if (fi.Find(fullProcessedPath))
+			if( fi.Find( fullProcessedPath ) )
 			{
-				if (!DeleteFileAlways(fullProcessedPath))
+				if( !DeleteFileAlways( fullProcessedPath ) )
 				{
 				//	PrintError("Cannot delete output file", fullProcessedPath);
 					return E_ABORT;
@@ -302,8 +303,8 @@ namespace Commander
 			}
 
 			_outFileStreamSpec = new COutFileStream;
-			CMyComPtr<ISequentialOutStream> outStreamLoc(_outFileStreamSpec);
-			if (!_outFileStreamSpec->Open(fullProcessedPath, CREATE_ALWAYS))
+			CMyComPtr<ISequentialOutStream> outStreamLoc( _outFileStreamSpec );
+			if( !_outFileStreamSpec->Create_ALWAYS( fullProcessedPath ) )
 			{
 			//	PrintError("Cannot open output file", fullProcessedPath);
 				return E_ABORT;
@@ -311,6 +312,7 @@ namespace Commander
 			_outFileStream = outStreamLoc;
 			*outStream = outStreamLoc.Detach();
 		}
+
 		return S_OK;
 	}
 
@@ -571,15 +573,15 @@ namespace Commander
 			res.InsertAtFront( L'0' );
 
 		UString fileName = VolName;
-		fileName += '.';
+		fileName.Add_Dot();
 		fileName += res;
 		fileName += VolExt;
 
 		COutFileStream *streamSpec = new COutFileStream;
 		CMyComPtr<ISequentialOutStream> streamLoc( streamSpec );
 
-		if( !streamSpec->Create( us2fs( fileName ), false ) )
-			return ::GetLastError();
+		if( !streamSpec->Create_NEW( us2fs( fileName ) ) )
+			return GetLastError_noZero_HRESULT();
 
 		*volumeStream = streamLoc.Detach();
 
@@ -612,8 +614,8 @@ namespace Commander
 	{
 		const GUID *clsid = getClsidFromFileName( _fileName );
 
-		CMyComPtr<IInArchive> archive;
-		if( CreateObject( clsid, &IID_IInArchive, (void **)&archive ) != S_OK )
+		CMyComPtr<IInArchive> archive; // try UDF handler first when opening ISO files
+		if( CreateObject( clsid == &CLSID_CFormatIso ? &CLSID_CFormatUdf : clsid, &IID_IInArchive, (void **)&archive ) != S_OK )
 		{
 			_errorMessage = L"Cannot get class object";
 			return false;
@@ -639,8 +641,13 @@ namespace Commander
 			const UInt64 scanSize = 1 << 23;
 			if( archive->Open( file, &scanSize, openCallback ) != S_OK )
 			{
-				_errorMessage = L"Cannot open file as archive";
-				return false;
+				// when opening ISO as UDF fails, try to use the default ISO handler
+				if( clsid != &CLSID_CFormatIso || CreateObject( clsid, &IID_IInArchive, (void **)&archive ) != S_OK
+					|| archive->Open( file, &scanSize, openCallback ) != S_OK )
+				{
+					_errorMessage = L"Cannot open file as archive";
+					return false;
+				}
 			}
 		}
 
@@ -815,8 +822,8 @@ namespace Commander
 	{
 		const GUID *clsid = getClsidFromFileName( _fileName );
 
-		CMyComPtr<IInArchive> archive;
-		if( CreateObject( clsid, &IID_IInArchive, (void **)&archive ) != S_OK )
+		CMyComPtr<IInArchive> archive; // try UDF handler first when opening ISO files
+		if( CreateObject( clsid == &CLSID_CFormatIso ? &CLSID_CFormatUdf : clsid, &IID_IInArchive, (void **)&archive ) != S_OK )
 		{
 			_errorMessage = L"CArch7zip: Cannot get class object.";
 			return false;
@@ -841,8 +848,13 @@ namespace Commander
 			const UInt64 scanSize = 1 << 23;
 			if( archive->Open( file, &scanSize, openCallback ) != S_OK )
 			{
-				_errorMessage = L"CArch7zip: Cannot open file as an archive.";
-				return false;
+				// when opening ISO as UDF fails, try to use the default ISO handler
+				if( clsid != &CLSID_CFormatIso || CreateObject( clsid, &IID_IInArchive, (void **)&archive ) != S_OK
+					|| archive->Open( file, &scanSize, openCallback ) != S_OK )
+				{
+					_errorMessage = L"CArch7zip: Cannot open file as an archive.";
+					return false;
+				}
 			}
 		}
 
@@ -1046,7 +1058,7 @@ namespace Commander
 		{
 			COutFileStream *outFileStreamSpec = new COutFileStream;
 			CMyComPtr<IOutStream> outFileStream = outFileStreamSpec;
-			if( !outFileStreamSpec->Create( PathUtils::getExtendedPath( targetNane ).c_str(), false ) )
+			if( !outFileStreamSpec->Create_NEW( PathUtils::getExtendedPath( targetNane ).c_str() ) )
 			{
 				_errorMessage = L"CArch7zip: Cannot create archive file.";
 				return false;

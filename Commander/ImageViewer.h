@@ -27,9 +27,11 @@ namespace Commander
 		void viewFileCore( const std::wstring& fileName );
 		void viewNext();
 		void viewPrevious();
-		void displayImage();
+		void selectActiveFrame();
+		void generateFrame();
 		void saveImage();
 		void cleanUp();
+		bool loadGifInfo();
 		bool _loadImageData();
 
 	private:
@@ -37,13 +39,20 @@ namespace Commander
 		HGLOBAL _hDataBuf;
 		IStream *_pStream;
 
-		Gdiplus::Graphics *_pGraph;
-		Gdiplus::Bitmap *_pBitmap;
-		Gdiplus::SolidBrush *_pBrush;
+		std::unique_ptr<Gdiplus::Graphics> _upGraphics;
+		std::unique_ptr<Gdiplus::SolidBrush> _upBrush;
+		std::unique_ptr<Gdiplus::Image> _upImage;
+		std::unique_ptr<Gdiplus::Bitmap> _upFrameBuffer;
+
+		std::vector<std::pair<HGLOBAL, UINT>> _frames;
+		int _frameIdx;
 
 		std::vector<std::wstring> _entries;
 
 		std::wstring _tempName;
+
+		bool _isAnimated;
+		bool _isPlaying;
 
 		//HMENU _hMenu;
 	};
