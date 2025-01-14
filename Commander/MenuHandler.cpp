@@ -122,6 +122,9 @@ namespace Commander
 		case IDM_FILES_UNPACK:
 			activeTab->processCommand( EFcCommand::UnpackItem );
 			break;
+		case IDM_FILES_REPACK:
+			activeTab->processCommand( EFcCommand::RepackItem );
+			break;
 		case IDM_FILES_SPLIT:
 			activeTab->processCommand( EFcCommand::SplitFile );
 			break;

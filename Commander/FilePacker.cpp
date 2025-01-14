@@ -66,12 +66,12 @@ namespace Commander
 	}
 
 
-	void CFilePacker::packFiles( const std::wstring& targetName, CPanelTab *pPanel )
+	void CFilePacker::packFiles( const std::wstring& targetName, std::shared_ptr<CPanelTab> spPanel )
 	{
 		_targetName = PathUtils::getFullPath( targetName );
 		_processingVolume = _targetName;
-		_entries = pPanel->getSelectedItemsPathFull();
-		_bytesTotal = pPanel->getDataManager()->getMarkedEntriesSize();
+		_entries = spPanel->getSelectedItemsPathFull();
+		_bytesTotal = spPanel->getDataManager()->getMarkedEntriesSize();
 		_bytesProcessed = 0ull;
 
 		_upArchiver = ArchiveType::createArchiver( _targetName );

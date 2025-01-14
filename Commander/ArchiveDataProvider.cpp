@@ -68,7 +68,7 @@ namespace Commander
 		_result = PathUtils::getFullPath( tempPath + PathUtils::stripPath( fileName ) );
 
 		// file extractor sends UM_READERNOTIFY notification when done
-		CBaseDialog::createModeless<CFileExtractor>( hWndNotify )->extract(
+		CBaseDialog::createModeless<CFileUnpacker>( hWndNotify )->unpack(
 			fileName,
 			tempPath,
 			FCS::inst().getApp().getActivePanel().getActiveTab(),

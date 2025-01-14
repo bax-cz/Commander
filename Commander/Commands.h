@@ -12,6 +12,7 @@ namespace Commander
 		ExecuteItem,
 		PackItem,
 		UnpackItem,
+		RepackItem,
 		RenameItem,
 		CopyItems,
 		MoveItems,

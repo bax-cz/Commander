@@ -26,7 +26,7 @@ namespace Commander
 		void updateDialogTitle( const std::wstring& status = L"" );
 		void updateGuiStatus( bool enable = true );
 		void updateLayout( int width, int height );
-		void updateHeaders( bool selChanged = true );
+		void updateHeaders( bool tabChanged = false );
 		void onChooseFileName();
 		void startDownload();
 

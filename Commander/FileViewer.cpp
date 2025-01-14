@@ -335,7 +335,7 @@ namespace Commander
 				_tempFileName = FCS::inst().getTempPath() + PathUtils::stripPath( fileName );
 
 				// file extractor sends UM_READERNOTIFY notification when done
-				CBaseDialog::createModeless<CFileExtractor>( _hDlg )->extract(
+				CBaseDialog::createModeless<CFileUnpacker>( _hDlg )->unpack(
 					path, fileName, FCS::inst().getTempPath(), CArchiver::EExtractAction::Overwrite );
 			}
 			else // read file directly

@@ -571,10 +571,10 @@ local unzFile unzOpenInternal(const void *path,
         if (unz64local_getLong64(&us.z_filefunc, us.filestream,&number_entry_CD)!=UNZ_OK)
             err=UNZ_ERRNO;
 
-        if ((number_entry_CD!=us.gi.number_entry) /*||
+        /*if ((number_entry_CD!=us.gi.number_entry) || // FIXME: multi-file archives support
             (number_disk_with_CD!=0) ||
-            (number_disk!=0)*/)
-            err=UNZ_BADZIPFILE;
+            (number_disk!=0))
+            err=UNZ_BADZIPFILE;*/
 
         /* size of the central directory */
         if (unz64local_getLong64(&us.z_filefunc, us.filestream,&us.size_central_dir)!=UNZ_OK)
@@ -621,10 +621,10 @@ local unzFile unzOpenInternal(const void *path,
             err=UNZ_ERRNO;
         number_entry_CD = uL;
 
-        if ((number_entry_CD!=us.gi.number_entry) /*||
+        /*if ((number_entry_CD!=us.gi.number_entry) || // FIXME: multi-file archives support
             (number_disk_with_CD!=0) ||
-            (number_disk!=0)*/)
-            err=UNZ_BADZIPFILE;
+            (number_disk!=0))
+            err=UNZ_BADZIPFILE;*/
 
         /* size of the central directory */
         if (unz64local_getLong(&us.z_filefunc, us.filestream,&uL)!=UNZ_OK)

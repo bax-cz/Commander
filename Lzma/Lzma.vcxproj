@@ -63,6 +63,7 @@
     <ClCompile Include="C\LzmaDec.c" />
     <ClCompile Include="C\LzmaEnc.c" />
     <ClCompile Include="C\LzmaLib.c" />
+    <ClCompile Include="C\Md5.c" />
     <ClCompile Include="C\MtCoder.c" />
     <ClCompile Include="C\MtDec.c" />
     <ClCompile Include="C\Ppmd7.c" />
@@ -76,6 +77,9 @@
     <ClCompile Include="C\Sha1Opt.c" />
     <ClCompile Include="C\Sha256.c" />
     <ClCompile Include="C\Sha256Opt.c" />
+    <ClCompile Include="C\Sha3.c" />
+    <ClCompile Include="C\Sha512.c" />
+    <ClCompile Include="C\Sha512Opt.c" />
     <ClCompile Include="C\Sort.c" />
     <ClCompile Include="C\SwapBytes.c" />
     <ClCompile Include="C\Threads.c" />
@@ -117,6 +121,7 @@
     <ClInclude Include="C\LzmaDec.h" />
     <ClInclude Include="C\LzmaEnc.h" />
     <ClInclude Include="C\LzmaLib.h" />
+    <ClInclude Include="C\Md5.h" />
     <ClInclude Include="C\MtCoder.h" />
     <ClInclude Include="C\MtDec.h" />
     <ClInclude Include="C\Ppmd.h" />
@@ -126,6 +131,8 @@
     <ClInclude Include="C\RotateDefs.h" />
     <ClInclude Include="C\Sha1.h" />
     <ClInclude Include="C\Sha256.h" />
+    <ClInclude Include="C\Sha3.h" />
+    <ClInclude Include="C\Sha512.h" />
     <ClInclude Include="C\Sort.h" />
     <ClInclude Include="C\Threads.h" />
     <ClInclude Include="C\Xxh64.h" />

@@ -25,6 +25,8 @@ namespace Commander
 			LF_INVISIBLE = 0x80000000UL
 		};
 
+		static const int BYTES_ROW = 16; // bytes per row in hex-view
+
 	public:
 		static const UINT resouceIdTemplate = IDD_COMPAREFILES;
 
@@ -45,6 +47,7 @@ namespace Commander
 		void moveLine( std::vector<std::pair<DWORD, std::string>>& buff, int line1, int line2, int newline1 );
 		void setLineFlag( std::vector<std::pair<DWORD, std::string>>& buff, int line, DWORD flag, bool set );
 		void writeRtfDocument( const std::vector<std::pair<DWORD, std::string>>& buff1, const std::vector<std::pair<DWORD, std::string>>& buff2, std::string& outBuff );
+		void writeRtfDocumentHex( const std::string& buf1, const std::string& buf2, std::streamsize offset, std::string& outBuff );
 
 	private:
 		void initFilePaths();
@@ -65,8 +68,12 @@ namespace Commander
 		void refresh();
 		void findTextDialog();
 		void searchText( bool reverse );
-		bool loadFiles();
-		bool compareFiles();
+		bool loadFilesAsText();
+		bool compareFilesText();
+		bool compareFilesBinary();
+
+	private:
+		std::streamoff findDiffBinary( std::streamoff startOffset, bool reverse = false );
 
 	private:
 		void onFindDialogNotify( int cmd );
@@ -80,6 +87,9 @@ namespace Commander
 
 		int _findFromIdxBeg;
 		int _findFromIdxEnd;
+
+		int _linesCountPerPage;
+		bool _binaryMode;
 
 		CDiffWrapper _diffWrapper;
 		

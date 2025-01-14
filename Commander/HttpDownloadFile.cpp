@@ -76,7 +76,7 @@ namespace Commander
 
 	void CHttpDownloadFile::startDownload()
 	{
-		updateDialogTitle( _initialized ? L"Downloading.." : L"Reading HEAD.." );
+		updateDialogTitle( _initialized ? L"Connecting" : L"Reading HEAD" );
 		updateGuiStatus( false );
 
 		_canceled = false;
@@ -117,8 +117,11 @@ namespace Commander
 
 	bool CHttpDownloadFile::onClose()
 	{
-		if( _worker.isRunning() && MessageBox( _hDlg, L"Cancel downloading file?", _dialogTitle.c_str(), MB_ICONQUESTION | MB_YESNO ) == IDNO )
-			return false;
+		if( _worker.isRunning() && _initialized )
+		{
+			if( MessageBox( _hDlg, L"Cancel downloading file?", _dialogTitle.c_str(), MB_ICONQUESTION | MB_YESNO ) == IDNO )
+				return false;
+		}
 
 		KillTimer( _hDlg, FC_TIMER_KEEPALIVE_ID );
 
@@ -151,10 +154,12 @@ namespace Commander
 
 		if( !status.empty() )
 		{
-			sstrTitle << L"[" << status << L"] - " << _dialogTitle;
+			sstrTitle << L"[" << status;
 
 			if( _attemptCount != FailedAttemptsMax )
-				sstrTitle << L" [" << FailedAttemptsMax - _attemptCount << L"/" << FailedAttemptsMax << L"]";
+				sstrTitle << L" " << FailedAttemptsMax - _attemptCount << L"/" << FailedAttemptsMax;
+
+			sstrTitle << L"] - " << _dialogTitle;
 		}
 		else
 			sstrTitle << _dialogTitle;
@@ -176,23 +181,23 @@ namespace Commander
 		enableOk = enableOk && ( GetWindowTextLength( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ) ) > 0 || !_initialized );
 
 		EnableWindow( GetDlgItem( _hDlg, IDOK ), enableOk );
-		EnableWindow( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ), enable );
 		EnableWindow( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), enable && _initialized );
 		EnableWindow( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_CHOOSEFILE ), enable && _initialized );
 
 		auto tabId = TabCtrl_GetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ) );
 		Edit_SetReadOnly( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ), !enable || tabId == 0 );
+		Edit_SetReadOnly( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL), !enable );
 
 		SetDlgItemText( _hDlg, IDC_DOWNLOADFILE_STATUSTEXT, L"" );
 		SetDlgItemText( _hDlg, IDOK, _initialized ? L"Download" : L"Get HEAD" );
 	}
 
-	void CHttpDownloadFile::updateHeaders( bool selChanged )
+	void CHttpDownloadFile::updateHeaders( bool tabChanged )
 	{
 		auto id = TabCtrl_GetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ) );
 
 		// store the request headers text when changing to response headers
-		if( selChanged && !_worker.isRunning() && id == 0 )
+		if( tabChanged && !_worker.isRunning() && id == 0 )
 		{
 			MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ), _rqstHeaders );
 		}
@@ -817,8 +822,8 @@ namespace Commander
 						fname = NetUtils::urlDecode( fname );
 					}
 
-					// sanitize the filename
-					_fileName = fname.empty() ? fname : PathUtils::sanitizeFileName( fname );
+					if( !fname.empty() )
+						_fileName = PathUtils::sanitizeFileName( fname );
 				}
 			}
 		}
@@ -848,7 +853,7 @@ namespace Commander
 				int tabId = TabCtrl_GetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ) );
 				TabCtrl_SetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ), !tabId ? 1 : 0 );
 
-				updateHeaders();
+				updateHeaders( true );
 				break;
 			}
 			}
@@ -879,7 +884,7 @@ namespace Commander
 
 				SetDlgItemText( _hDlg, IDE_DOWNLOADFILE_FILENAME, _fileName.c_str() );
 
-				updateHeaders( false );
+				updateHeaders();
 				updateGuiStatus();
 				updateDialogTitle();
 			}
@@ -909,7 +914,7 @@ namespace Commander
 					{
 						EnableWindow( GetDlgItem( _hDlg, IDOK ), TRUE );
 						SetDlgItemText( _hDlg, IDOK, L"Stop" );
-						updateHeaders( false );
+						updateHeaders();
 					}
 					break;
 				}
@@ -921,7 +926,7 @@ namespace Commander
 					{
 						_attemptCount--;
 
-						updateDialogTitle( L"Retrying.." );
+						updateDialogTitle( L"Retrying" );
 						SetTimer( _hDlg, FC_TIMER_KEEPALIVE_ID, MiscUtils::getRand( 4500, 5500 ), NULL );
 						break;
 					}
@@ -940,6 +945,7 @@ namespace Commander
 
 				_canceled = false;
 
+				updateHeaders();
 				updateGuiStatus();
 				updateDialogTitle();
 
@@ -969,7 +975,7 @@ namespace Commander
 							_initialized = false;
 
 							_rqstHeaders.clear();
-							updateHeaders( false );
+							updateHeaders();
 						}
 					}
 
@@ -985,7 +991,7 @@ namespace Commander
 		case WM_NOTIFY:
 			if( LOWORD( wParam ) == IDC_DOWNLOADFILE_HEADERS && ((LPNMHDR)lParam)->code == TCN_SELCHANGE )
 			{
-				updateHeaders();
+				updateHeaders( true );
 			}
 			break;
 

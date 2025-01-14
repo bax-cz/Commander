@@ -36,7 +36,7 @@ namespace TarLib
 
 			_offsetTar += static_cast<long long>( BZ2_bzread( _bzFile, buf, (int)reqPos ) );
 
-			delete []buf;
+			delete[] buf;
 		}
 	}
 

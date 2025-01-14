@@ -1221,6 +1221,9 @@ namespace Commander
 		case VK_INSERT:
 			_pParentTab->processCommand( EFcCommand::ClipCopyPath );
 			break;
+		case VK_F5:
+			_pParentTab->processCommand( EFcCommand::RepackItem );
+			break;
 		case 0x54: // "T - open new tab in opposite panel"
 			_pParentTab->processCommand( EFcCommand::OpenTabOpposite );
 			break;

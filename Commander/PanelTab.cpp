@@ -468,6 +468,7 @@ namespace Commander
 		_availableCommands[EFcCommand::ExecuteItem] = true;
 		_availableCommands[EFcCommand::PackItem] = (!isFixed || isMarked) && !isReadOnly;
 		_availableCommands[EFcCommand::UnpackItem] = ((!isFixed || isMarked) && _dataManager.isInArchiveMode()) || ((isArchive || isMarked) && !_dataManager.isInArchiveMode());
+		_availableCommands[EFcCommand::RepackItem] = ((isArchive || isMarked) && !_dataManager.isInArchiveMode());
 		_availableCommands[EFcCommand::RenameItem] = !isFixed && !isReadOnly;
 		_availableCommands[EFcCommand::CopyItems] = (!isFixed || isMarked) && !_dataManager.isInNetworkMode();
 		_availableCommands[EFcCommand::MoveItems] = (!isFixed || isMarked) && !isReadOnly;
@@ -635,6 +636,7 @@ namespace Commander
 			MenuUtils::enableItem( _menuBar, IDM_FILES_CHANGECASE,           _availableCommands[EFcCommand::ChangeCase] );
 			MenuUtils::enableItem( _menuBar, IDM_FILES_PACK,                 _availableCommands[EFcCommand::PackItem] );
 			MenuUtils::enableItem( _menuBar, IDM_FILES_UNPACK,               _availableCommands[EFcCommand::UnpackItem] );
+			MenuUtils::enableItem( _menuBar, IDM_FILES_REPACK,               _availableCommands[EFcCommand::RepackItem] );
 			MenuUtils::enableItem( _menuBar, IDM_FILES_SPLIT,                _availableCommands[EFcCommand::SplitFile] );
 			MenuUtils::enableItem( _menuBar, IDM_FILES_COMBINE,              _availableCommands[EFcCommand::CombineFile] );
 			MenuUtils::enableItem( _menuBar, IDM_FILES_DOWNLOAD,             _availableCommands[EFcCommand::DownloadFile] );
@@ -839,7 +841,7 @@ namespace Commander
 			int focusedItem = _listViewItems.getFocusedItemIndex();
 			std::wstring itemName = _dataManager.getEntryName( focusedItem );
 
-			if( _dataManager.getEntryType( focusedItem ) == EEntryType::File )
+			if( _dataManager.isEntryFile( focusedItem ) )
 				sstr << L"file";
 			else
 				sstr << L"directory";
@@ -1370,7 +1372,7 @@ bool testThreadProc( const std::wstring& dirName, const std::wstring& fileName )
 		{
 			tmpName = PathUtils::stripPath( entries[0] );
 
-			if( _dataManager.getEntryType( _listViewItems.getFocusedItemIndex() ) == EEntryType::File )
+			if( _dataManager.isEntryFile( _listViewItems.getFocusedItemIndex() ) )
 				tmpName = PathUtils::stripFileExtension( tmpName );
 		}
 
@@ -1382,7 +1384,7 @@ bool testThreadProc( const std::wstring& dirName, const std::wstring& fileName )
 		if( !result.empty() )
 		{
 			auto archName = PathIsRelative( result.c_str() ) ? _dataManager.getCurrentDirectory() + result : result;
-			CBaseDialog::createModeless<CFilePacker>()->packFiles( archName, this );
+			CBaseDialog::createModeless<CFilePacker>()->packFiles( archName, _pParentPanel->getActiveTab() );
 		}
 
 		return false;
@@ -1391,9 +1393,9 @@ bool testThreadProc( const std::wstring& dirName, const std::wstring& fileName )
 	//
 	// Extract (from) archive (rar, zip, tar, gz, bz2, 7z, xz)
 	//
-	bool CPanelTab::extractArchiveGui( const std::wstring& fileName )
+	bool CPanelTab::extractArchiveGui( const std::wstring& fileName, bool repack )
 	{
-		std::wstring title = L"Extract", caption;
+		std::wstring title = repack ? L"Repack" : L"Extract", caption;
 
 		if( !_dataManager.isInArchiveMode() && !_dataManager.getMarkedEntries().empty() ) // extract multiple archives
 		{
@@ -1417,8 +1419,13 @@ bool testThreadProc( const std::wstring& dirName, const std::wstring& fileName )
 				{
 					auto outDir = PathIsRelative( result.c_str() ) ? getOppositeDir() + result : result;
 
-					// extract known archives
-					CBaseDialog::createModeless<CFileExtractor>()->extract( items, PathUtils::addDelimiter( outDir ), _pParentPanel->getActiveTab() );
+					// extract/repack known archives
+					auto unpacker = CBaseDialog::createModeless<CFileUnpacker>();
+
+					if( repack )
+						unpacker->repack( items, PathUtils::addDelimiter( outDir ), _pParentPanel->getActiveTab() );
+					else
+						unpacker->unpack( items, PathUtils::addDelimiter( outDir ), _pParentPanel->getActiveTab() );
 				}
 			}
 			else
@@ -1432,7 +1439,7 @@ bool testThreadProc( const std::wstring& dirName, const std::wstring& fileName )
 			if( !_dataManager.getMarkedEntries().empty() )
 				caption = getSelectedItemsString( _dataManager.getMarkedEntries(), title, false );
 			else
-				caption = L"Extract \"" + PathUtils::stripPath( fileName ) + L"\" to:";
+				caption = title + L" \"" + PathUtils::stripPath( fileName ) + L"\" to:";
 
 			CTextInput::CParams params( title, caption, getOppositeDir(), true, false, 400 );
 			auto result = MiscUtils::showTextInputBox( params );
@@ -1440,7 +1447,12 @@ bool testThreadProc( const std::wstring& dirName, const std::wstring& fileName )
 			if( !result.empty() )
 			{
 				auto outDir = PathIsRelative( result.c_str() ) ? getOppositeDir() + result : result;
-				CBaseDialog::createModeless<CFileExtractor>()->extract( L"", PathUtils::addDelimiter( outDir ), _pParentPanel->getActiveTab() );
+				auto unpacker = CBaseDialog::createModeless<CFileUnpacker>();
+
+				if( repack )
+					unpacker->repack( { fileName }, PathUtils::addDelimiter( outDir ), _pParentPanel->getActiveTab() );
+				else
+					unpacker->unpack( L"", PathUtils::addDelimiter( outDir ), _pParentPanel->getActiveTab() );
 			}
 		}
 

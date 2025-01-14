@@ -16,7 +16,7 @@ NEW FEATURES/FIXES/IMPROVEMENTS:
 - look at Windows Search API (ISearchFolderItemFactory) ??
 - dark mode ??
 
-Version 0.2.8.4:
+Version 0.2.8.5:
 ----------------
 FEATURES:
 - discount (3.0.0d) - markdown support in html viewer - DONE
@@ -34,7 +34,7 @@ FEATURES:
 - implement drag & drop with mouse selection of items - PARTLY DONE (mouse selection)
 - FTP client and PuTTY(0.81) with changes from WinSCP(6.2.3) integration - DONE
 - main toolbar and menu commands - DONE
-- unrar(7.0.9), zlib(1.3.1), bzip2(1.0.8), 7-Zip(24.08), undmg, uniso libraries integration - DONE
+- unrar(7.1.2), zlib(1.3.1), bzip2(1.0.8), 7-Zip(24.09), undmg, uniso libraries integration - DONE
 - file hex/text viewer - DONE
 - fast-copy(3.63) library by H. Shirouzu integration - PARTLY DONE (needs testing, currently not used) - https://ipmsg.org/tools/fastcopy.html.en
 - duplicate files finder - DONE

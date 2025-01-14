@@ -2,6 +2,7 @@
 
 #include "Commander.h"
 #include "CompareFiles.h"
+#include "FileViewer.h"
 #include "TextFileReader.h"
 #include "IconUtils.h"
 #include "MiscUtils.h"
@@ -29,9 +30,11 @@ namespace Commander
 		, _imgListToolbar( nullptr )
 		, _imgListToolbarHot( nullptr )
 		, _imgListToolbarDisabled( nullptr )
+		, _binaryMode( false )
 		, _findParams{ false }
 		, _findFromIdxBeg( 0 )
 		, _findFromIdxEnd( 0 )
+		, _linesCountPerPage( 0 )
 		, _options{ 0 }
 		, _curDiff( -1 )
 		, _curZoom( 100 )
@@ -42,8 +45,6 @@ namespace Commander
 		if( _hRichEditLib == nullptr )
 			// initialize Rich Edit 1.0 class
 			_hRichEditLib = LoadLibrary( L"Riched32.dll" );
-
-		_hActiveEdit = GetDlgItem( _hDlg, IDC_COMPARERICHEDIT_LEFT );
 	}
 
 	CCompareFiles::~CCompareFiles()
@@ -202,6 +203,26 @@ namespace Commander
 		FCS::inst().getApp().getCompareFile2().clear();
 	}
 
+	int getLinesCount( HWND hRichedit )
+	{
+		RECT rct = { 0 };
+		SendMessage( hRichedit, EM_GETRECT, 0, (LPARAM)&rct );
+
+		LONG_PTR numerator = 0, denominator = 0;
+		SendMessage( hRichedit, EM_GETZOOM, reinterpret_cast<WPARAM>( &numerator ), reinterpret_cast<LPARAM>( &denominator ) );
+
+		// when zoom is not available (prior to Win10)
+		if( numerator == 0 && denominator == 0 )
+			numerator = denominator = 1;
+
+		// get char format
+		CHARFORMAT cf = { 0 }; cf.cbSize = sizeof( cf );
+		SendMessage( hRichedit, EM_GETCHARFORMAT, SCF_DEFAULT, reinterpret_cast<LPARAM>( &cf ) );
+
+		// convert twips to points: cf.yHeight / 20.0
+		return (int)( (double)rct.bottom / ( ( (double)cf.yHeight / 20.0 ) * (double)numerator / (double)denominator ) );
+	}
+
 	void CCompareFiles::onInit()
 	{
 		initFilePaths();
@@ -244,6 +265,11 @@ namespace Commander
 
 		// create find dialog instance
 		_pFindDlg = CBaseDialog::createModeless<CFindText>( _hDlg );
+
+		// count how many rows can be displayed
+		_hActiveEdit = GetDlgItem( _hDlg, IDC_COMPARERICHEDIT_LEFT );
+	//	_linesCountPerPage = getLinesCount( _hActiveEdit );
+		_linesCountPerPage = MiscUtils::countVisibleLines( _hActiveEdit );
 
 		MiscUtils::centerOnWindow( FCS::inst().getFcWindow(), _hDlg );
 
@@ -628,18 +654,95 @@ namespace Commander
 
 	std::string escapeRtfControlChars( const std::string& str )
 	{
-		std::string outStr;
-		outStr.reserve( str.length() );
+		std::string strOut;
+		strOut.reserve( str.length() );
 
 		for( auto it = str.begin(); it != str.end(); ++it  )
 		{
 			if( *it == '\\' || *it == '{' || *it == '}' )
-				outStr += '\\';
+				strOut += '\\';
 
-			outStr += *it;
+			strOut += *it;
 		}
 
-		return outStr;
+		return strOut;
+	}
+
+	std::string putAnsiCharsHex( const std::string& buf1, const std::string& buf2, size_t idx, size_t bytesPerLine )
+	{
+		std::string strOut;
+
+		for( size_t i = 0; i < bytesPerLine; ++i )
+		{
+			if( buf2.size() > idx + i && buf1[idx+i] != buf2[idx+i] )
+				strOut += "\\cf4\\highlight2 ";
+
+			char ch = CFileViewer::getPrintableChar( buf1[idx+i] );
+
+			// escapeRtfControlChars
+			if( ch == '\\' || ch == '{' || ch == '}' )
+				strOut += '\\';
+
+			strOut += ch;
+
+			if( buf2.size() > idx + i && buf1[idx+i] != buf2[idx+i] )
+				strOut += "\\cf0\\highlight0 ";
+		}
+
+		return strOut;
+	}
+
+	void CCompareFiles::writeRtfDocumentHex( const std::string& buf1, const std::string& buf2, std::streamsize offset, std::string& outBuff )
+	{
+		// intialize RTF fonts and color table
+		outBuff = "{\\rtf1\\ansi\\ansicpg1250\\deff0\\nouicompat\\deflang1029{\\fonttbl{\\f0\\fnil\\fcharset0 Consolas;}}";
+		outBuff += "{\\colortbl ;\\red255\\green0\\blue0;\\red0\\green77\\blue187;\\red128\\green128\\blue128;\\red0\\green255\\blue0;}";
+
+		LARGE_INTEGER fileSize; fileSize.QuadPart = offset;
+		size_t bytesPerLine = BYTES_ROW;
+
+		for( size_t idx = 0; _worker.isRunning(); idx += BYTES_ROW )
+		{
+			if( idx < buf1.size() )
+				bytesPerLine = min( buf1.size() - idx, BYTES_ROW );
+			else
+				break;
+
+			outBuff += "\\fs21\\pard ";
+
+			std::ostringstream sstr;
+			sstr << std::hex << std::setfill( '0' ) << std::uppercase;
+
+			// write out the offset number
+			sstr << FsUtils::getOffsetNumber( fileSize, offset + idx );
+
+			// write out extra space between every 4 bytes and ascii data at the end
+			for( std::streamsize i = 1; i < BYTES_ROW + 1; ++i )
+			{
+				// write out one BYTE
+				if( i < bytesPerLine + 1 )
+				{
+					if( buf2.size() > idx + i - 1 && buf1[idx+i-1] != buf2[idx+i-1] )
+						sstr << "\\cf4\\highlight2 " << std::setw( 2 ) << ( buf1[idx+i-1] & 0xFF ) << "\\cf0\\highlight0  ";
+					else
+						sstr << std::setw( 2 ) << ( buf1[idx+i-1] & 0xFF ) << " ";
+				}
+				else
+					sstr << "   ";
+
+				// spacing between bytes
+				if( ( i % 4 ) == 0 )
+					sstr << " ";
+			}
+
+			outBuff += sstr.str();
+
+			// write out the ANSI representation of the data
+			outBuff += putAnsiCharsHex( buf1, buf2, idx, bytesPerLine );
+			outBuff += "\\par ";
+		}
+
+		outBuff += "}";
 	}
 
 	void CCompareFiles::writeRtfDocument( const std::vector<std::pair<DWORD, std::string>>& buff1, const std::vector<std::pair<DWORD, std::string>>& buff2, std::string& outBuff )
@@ -682,7 +785,7 @@ namespace Commander
 		outBuff += "}";
 	}
 
-	bool CCompareFiles::compareFiles()
+	bool CCompareFiles::compareFilesText()
 	{
 		// set up diff wrapper
 		_diffWrapper.SetOptions( &_options );
@@ -715,7 +818,7 @@ namespace Commander
 		return false;
 	}
 
-	bool CCompareFiles::loadFiles()
+	bool CCompareFiles::loadFilesAsText()
 	{
 		std::ifstream fs1( PathUtils::getExtendedPath( _path1 ), std::ios::binary );
 		std::ifstream fs2( PathUtils::getExtendedPath( _path2 ), std::ios::binary );
@@ -752,14 +855,140 @@ namespace Commander
 		return false;
 	}
 
+	/*bool compareChunks( const std::string& buf1, const std::string& buf2, std::streamsize len )
+	{
+		uLong crc1 = crc32( 0L, Z_NULL, 0 );
+		uLong crc2 = crc32( 0L, Z_NULL, 0 );
+
+		crc1 = crc32( crc1, reinterpret_cast<const Bytef*>( &buf1[0] ), static_cast<uInt>( len ) );
+		crc2 = crc32( crc2, reinterpret_cast<const Bytef*>( &buf2[0] ), static_cast<uInt>( len ) );
+
+		return crc1 == crc2;
+	}*/
+
+	std::streamoff findOffsetBinary( const std::string& buf1, const std::string& buf2, std::streamsize len )
+	{
+		_ASSERTE( buf1.size() >= len );
+		_ASSERTE( buf2.size() >= len );
+
+		std::streamoff off = 0;
+
+		while( off < len )
+		{
+			if( buf1[off] != buf2[off] )
+				break;
+			else
+				off++;
+		}
+
+		return off;
+	}
+
+	std::streamoff CCompareFiles::findDiffBinary( std::streamoff startOffset, bool reverse )
+	{
+		std::ifstream fs1( PathUtils::getExtendedPath( _path1 ), std::ios::binary );
+		std::ifstream fs2( PathUtils::getExtendedPath( _path2 ), std::ios::binary );
+
+		std::string buf1( 0x10000, 0 );
+		std::string buf2( 0x10000, 0 );
+
+		if( fs1.is_open() && fs2.is_open() )
+		{
+			std::streamoff offRel = 0, offAbs = 0;
+			std::streamoff size1, size2;
+
+			while( _worker.isRunning() )
+			{
+				// read chunks
+				size1 = fs1.read( reinterpret_cast<char*>( &buf1[0] ), buf1.size() ).gcount();
+				size2 = fs2.read( reinterpret_cast<char*>( &buf2[0] ), buf2.size() ).gcount();
+
+				// compare chunks
+				if( size1 == 0 || size1 != size2 || !!memcmp( &buf1[0], &buf2[0], size1 ) )
+				{
+					// find the offset of the first difference in both chunks
+					offRel = findOffsetBinary( buf1, buf2, min( size1, size2 ) );
+
+					return offAbs + offRel;
+				}
+
+				offAbs += size1;
+			}
+		}
+
+		return -1ll;
+	}
+
+	bool CCompareFiles::compareFilesBinary()
+	{
+		//	auto ticks = GetTickCount();
+		auto offsetDiff = findDiffBinary( 0 );
+
+		// elapsed time - test
+		//	std::wstring text = StringUtils::formatTime( GetTickCount() - ticks );
+		//	MessageBox( NULL, text.c_str(), L"Elapsed time", MB_ICONINFORMATION | MB_OK );
+
+		// a difference has been found at the offset 'offsetDiff'
+		if( offsetDiff != -1ll )
+		{
+			// write out rtf documents
+	//		writeRtfDocumentHex( bufLeft, bufRight, offAbs + offset, _diffLeft );
+	//		writeRtfDocumentHex( bufRight, bufLeft, offAbs + offset, _diffRight );
+
+			//	std::ofstream fs1( "C:\\Users\\bax\\Documents\\out1.rtf", std::ios::binary );
+			//	fs1 << _diffLeft;
+				
+			//	std::ofstream fs2( "C:\\Users\\bax\\Documents\\out2.rtf", std::ios::binary );
+			//	fs2 << _diffRight;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	// TODO: move this funciton somewhere else
+	bool replaceByte( const std::wstring& path, ULONGLONG offset, BYTE byte )
+	{
+		HANDLE hFile = CreateFile( PathUtils::getExtendedPath( path ).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL );
+		bool ret = false;
+
+		if( hFile != INVALID_HANDLE_VALUE )
+		{
+			LARGE_INTEGER distanceToMove, newFilePointer;
+			distanceToMove.QuadPart = offset;//0xAFDFBA00ll;
+
+			if( SetFilePointerEx( hFile, distanceToMove, &newFilePointer, FILE_BEGIN ) != 0 )
+			{
+				DWORD written = 0;
+				if( WriteFile( hFile, &byte, 1, &written, NULL ) )
+				{
+					ret = !!written;
+				}
+			}
+			else
+				PrintDebug("%ls", SysUtils::getErrorMessage( GetLastError() ).c_str());
+
+			CloseHandle(hFile);
+		}
+
+		return ret;
+	}
+
 	//
 	// Look for duplicates in two lists
 	//
 	bool CCompareFiles::_workerProc()
 	{
-		if( loadFiles() )
+		if( !_binaryMode && loadFilesAsText() )
 		{
-			return compareFiles();
+			return compareFilesText();
+		}
+		else
+		{
+			// TODO: binary compare
+			_binaryMode = compareFilesBinary();
+			return _binaryMode;
 		}
 
 		return false;
@@ -939,7 +1168,7 @@ namespace Commander
 			if( wParam == 1 )
 			{
 				SETTEXTEX stx;
-				stx.codepage = CP_UTF8;
+				stx.codepage = _binaryMode ? CP_ACP : CP_UTF8;
 				stx.flags = ST_DEFAULT;
 
 				//SendMessage( hRich1, EM_SETTEXTMODE, (WPARAM)TM_RICHTEXT, 0 );
@@ -951,7 +1180,7 @@ namespace Commander
 			}
 			else if( wParam == 0 )
 			{
-				MessageBox( _hDlg, L"Cannot read source files as text.", L"Compare Files", MB_ICONEXCLAMATION | MB_OK );
+				MessageBox( _hDlg, L"Cannot read source files.", L"Compare Files", MB_ICONEXCLAMATION | MB_OK );
 				close();
 			}
 			break;
@@ -1038,6 +1267,14 @@ namespace Commander
 			SetTextColor( reinterpret_cast<HDC>( wParam ), FC_COLOR_TEXT );
 			SetBkColor( reinterpret_cast<HDC>( wParam ), FC_COLOR_DIRBOXBKGND );
 			return reinterpret_cast<LRESULT>( FCS::inst().getApp().getBkgndBrush() );
+
+		case WM_SETCURSOR:
+			if( _worker.isRunning() )
+			{
+				SetCursor( LoadCursor( NULL, IDC_WAIT ) );
+				return 0;
+			}
+			break;
 
 		case WM_SIZE:
 		{

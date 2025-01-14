@@ -125,8 +125,8 @@ namespace Commander
 				upArchiver = std::make_unique<CArchRar>();
 				break;
 			case EArchType::FMT_ZIP:
-				upArchiver = std::make_unique<CArchZip>();
-				break;
+			//	upArchiver = std::make_unique<CArchZip>();
+			//	break;
 			case EArchType::FMT_7ZIP:
 			case EArchType::FMT_ARJ:
 			case EArchType::FMT_Z:

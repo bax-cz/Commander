@@ -4,15 +4,17 @@
 
 namespace Commander
 {
-	class CFileExtractor : public CBaseDialog
+	class CFileUnpacker : public CBaseDialog
 	{
 	public:
 		static const UINT resouceIdTemplate = IDD_PROGRESS;
 
 	public:
-		void extract( const std::vector<std::wstring>& items, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
-		void extract( const std::wstring& fileName, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
-		void extract( const std::wstring& archiveName, const std::wstring& localPath, const std::wstring& targetDir, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
+		void unpack( const std::vector<std::wstring>& items, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
+		void unpack( const std::wstring& fileName, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
+		void unpack( const std::wstring& archiveName, const std::wstring& localPath, const std::wstring& targetDir, CArchiver::EExtractAction action = CArchiver::EExtractAction::Rename );
+
+		void repack( const std::vector<std::wstring>& items, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel );
 
 		virtual void onInit() override;
 		virtual bool onOk() override;
@@ -41,5 +43,7 @@ namespace Commander
 
 		ULONGLONG _bytesTotal;
 		ULONGLONG _bytesProcessed;
+
+		bool _repack;
 	};
 }

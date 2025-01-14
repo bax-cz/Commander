@@ -188,6 +188,18 @@
     <ClCompile Include="C\Xxh64.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C\Md5.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C\Sha3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C\Sha512.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C\Sha512Opt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C\7z.h">
@@ -320,6 +332,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C\ZstdDec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C\Md5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C\Sha3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C\Sha512.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,24 +10,51 @@
 
 namespace Commander
 {
-	bool CFileExtractor::_workerProc()
+	bool CFileUnpacker::_workerProc()
 	{
 		_ASSERTE( _upArchiver != nullptr );
 
 		ShellUtils::CComInitializer _com( COINIT_APARTMENTTHREADED );
 
+		// repack entries using 7-zip archiver
+		std::wstring arch = L".7z";
+		std::unique_ptr<CArchiver> upRePacker;
+		std::wstring tmpDir = FsUtils::getNextFileName( FCS::inst().getTempPath(), L"$pack" );
+		tmpDir = FCS::inst().getTempPath() + PathUtils::addDelimiter( tmpDir );
+
 		// extract the first archive
-		bool ret = _upArchiver->extractEntries( _entries, _targetDir );
+		bool ret = _upArchiver->extractEntries( _entries, _repack ? tmpDir : _targetDir );
+
+		if( _repack )
+		{
+			auto archName = _targetDir + PathUtils::stripFileExtension( PathUtils::stripPath( _archiveNames[0] ) ) + arch;
+
+			upRePacker = ArchiveType::createArchiver( arch );
+			upRePacker->init( archName, nullptr, nullptr, &_worker );
+			upRePacker->packEntries( FsUtils::getEntriesList( tmpDir, FCS::inst().getApp().getFindFLags() ), archName );
+
+			FsUtils::deleteDirectory( tmpDir, FCS::inst().getApp().getFindFLags() );
+		}
 
 		// extract others when there is more of them
 		if( _archiveNames.size() > 1 )
 		{
 			for( auto it = _archiveNames.begin() + 1; it != _archiveNames.end(); ++it )
 			{
+				_worker.sendMessage( FC_ARCHPROCESSINGVOLUME, reinterpret_cast<LPARAM>( it->c_str() ) );
+
 				auto upArchiver = ArchiveType::createArchiver( *it );
 				upArchiver->init( *it, nullptr, nullptr, &_worker, _action );
 
-				ret = ret && upArchiver->extractEntries( { *it }, _targetDir );
+				ret = ret && upArchiver->extractEntries( { *it }, _repack ? tmpDir : _targetDir );
+
+				if( _repack )
+				{
+					upRePacker->packEntries( FsUtils::getEntriesList( tmpDir, FCS::inst().getApp().getFindFLags() ),
+						_targetDir + PathUtils::stripFileExtension( PathUtils::stripPath( *it ) ) + arch );
+
+					FsUtils::deleteDirectory( tmpDir, FCS::inst().getApp().getFindFLags() );
+				}
 
 				if( !_worker.isRunning() )
 					break;
@@ -37,8 +64,10 @@ namespace Commander
 		return ret;
 	}
 
-	void CFileExtractor::onInit()
+	void CFileUnpacker::onInit()
 	{
+		_repack = false;
+
 		_worker.init( [this] { return _workerProc(); }, _hDlg, UM_STATUSNOTIFY );
 
 		SetWindowText( _hDlg, L"(0%) Extract" );
@@ -58,13 +87,13 @@ namespace Commander
 		show(); // show dialog
 	}
 
-	bool CFileExtractor::onOk()
+	bool CFileUnpacker::onOk()
 	{
 		// TODO: onPause button pressed
 		return false;
 	}
 
-	bool CFileExtractor::onClose()
+	bool CFileUnpacker::onClose()
 	{
 		show( SW_HIDE ); // hide dialog
 
@@ -78,7 +107,7 @@ namespace Commander
 	//
 	// Draw progress-bar background rectangels
 	//
-	void CFileExtractor::drawBackground( HDC hdc )
+	void CFileUnpacker::drawBackground( HDC hdc )
 	{
 		auto rct1 = IconUtils::getControlRect( GetDlgItem( _hDlg, IDC_PROGRESSFILE ) );
 		auto rct2 = IconUtils::getControlRect( GetDlgItem( _hDlg, IDC_PROGRESSTOTAL ) );
@@ -92,7 +121,7 @@ namespace Commander
 		SelectObject( hdc, original );
 	}
 
-	void CFileExtractor::extract( const std::vector<std::wstring>& items, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action )
+	void CFileUnpacker::unpack( const std::vector<std::wstring>& items, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action )
 	{
 		_archiveNames = items;
 		_targetDir = targetDir;
@@ -104,7 +133,7 @@ namespace Commander
 		extractCore();
 	}
 
-	void CFileExtractor::extract( const std::wstring& fileName, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action )
+	void CFileUnpacker::unpack( const std::wstring& fileName, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel, CArchiver::EExtractAction action )
 	{
 		_targetDir = targetDir;
 		_action = action;
@@ -121,7 +150,7 @@ namespace Commander
 		extractCore();
 	}
 
-	void CFileExtractor::extract( const std::wstring& archiveName, const std::wstring& localPath, const std::wstring& targetDir, CArchiver::EExtractAction action )
+	void CFileUnpacker::unpack( const std::wstring& archiveName, const std::wstring& localPath, const std::wstring& targetDir, CArchiver::EExtractAction action )
 	{
 		_archiveNames.push_back( archiveName );
 		_targetDir = targetDir;
@@ -134,7 +163,21 @@ namespace Commander
 		extractCore();
 	}
 
-	void CFileExtractor::extractCore()
+	void CFileUnpacker::repack( const std::vector<std::wstring>& items, const std::wstring& targetDir, std::shared_ptr<CPanelTab> spPanel )
+	{
+		_repack = true;
+
+		_archiveNames = items;
+		_targetDir = targetDir;
+		_action = CArchiver::EExtractAction::Overwrite;
+		_bytesTotal = spPanel->getDataManager()->getMarkedEntriesSize();
+		_bytesProcessed = 0ull;
+		_entries.push_back( items[0] );
+
+		extractCore();
+	}
+
+	void CFileUnpacker::extractCore()
 	{
 		_ASSERTE( !_archiveNames.empty() );
 
@@ -154,7 +197,7 @@ namespace Commander
 		_worker.start();
 	}
 
-	void CFileExtractor::updateProgressStatus()
+	void CFileUnpacker::updateProgressStatus()
 	{
 		auto textFrom = MiscUtils::makeCompactPath( GetDlgItem( _hDlg, IDC_TEXTFROM ), _processingPath );
 		SetDlgItemText( _hDlg, IDC_TEXTFROM, textFrom.c_str() );
@@ -172,7 +215,7 @@ namespace Commander
 		SetWindowText( _hDlg, wndTitle.str().c_str() );
 	}
 
-	INT_PTR CALLBACK CFileExtractor::dialogProc( UINT message, WPARAM wParam, LPARAM lParam )
+	INT_PTR CALLBACK CFileUnpacker::dialogProc( UINT message, WPARAM wParam, LPARAM lParam )
 	{
 		switch( message )
 		{

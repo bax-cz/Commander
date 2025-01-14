@@ -42,6 +42,10 @@ namespace Commander
 			retVal = extractArchiveGui( path + itemName );
 			break;
 
+		case EFcCommand::RepackItem:
+			retVal = extractArchiveGui( path + itemName, true );
+			break;
+
 		case EFcCommand::RenameItem:
 			LvUtils::editItemLabel( _listViewItems.getHwnd(), focusedItem );
 			break;

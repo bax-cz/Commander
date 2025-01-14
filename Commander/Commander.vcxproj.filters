@@ -1265,6 +1265,15 @@
     <ClCompile Include="..\Lzma\CPP\Common\MyMap.cpp">
       <Filter>Source Files\7zip\Common</Filter>
     </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\Md5Reg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\Sha3Reg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Lzma\CPP\Common\Sha512Reg.cpp">
+      <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Commander.rc">

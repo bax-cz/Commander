@@ -251,7 +251,7 @@ namespace Commander
 				_tempFileName = FCS::inst().getTempPath() + PathUtils::stripPath( fileName );
 
 				// file extractor sends UM_READERNOTIFY notification when done
-				CBaseDialog::createModeless<CFileExtractor>( _hDlg )->extract(
+				CBaseDialog::createModeless<CFileUnpacker>( _hDlg )->unpack(
 					dirName, fileName, FCS::inst().getTempPath(), CArchiver::EExtractAction::Overwrite );
 			}
 			else // read file directly
@@ -376,7 +376,9 @@ namespace Commander
 		{
 			SetCursor( NULL );
 
-			MessageBox( _hDlg, _errorMessage.c_str(), L"Cannot Read File", MB_ICONEXCLAMATION | MB_OK );
+			if( !_errorMessage.empty() )
+				MessageBox( _hDlg, _errorMessage.c_str(), L"Cannot Read File", MB_ICONEXCLAMATION | MB_OK );
+
 			close(); // close dialog
 		}
 	}
@@ -440,6 +442,12 @@ namespace Commander
 	{
 		CTextFileReader reader( inStream, &_worker, _useEncoding, _useCodePage, CTextFileReader::EOptions::forceAnsi );
 
+		// ask user what to do when text file is too big (over 16MB)
+		if( !reader.isText() && _fileSize > 0xFFFFFFll && MessageBox( _hDlg,
+				L"File appears to be a binary file.\nContinue displaying as text?", L"Binary File",
+				MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2 ) == IDNO )
+			return false;
+
 		_useEncoding = reader.getEncoding();
 		_fileBom = reader.getByteOrderMarker();
 		_fileEol = reader.getEol();
@@ -448,7 +456,7 @@ namespace Commander
 		PrintDebug("Encoding: %ls, EOL: %ls", StringUtils::encodingToStr( _useEncoding ).c_str(), StringUtils::eolToStr( _fileEol ).c_str());
 
 		// read file content as text
-		DWORD errorId = NO_ERROR;
+		DWORD errorId = ERROR_SUCCESS;
 		SIZE_T offset = 0ull, allocSize = getAllocSize( _useEncoding, _fileEol, _fileSize );
 
 		HLOCAL hLocal = LocalAlloc( ( !_fileSize ? LMEM_MOVEABLE | LMEM_ZEROINIT : LMEM_MOVEABLE ), allocSize );
@@ -494,11 +502,11 @@ namespace Commander
 						*(buf + offset) = L'\0'; // append terminating zero
 				}
 
-				DWORD errorIdUnlock = NO_ERROR;
+				DWORD errorIdUnlock = ERROR_SUCCESS;
 				if( LocalUnlock( hLocal ) == FALSE )
 					errorIdUnlock = GetLastError();
 
-				if( errorIdUnlock != NO_ERROR && errorIdUnlock != ERROR_NOT_LOCKED )
+				if( errorIdUnlock != ERROR_SUCCESS && errorIdUnlock != ERROR_NOT_LOCKED )
 				{
 					PrintDebug("LocalUnlock Error: %u", errorIdUnlock);
 				}

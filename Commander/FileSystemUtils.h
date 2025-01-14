@@ -850,6 +850,44 @@ namespace Commander
 		}
 
 		//
+		// Get list of entries inside given directory - excluding dotted (. and ..) directories
+		//
+		static std::vector<std::wstring> getEntriesList( const std::wstring& dirName, DWORD flags )
+		{
+			std::vector<std::wstring> outList;
+
+			auto pathFind = PathUtils::addDelimiter( dirName );
+
+			WIN32_FIND_DATA wfd = { 0 };
+
+			// crawl file system structure
+			HANDLE hFile = FindFirstFileEx( ( PathUtils::getExtendedPath( pathFind ) + L"*" ).c_str(), FindExInfoStandard, &wfd, FindExSearchNameMatch, NULL, flags );
+			if( hFile != INVALID_HANDLE_VALUE )
+			{
+				do
+				{
+					if( ( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) )
+					{
+						if( !( wfd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT )
+							&& !PathUtils::isDirectoryDotted( wfd.cFileName )
+							&& !PathUtils::isDirectoryDoubleDotted( wfd.cFileName ))
+						{
+							outList.push_back( pathFind + wfd.cFileName );
+						}
+					}
+					else
+					{
+						outList.push_back( pathFind + wfd.cFileName );
+					}
+				} while( FindNextFile( hFile, &wfd ) );
+
+				FindClose( hFile );
+			}
+
+			return outList;
+		}
+
+		//
 		// Get free space on disk
 		//
 		static ULONGLONG getDiskFreeSpace( const std::wstring& driveName, ULONGLONG *total = NULL )

@@ -508,6 +508,7 @@
     <ClCompile Include="..\Lzma\CPP\Common\CRC.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\CrcReg.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\IntToString.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\Md5Reg.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\MyMap.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\MyString.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\MyVector.cpp" />
@@ -515,6 +516,8 @@
     <ClCompile Include="..\Lzma\CPP\Common\NewHandler.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\Sha1Reg.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\Sha256Reg.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\Sha3Reg.cpp" />
+    <ClCompile Include="..\Lzma\CPP\Common\Sha512Reg.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\StringConvert.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\StringToInt.cpp" />
     <ClCompile Include="..\Lzma\CPP\Common\UTFConvert.cpp" />

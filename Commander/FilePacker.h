@@ -10,7 +10,7 @@ namespace Commander
 		static const UINT resouceIdTemplate = IDD_PROGRESS;
 
 	public:
-		void packFiles( const std::wstring& targetName, CPanelTab *pPanel );
+		void packFiles( const std::wstring& targetName, std::shared_ptr<CPanelTab> spPanel );
 
 		virtual void onInit() override;
 		virtual bool onClose() override;
