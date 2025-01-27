@@ -1068,8 +1068,9 @@ namespace Commander
 				return false;
 			}
 
+			const GUID *clsid = getClsidFromFileName( _fileName );
 			CMyComPtr<IOutArchive> outArchive;
-			if( CreateObject( &CLSID_CFormat7z, &IID_IOutArchive, (void **)&outArchive ) != S_OK )
+			if( CreateObject( clsid, &IID_IOutArchive, (void **)&outArchive ) != S_OK )
 			{
 				_errorMessage = L"CArch7zip: Cannot get class object.";
 				return false;
