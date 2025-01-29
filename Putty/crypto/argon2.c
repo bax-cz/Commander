@@ -466,7 +466,7 @@ static void argon2_internal(uint32_t p, uint32_t T, uint32_t m, uint32_t t,
                      * in our current output block. */
                     G_xor(B[i + p * j].data, B[i + p * jm1].data,
                           B[index_l + p * index_z].data);
-}
+                }
             }
 
             /* We've finished processing a slice. Reset jstart to 0. It will

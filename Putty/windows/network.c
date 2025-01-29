@@ -224,8 +224,8 @@ DECL_WINDOWS_FUNCTION(static, int, getaddrinfo,
                        const struct addrinfo *hints, struct addrinfo **res));
 DECL_WINDOWS_FUNCTION(static, void, freeaddrinfo, (struct addrinfo *res));
 DECL_WINDOWS_FUNCTION(static, int, getnameinfo,
-                      (const struct sockaddr FAR * sa, socklen_t salen,
-                       char FAR * host, DWORD hostlen, char FAR * serv,
+                      (const struct sockaddr FAR *sa, socklen_t salen,
+                       char FAR *host, DWORD hostlen, char FAR *serv,
                        DWORD servlen, int flags));
 DECL_WINDOWS_FUNCTION(static, int, WSAAddressToStringA,
                       (LPSOCKADDR, DWORD, LPWSAPROTOCOL_INFO,
@@ -482,24 +482,24 @@ SockAddr *sk_namelookup(const char *host, char **canonicalname,
     addr->refcount = 1;
 
 #ifndef NO_IPV6
-        /*
+    /*
      * Use getaddrinfo, as long as it's available. This should handle
      * both IPv4 and IPv6 address literals, and hostnames, in one
      * unified API.
-         */
-        if (p_getaddrinfo) {
-            struct addrinfo hints;
-            memset(&hints, 0, sizeof(hints));
+     */
+    if (p_getaddrinfo) {
+        struct addrinfo hints;
+        memset(&hints, 0, sizeof(hints));
         hints.ai_family = (address_family == ADDRTYPE_IPV4 ? AF_INET :
                            address_family == ADDRTYPE_IPV6 ? AF_INET6 :
                            AF_UNSPEC);
-            hints.ai_flags = AI_CANONNAME;
+        hints.ai_flags = AI_CANONNAME;
         hints.ai_socktype = SOCK_STREAM;
 
-                /* strip [] on IPv6 address literals */
-                char *trimmed_host = host_strduptrim(host);
+        /* strip [] on IPv6 address literals */
+        char *trimmed_host = host_strduptrim(host);
         int err = p_getaddrinfo(trimmed_host, NULL, &hints, &addr->ais);
-                sfree(trimmed_host);
+        sfree(trimmed_host);
 
         if (addr->ais) {
             addr->superfamily = IP;
@@ -509,17 +509,17 @@ SockAddr *sk_namelookup(const char *host, char **canonicalname,
                 *canonicalname = dupstr(host);
         } else {
             addr->error = namelookup_strerror(err);
-            }
+        }
         return addr;
-            }
+    }
 #endif
 
-            /*
+    /*
      * Failing that (if IPv6 support was not compiled in, or if
      * getaddrinfo turned out to be unavailable at run time), try the
      * old-fashioned approach, which is to start by manually checking
      * for an IPv4 literal and then use gethostbyname.
-             */
+     */
     unsigned long a = p_inet_addr(host);
     if (a != (unsigned long) INADDR_NONE) {
         addr->addresses = snew(unsigned long);
@@ -528,19 +528,19 @@ SockAddr *sk_namelookup(const char *host, char **canonicalname,
         addr->superfamily = IP;
         *canonicalname = dupstr(host);
         return addr;
-        }
+    }
 
     struct hostent *h = p_gethostbyname(host);
     if (h) {
         addr->superfamily = IP;
 
         size_t n;
-                for (n = 0; h->h_addr_list[n]; n++);
+        for (n = 0; h->h_addr_list[n]; n++);
         addr->addresses = snewn(n, unsigned long);
         addr->naddresses = n;
         for (n = 0; n < addr->naddresses; n++) {
             uint32_t a;
-                    memcpy(&a, h->h_addr_list[n], sizeof(a));
+            memcpy(&a, h->h_addr_list[n], sizeof(a));
             addr->addresses[n] = p_ntohl(a);
         }
 
@@ -887,7 +887,9 @@ static Socket *sk_net_accept(accept_ctx_t ctx, Plug *plug)
         return &ret->sock;
     }
 
+    WINSCP_PUTTY_SECTION_ENTER;
     add234(sktree, ret);
+    WINSCP_PUTTY_SECTION_LEAVE;
 
     return &ret->sock;
 }
@@ -940,7 +942,9 @@ static DWORD try_connect(NetSocket *sock,
      * sorting criterion. We'll add it back before exiting this
      * function, whether we changed anything or not.
      */
+    WINSCP_PUTTY_SECTION_ENTER;
     del234(sktree, sock);
+    WINSCP_PUTTY_SECTION_LEAVE;
 
     s = p_socket(family, SOCK_STREAM, 0);
     sock->s = s;
@@ -951,7 +955,7 @@ static DWORD try_connect(NetSocket *sock,
         goto ret;
     }
 
-        SetHandleInformation((HANDLE)s, HANDLE_FLAG_INHERIT, 0);
+    SetHandleInformation((HANDLE)s, HANDLE_FLAG_INHERIT, 0);
 
     if (sock->oobinline) {
         BOOL b = true;
@@ -1146,12 +1150,14 @@ static DWORD try_connect(NetSocket *sock,
 
     err = 0;
 
-    ret:
+  ret:
 
     /*
      * No matter what happened, put the socket back in the tree.
      */
+    WINSCP_PUTTY_SECTION_ENTER;
     add234(sktree, sock);
+    WINSCP_PUTTY_SECTION_LEAVE;
 
     if (err) {
         SockAddr thisaddr = sk_extractaddr_tmp(
@@ -1217,7 +1223,7 @@ Socket *sk_new(SockAddr *addr, int port, bool privport, bool oobinline,
 
 static Socket *sk_newlistener_internal(
     const char *srcaddr, int port, Plug *plug,
-                       bool local_host_only, int orig_address_family)
+    bool local_host_only, int orig_address_family)
 {
     SOCKET s;
     SOCKADDR_IN a;
@@ -1292,65 +1298,65 @@ static Socket *sk_newlistener_internal(
     switch (address_family) {
 #ifndef NO_IPV6
       case AF_INET6: {
-            memset(&a6, 0, sizeof(a6));
-            a6.sin6_family = AF_INET6;
-            if (local_host_only)
-                a6.sin6_addr = in6addr_loopback;
-            else
-                a6.sin6_addr = in6addr_any;
-            if (srcaddr != NULL && p_getaddrinfo) {
-                struct addrinfo hints;
-                struct addrinfo *ai;
-                int err;
+        memset(&a6, 0, sizeof(a6));
+        a6.sin6_family = AF_INET6;
+        if (local_host_only)
+            a6.sin6_addr = in6addr_loopback;
+        else
+            a6.sin6_addr = in6addr_any;
+        if (srcaddr != NULL && p_getaddrinfo) {
+            struct addrinfo hints;
+            struct addrinfo *ai;
+            int err;
 
-                memset(&hints, 0, sizeof(hints));
-                hints.ai_family = AF_INET6;
-                hints.ai_flags = 0;
-                {
-                    /* strip [] on IPv6 address literals */
-                    char *trimmed_addr = host_strduptrim(srcaddr);
-                    err = p_getaddrinfo(trimmed_addr, NULL, &hints, &ai);
-                    sfree(trimmed_addr);
-                }
-                if (err == 0 && ai->ai_family == AF_INET6) {
-                    a6.sin6_addr =
-                        ((struct sockaddr_in6 *)ai->ai_addr)->sin6_addr;
-                }
+            memset(&hints, 0, sizeof(hints));
+            hints.ai_family = AF_INET6;
+            hints.ai_flags = 0;
+            {
+                /* strip [] on IPv6 address literals */
+                char *trimmed_addr = host_strduptrim(srcaddr);
+                err = p_getaddrinfo(trimmed_addr, NULL, &hints, &ai);
+                sfree(trimmed_addr);
             }
-            a6.sin6_port = p_htons(port);
+            if (err == 0 && ai->ai_family == AF_INET6) {
+                a6.sin6_addr =
+                    ((struct sockaddr_in6 *)ai->ai_addr)->sin6_addr;
+            }
+        }
+        a6.sin6_port = p_htons(port);
         bindaddr = (struct sockaddr *)&a6;
         bindsize = sizeof(a6);
         break;
       }
 #endif
       case AF_INET: {
-            bool got_addr = false;
-            a.sin_family = AF_INET;
+        bool got_addr = false;
+        a.sin_family = AF_INET;
 
-            /*
-             * Bind to source address. First try an explicitly
-             * specified one...
-             */
-            if (srcaddr) {
-                a.sin_addr.s_addr = p_inet_addr(srcaddr);
-                if (a.sin_addr.s_addr != INADDR_NONE) {
-                    /* Override localhost_only with specified listen addr. */
-                    ret->localhost_only = ipv4_is_loopback(a.sin_addr);
-                    got_addr = true;
-                }
+        /*
+         * Bind to source address. First try an explicitly
+         * specified one...
+         */
+        if (srcaddr) {
+            a.sin_addr.s_addr = p_inet_addr(srcaddr);
+            if (a.sin_addr.s_addr != INADDR_NONE) {
+                /* Override localhost_only with specified listen addr. */
+                ret->localhost_only = ipv4_is_loopback(a.sin_addr);
+                got_addr = true;
             }
+        }
 
-            /*
-             * ... and failing that, go with one of the standard ones.
-             */
-            if (!got_addr) {
-                if (local_host_only)
-                    a.sin_addr.s_addr = p_htonl(INADDR_LOOPBACK);
-                else
-                    a.sin_addr.s_addr = p_htonl(INADDR_ANY);
-            }
+        /*
+         * ... and failing that, go with one of the standard ones.
+         */
+        if (!got_addr) {
+            if (local_host_only)
+                a.sin_addr.s_addr = p_htonl(INADDR_LOOPBACK);
+            else
+                a.sin_addr.s_addr = p_htonl(INADDR_ANY);
+        }
 
-            a.sin_port = p_htons((short)port);
+        a.sin_port = p_htons((short)port);
         bindaddr = (struct sockaddr *)&a;
         bindsize = sizeof(a);
         break;
@@ -1362,18 +1368,18 @@ static Socket *sk_newlistener_internal(
         bindaddr = (struct sockaddr *)&au;
         bindsize = sizeof(au);
         break;
-        }
+      }
 #endif
       default:
         unreachable("bad address family in sk_newlistener_internal");
     }
 
     retcode = p_bind(s, bindaddr, bindsize);
-        if (retcode != SOCKET_ERROR) {
-            err = 0;
-        } else {
-            err = p_WSAGetLastError();
-        }
+    if (retcode != SOCKET_ERROR) {
+        err = 0;
+    } else {
+        err = p_WSAGetLastError();
+    }
 
     if (err) {
         p_closesocket(s);
@@ -1401,7 +1407,9 @@ static Socket *sk_newlistener_internal(
         return &ret->sock;
     }
 
+    WINSCP_PUTTY_SECTION_ENTER;
     add234(sktree, ret);
+    WINSCP_PUTTY_SECTION_LEAVE;
 
 #ifndef NO_IPV6
     /*
@@ -1463,7 +1471,9 @@ static void sk_net_close(Socket *sock)
 
     bufchain_clear(&s->output_data);
 
+    WINSCP_PUTTY_SECTION_ENTER;
     del234(sktree, s);
+    WINSCP_PUTTY_SECTION_LEAVE;
 #ifdef MPEXT
     do_select(s->plug, s->s, false);
 #else
@@ -1500,7 +1510,11 @@ static void socket_error_callback(void *vs)
      * Just in case other socket work has caused this socket to vanish
      * or become somehow non-erroneous before this callback arrived...
      */
-    if (!find234(sktree, s, NULL) || !s->pending_error)
+    int nr;
+    WINSCP_PUTTY_SECTION_ENTER;
+    nr = !find234(sktree, s, NULL) || !s->pending_error;
+    WINSCP_PUTTY_SECTION_LEAVE;
+    if (nr)
         return;
 
     /*
@@ -1662,7 +1676,9 @@ void select_result(WPARAM wParam, LPARAM lParam)
     if (wParam == 0)
         return;                /* boggle */
 
+    WINSCP_PUTTY_SECTION_ENTER;
     s = find234(sktree, (void *) wParam, cmpforsearch);
+    WINSCP_PUTTY_SECTION_LEAVE;
     if (!s)
         return;                /* boggle */
 
@@ -1794,7 +1810,7 @@ void select_result(WPARAM wParam, LPARAM lParam)
                     plug_receive(s->plug, 0, buf, ret);
                 else
                     plug_closing_normal(s->plug);
-                }
+            }
         } while (ret > 0);
         return;
       case FD_ACCEPT: {
@@ -1812,9 +1828,9 @@ void select_result(WPARAM wParam, LPARAM lParam)
         t = p_accept(s->s,(struct sockaddr *)&isa,&addrlen);
         if (t == INVALID_SOCKET)
         {
-          err = p_WSAGetLastError();
-          if (err == WSATRY_AGAIN)
-              break;
+            err = p_WSAGetLastError();
+            if (err == WSATRY_AGAIN)
+                break;
         }
 
         actx.p = (void *)t;
@@ -1827,9 +1843,9 @@ void select_result(WPARAM wParam, LPARAM lParam)
         if (s->localhost_only && !ipv4_is_local_addr(isa.sin_addr))
 #endif
         {
-          p_closesocket(t);      /* dodgy WinSock let nonlocal through */
+            p_closesocket(t);      /* dodgy WinSock let nonlocal through */
         } else if (plug_accepting(s->plug, sk_net_accept, actx)) {
-          p_closesocket(t);      /* denied or error */
+            p_closesocket(t);      /* denied or error */
         }
         break;
       }
@@ -1920,6 +1936,9 @@ static void sk_net_set_frozen(Socket *sock, bool is_frozen)
     s->frozen_readable = false;
 }
 
+#ifndef WINSCP
+// WINSCP: if ever needed, do not forget about guarding access to sktree
+
 void socket_reselect_all(void)
 {
     NetSocket *s;
@@ -1927,11 +1946,7 @@ void socket_reselect_all(void)
 
     for (i = 0; (s = index234(sktree, i)) != NULL; i++) {
         if (!s->frozen)
-#ifdef MPEXT
-            do_select(s->plug, s->s, true);
-#else
             do_select(s->s, true);
-#endif
     }
 }
 
@@ -1961,6 +1976,7 @@ bool socket_writable(SOCKET skt)
     else
         return false;
 }
+#endif
 
 int net_service_lookup(const char *service)
 {

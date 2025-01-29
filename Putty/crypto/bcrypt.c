@@ -12,7 +12,7 @@
 #include "blowfish.h"
 
 static BlowfishContext *bcrypt_setup(const unsigned char *key, int keybytes,
-                              const unsigned char *salt, int saltbytes)
+                                     const unsigned char *salt, int saltbytes)
 {
     int i;
     BlowfishContext *ctx;
@@ -33,8 +33,8 @@ static BlowfishContext *bcrypt_setup(const unsigned char *key, int keybytes,
 }
 
 static void bcrypt_hash(const unsigned char *key, int keybytes,
-                 const unsigned char *salt, int saltbytes,
-                 unsigned char output[32])
+                        const unsigned char *salt, int saltbytes,
+                        unsigned char output[32])
 {
     BlowfishContext *ctx;
     int i;
@@ -50,9 +50,9 @@ static void bcrypt_hash(const unsigned char *key, int keybytes,
 }
 
 static void bcrypt_genblock(int counter,
-                     const unsigned char hashed_passphrase[64],
-                     const unsigned char *salt, int saltbytes,
-                     unsigned char output[32])
+                            const unsigned char hashed_passphrase[64],
+                            const unsigned char *salt, int saltbytes,
+                            unsigned char output[32])
 {
     unsigned char hashed_salt[64];
 

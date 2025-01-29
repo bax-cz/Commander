@@ -353,7 +353,7 @@ static void proxy_socks5_process_queue(ProxyNegotiator *pn)
                             "SOCKS 5 CHAP authentication failed");
                         crStopV;
                     }
-                } else if (s->chap_attr==SOCKS5_AUTH_CHAP_ATTR_CHALLENGE) {
+                } else if (s->chap_attr == SOCKS5_AUTH_CHAP_ATTR_CHALLENGE) {
                     /* The CHAP challenge string. Send the response */
                     strbuf *response = chap_response(
                         make_ptrlen(s->chap_buf, s->chap_attr_len),

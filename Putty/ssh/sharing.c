@@ -561,7 +561,7 @@ static void share_remove_halfchannel(struct ssh_sharing_connstate *cs,
 
 static struct share_channel *share_add_channel(
     struct ssh_sharing_connstate *cs, unsigned downstream_id,
-     unsigned upstream_id, unsigned server_id, int state, int maxpkt)
+    unsigned upstream_id, unsigned server_id, int state, int maxpkt)
 {
     struct share_channel *chan = snew(struct share_channel);
     chan->downstream_id = downstream_id;
@@ -663,7 +663,7 @@ static struct share_xchannel *share_find_xchannel_by_server(
 }
 
 static void share_remove_xchannel(struct ssh_sharing_connstate *cs,
-                                 struct share_xchannel *xc)
+                                  struct share_xchannel *xc)
 {
     del234(cs->xchannels_by_us, xc);
     del234(cs->xchannels_by_server, xc);
@@ -988,7 +988,7 @@ static void share_xchannel_add_message(
 }
 
 static void share_dead_xchannel_respond(struct ssh_sharing_connstate *cs,
-                                 struct share_xchannel *xc)
+                                        struct share_xchannel *xc)
 {
     /*
      * Handle queued incoming messages from the server destined for an
@@ -1013,8 +1013,8 @@ static void share_dead_xchannel_respond(struct ssh_sharing_connstate *cs,
                 put_uint32(packet, xc->server_id);
                 ssh_send_packet_from_downstream(
                     cs->parent->cl, cs->id, SSH2_MSG_CHANNEL_FAILURE,
-                     packet->s, packet->len,
-                     "downstream refused X channel open");
+                    packet->s, packet->len,
+                    "downstream refused X channel open");
                 strbuf_free(packet);
             }
         } else if (msg->type == SSH2_MSG_CHANNEL_CLOSE) {
@@ -1070,7 +1070,7 @@ static void share_xchannel_confirmation(
 }
 
 static void share_xchannel_failure(struct ssh_sharing_connstate *cs,
-                            struct share_xchannel *xc)
+                                   struct share_xchannel *xc)
 {
     /*
      * If downstream refuses to open our X channel at all for some
@@ -1381,7 +1381,7 @@ static void share_got_pkt_from_downstream(struct ssh_sharing_connstate *cs,
                 pkt[wantreplypos] = 1;
                 ssh_send_packet_from_downstream(
                     cs->parent->cl, cs->id, type, pkt, pktlen,
-                     orig_wantreply ? NULL : "upstream added want_reply flag");
+                    orig_wantreply ? NULL : "upstream added want_reply flag");
                 fwd = share_add_forwarding(cs, host, port);
                 ssh_sharing_queue_global_request(cs->parent->cl, cs);
 
@@ -1444,7 +1444,7 @@ static void share_got_pkt_from_downstream(struct ssh_sharing_connstate *cs,
                 pkt[wantreplypos] = 1;
                 ssh_send_packet_from_downstream(
                     cs->parent->cl, cs->id, type, pkt, pktlen,
-                     orig_wantreply ? NULL : "upstream added want_reply flag");
+                    orig_wantreply ? NULL : "upstream added want_reply flag");
                 ssh_sharing_queue_global_request(cs->parent->cl, cs);
 
                 /*

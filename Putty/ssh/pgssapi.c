@@ -115,7 +115,7 @@ static gss_OID_desc oid_GSS_C_NT_EXPORT_NAME = {
     /* The implementation must reserve static storage for a
      * gss_OID_desc object containing the value */
     6, "\x2b\x06\x01\x05\x06\x04",
-     /* corresponding to an object-identifier value of
+    /* corresponding to an object-identifier value of
      * {1(iso), 3(org), 6(dod), 1(internet), 5(security),
      * 6(nametypes), 4(gss-api-exported-name)}.  The constant
      * GSS_C_NT_EXPORT_NAME should be initialized to point

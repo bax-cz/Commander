@@ -18,7 +18,7 @@ enum TCipher { cipWarn, cip3DES, cipBlowfish, cipAES, cipDES, cipArcfour, cipCha
 // explicit values to skip obsoleted fsExternalSSH, fsExternalSFTP
 enum TFSProtocol { fsSCPonly = 0, fsSFTP = 1, fsSFTPonly = 2, fsFTP = 5, fsWebDAV = 6, fsS3 = 7 };
 #define FSPROTOCOL_COUNT (fsS3+1)
-extern const wchar_t * ProxyMethodNames;
+extern const wchar_t *ProxyMethodNames;
 enum TProxyMethod { pmNone, pmSocks4, pmSocks5, pmHTTP, pmTelnet, pmCmd };
 enum TKex { kexWarn, kexDHGroup1, kexDHGroup14, kexDHGroup15, kexDHGroup16, kexDHGroup17, kexDHGroup18, kexDHGEx, kexRSA, kexECDH, kexNTRUHybrid, kexCount };
 #define KEX_COUNT (kexCount) 
@@ -32,9 +32,9 @@ enum TSshBug { sbHMAC2, sbDeriveKey2, sbRSAPad2,
 #define BUG_COUNT (sbChanReq+1)
 enum TSftpBug { sbSymlink, sbSignedTS };
 #define SFTP_BUG_COUNT (sbSignedTS+1)
-extern const wchar_t * PingTypeNames;
+extern const wchar_t *PingTypeNames;
 enum TPingType { ptOff, ptNullPacket, ptDummyCommand };
-extern const wchar_t * FtpPingTypeNames;
+extern const wchar_t *FtpPingTypeNames;
 enum TFtpPingType { fptOff, fptDummyCommand0, fptDummyCommand, fptDirectoryListing };
 enum TAddressFamily { afAuto, afIPv4, afIPv6 };
 enum TFtps { ftpsNone, ftpsImplicit, ftpsExplicitSsl, ftpsExplicitTls };
@@ -280,7 +280,7 @@ public:
 	void __fastcall SetFSProtocol(TFSProtocol value);
 	UnicodeString __fastcall GetFSProtocolStr();
 	void __fastcall SetLocalDirectory(UnicodeString value);
-	void __fastcall SetOtherLocalDirectory(const UnicodeString & value);
+	void __fastcall SetOtherLocalDirectory(const UnicodeString& value);
 	UnicodeString __fastcall GetLocalDirectoryExpanded();
 	void __fastcall SetRemoteDirectory(UnicodeString value);
 	void __fastcall SetSynchronizeBrowsing(bool value);
@@ -310,8 +310,8 @@ public:
 	void __fastcall SetIgnoreLsWarnings(bool value);
 	void __fastcall SetTcpNoDelay(bool value);
 	void __fastcall SetSendBuf(int value);
-	void __fastcall SetSourceAddress(const UnicodeString & value);
-	void __fastcall SetProtocolFeatures(const UnicodeString & value);
+	void __fastcall SetSourceAddress(const UnicodeString& value);
+	void __fastcall SetProtocolFeatures(const UnicodeString& value);
 	void __fastcall SetSshSimple(bool value);
 	bool __fastcall GetUsesSsh();
 	void __fastcall SetCipherList(UnicodeString value);
@@ -415,62 +415,62 @@ public:
 	void __fastcall SetWebDavAuthLegacy(bool value);
 
 	TDateTime __fastcall GetTimeoutDT();
-	void __fastcall SavePasswords(THierarchicalStorage * Storage, bool PuttyExport, bool DoNotEncryptPasswords, bool SaveAll);
+	void __fastcall SavePasswords(THierarchicalStorage *Storage, bool PuttyExport, bool DoNotEncryptPasswords, bool SaveAll);
 	UnicodeString __fastcall GetLocalName();
 	UnicodeString __fastcall GetFolderName();
 	void __fastcall Modify();
 	UnicodeString __fastcall GetSource();
-	void __fastcall DoLoad(THierarchicalStorage * Storage, bool PuttyImport, bool & RewritePassword, bool Unsafe, bool RespectDisablePasswordStoring);
-	void __fastcall DoSave(THierarchicalStorage * Storage,
-		bool PuttyExport, const TSessionData * Default, bool DoNotEncryptPasswords);
-	UnicodeString __fastcall ReadXmlNode(_di_IXMLNode Node, const UnicodeString & Name, const UnicodeString & Default);
-	int __fastcall ReadXmlNode(_di_IXMLNode Node, const UnicodeString & Name, int Default);
-	_di_IXMLNode __fastcall FindSettingsNode(_di_IXMLNode Node, const UnicodeString & Name);
-	UnicodeString __fastcall ReadSettingsNode(_di_IXMLNode Node, const UnicodeString & Name, const UnicodeString & Default);
-	int __fastcall ReadSettingsNode(_di_IXMLNode Node, const UnicodeString & Name, int Default);
-	bool __fastcall IsSame(const TSessionData * Default, bool AdvancedOnly, TStrings * DifferentProperties, bool Decrypted);
+	void __fastcall DoLoad(THierarchicalStorage *Storage, bool PuttyImport, bool& RewritePassword, bool Unsafe, bool RespectDisablePasswordStoring);
+	void __fastcall DoSave(THierarchicalStorage *Storage,
+		bool PuttyExport, const TSessionData *Default, bool DoNotEncryptPasswords);
+	UnicodeString __fastcall ReadXmlNode(_di_IXMLNode Node, const UnicodeString& Name, const UnicodeString& Default);
+	int __fastcall ReadXmlNode(_di_IXMLNode Node, const UnicodeString& Name, int Default);
+	_di_IXMLNode __fastcall FindSettingsNode(_di_IXMLNode Node, const UnicodeString& Name);
+	UnicodeString __fastcall ReadSettingsNode(_di_IXMLNode Node, const UnicodeString& Name, const UnicodeString& Default);
+	int __fastcall ReadSettingsNode(_di_IXMLNode Node, const UnicodeString& Name, int Default);
+	bool __fastcall IsSame(const TSessionData *Default, bool AdvancedOnly, TStrings *DifferentProperties, bool Decrypted);
 	UnicodeString __fastcall GetNameWithoutHiddenPrefix();
 	bool __fastcall HasStateData();
-	void __fastcall CopyStateData(TSessionData * SourceData);
-	void __fastcall CopyNonCoreData(TSessionData * SourceData);
+	void __fastcall CopyStateData(TSessionData *SourceData);
+	void __fastcall CopyNonCoreData(TSessionData *SourceData);
 	UnicodeString __fastcall GetNormalizedPuttyProtocol() const;
 	void ReadPasswordsFromFiles();
-	static RawByteString __fastcall EncryptPassword(const UnicodeString & Password, UnicodeString Key);
-	static UnicodeString __fastcall DecryptPassword(const RawByteString & Password, UnicodeString Key);
-	static RawByteString __fastcall StronglyRecryptPassword(const RawByteString & Password, UnicodeString Key);
-	static bool __fastcall DoIsProtocolUrl(const UnicodeString & Url, const UnicodeString & Protocol, int & ProtocolLen);
-	static bool __fastcall IsProtocolUrl(const UnicodeString & Url, const UnicodeString & Protocol, int & ProtocolLen);
-	static void __fastcall AddSwitch(UnicodeString & Result, const UnicodeString & Name, bool Rtf);
+	static RawByteString __fastcall EncryptPassword(const UnicodeString& Password, UnicodeString Key);
+	static UnicodeString __fastcall DecryptPassword(const RawByteString& Password, UnicodeString Key);
+	static RawByteString __fastcall StronglyRecryptPassword(const RawByteString& Password, UnicodeString Key);
+	static bool __fastcall DoIsProtocolUrl(const UnicodeString& Url, const UnicodeString& Protocol, int& ProtocolLen);
+	static bool __fastcall IsProtocolUrl(const UnicodeString& Url, const UnicodeString& Protocol, int& ProtocolLen);
+	static void __fastcall AddSwitch(UnicodeString& Result, const UnicodeString& Name, bool Rtf);
 	static void __fastcall AddSwitch(
-		UnicodeString & Result, const UnicodeString & Name, const UnicodeString & Value, bool Rtf);
-	static void __fastcall AddSwitch(UnicodeString & Result, const UnicodeString & Name, int Value, bool Rtf);
+		UnicodeString& Result, const UnicodeString& Name, const UnicodeString& Value, bool Rtf);
+	static void __fastcall AddSwitch(UnicodeString& Result, const UnicodeString& Name, int Value, bool Rtf);
 	static void __fastcall AddAssemblyProperty(
-		UnicodeString & Result, TAssemblyLanguage Language,
-		const UnicodeString & Name, const UnicodeString & Value);
+		UnicodeString& Result, TAssemblyLanguage Language,
+		const UnicodeString& Name, const UnicodeString& Value);
 	static void __fastcall AddAssemblyProperty(
-		UnicodeString & Result, TAssemblyLanguage Language,
-		const UnicodeString & Name, const UnicodeString & Type,
-		const UnicodeString & Member);
+		UnicodeString& Result, TAssemblyLanguage Language,
+		const UnicodeString& Name, const UnicodeString& Type,
+		const UnicodeString& Member);
 	static void __fastcall AddAssemblyProperty(
-		UnicodeString & Result, TAssemblyLanguage Language,
-		const UnicodeString & Name, int Value);
+		UnicodeString& Result, TAssemblyLanguage Language,
+		const UnicodeString& Name, int Value);
 	void __fastcall AddAssemblyProperty(
-		UnicodeString & Result, TAssemblyLanguage Language,
-		const UnicodeString & Name, bool Value);
-	TStrings * __fastcall GetRawSettingsForUrl();
-	void __fastcall DoCopyData(TSessionData * SourceData, bool NoRecrypt);
+		UnicodeString& Result, TAssemblyLanguage Language,
+		const UnicodeString& Name, bool Value);
+	TStrings __fastcall *GetRawSettingsForUrl();
+	void __fastcall DoCopyData(TSessionData *SourceData, bool NoRecrypt);
 	bool HasS3AutoCredentials();
 	template<class AlgoT>
-	void __fastcall SetAlgoList(AlgoT * List, const AlgoT * DefaultList, const UnicodeString * Names,
+	void __fastcall SetAlgoList(AlgoT *List, const AlgoT *DefaultList, const UnicodeString *Names,
 		int Count, AlgoT WarnAlgo, UnicodeString value);
-	static void __fastcall Remove(THierarchicalStorage * Storage, const UnicodeString & Name);
+	static void __fastcall Remove(THierarchicalStorage *Storage, const UnicodeString& Name);
 
 	__property UnicodeString InternalStorageKey = { read = GetInternalStorageKey };*/
 
 public:
 	inline /*__fastcall*/ TSessionData(/*UnicodeString aName*/) { Default(); FModified = true; }
 	inline /*virtual*/ /*__fastcall*/ ~TSessionData() {}
-//	TSessionData * __fastcall Clone();
+//	TSessionData __fastcall *Clone();
 	inline void /*__fastcall*/ Default() {
 		DefaultSettings();
 		FIsWorkspace = false;
@@ -692,14 +692,14 @@ public:
 		return Result;
 	}
 	/*void __fastcall NonPersistant();
-	void __fastcall Load(THierarchicalStorage * Storage, bool PuttyImport);
-	void __fastcall ApplyRawSettings(TStrings * RawSettings, bool Unsafe);
-	void __fastcall ApplyRawSettings(THierarchicalStorage * Storage, bool Unsafe, bool RespectDisablePasswordStoring);
-	void __fastcall ImportFromFilezilla(_di_IXMLNode Node, const UnicodeString & Path, _di_IXMLNode SettingsNode);
-	void ImportFromOpenssh(TStrings * Lines);
-	void __fastcall Save(THierarchicalStorage * Storage, bool PuttyExport,
-		const TSessionData * Default = NULL);
-	void __fastcall SaveRecryptedPasswords(THierarchicalStorage * Storage);
+	void __fastcall Load(THierarchicalStorage *Storage, bool PuttyImport);
+	void __fastcall ApplyRawSettings(TStrings *RawSettings, bool Unsafe);
+	void __fastcall ApplyRawSettings(THierarchicalStorage *Storage, bool Unsafe, bool RespectDisablePasswordStoring);
+	void __fastcall ImportFromFilezilla(_di_IXMLNode Node, const UnicodeString& Path, _di_IXMLNode SettingsNode);
+	void ImportFromOpenssh(TStrings *Lines);
+	void __fastcall Save(THierarchicalStorage *Storage, bool PuttyExport,
+		const TSessionData *Default = NULL);
+	void __fastcall SaveRecryptedPasswords(THierarchicalStorage *Storage);
 	void __fastcall RecryptPasswords();
 	bool __fastcall HasPassword();
 	bool __fastcall HasAnySessionPassword();
@@ -708,24 +708,24 @@ public:
 	void __fastcall MaskPasswords();
 	void __fastcall Remove();
 	void __fastcall CacheHostKeyIfNotCached();
-	virtual void __fastcall Assign(TPersistent * Source);
-	virtual int __fastcall Compare(TNamedObject * Other);
-	void __fastcall CopyData(TSessionData * Source);
-	void __fastcall CopyDataNoRecrypt(TSessionData * SourceData);
-	void __fastcall CopyDirectoriesStateData(TSessionData * SourceData);
-	bool __fastcall ParseUrl(UnicodeString Url, TOptions * Options,
-		TStoredSessionList * StoredSessions, bool & DefaultsOnly,
-		UnicodeString * FileName, bool * AProtocolDefined, UnicodeString * MaskedUrl, int Flags);
-	TStrings * __fastcall SaveToOptions(const TSessionData * Default, bool SaveName, bool PuttyExport);
+	virtual void __fastcall Assign(TPersistent *Source);
+	virtual int __fastcall Compare(TNamedObject *Other);
+	void __fastcall CopyData(TSessionData *Source);
+	void __fastcall CopyDataNoRecrypt(TSessionData *SourceData);
+	void __fastcall CopyDirectoriesStateData(TSessionData *SourceData);
+	bool __fastcall ParseUrl(UnicodeString Url, TOptions *Options,
+		TStoredSessionList *StoredSessions, bool& DefaultsOnly,
+		UnicodeString *FileName, bool *AProtocolDefined, UnicodeString *MaskedUrl, int Flags);
+	TStrings __fastcall *SaveToOptions(const TSessionData *Default, bool SaveName, bool PuttyExport);
 	void __fastcall ConfigureTunnel(int PortNumber);
 	void __fastcall RollbackTunnel();
-	TSessionData * CreateTunnelData(int TunnelLocalPortNumber);
+	TSessionData *CreateTunnelData(int TunnelLocalPortNumber);
 	void __fastcall ExpandEnvironmentVariables();
 	void __fastcall DisableAuthentationsExceptPassword();
-	bool __fastcall IsSame(const TSessionData * Default, bool AdvancedOnly);
-	bool __fastcall IsSameDecrypted(const TSessionData * Default);
-	bool __fastcall IsSameSite(const TSessionData * Default);
-	bool __fastcall IsInFolderOrWorkspace(const UnicodeString & Name);
+	bool __fastcall IsSame(const TSessionData *Default, bool AdvancedOnly);
+	bool __fastcall IsSameDecrypted(const TSessionData *Default);
+	bool __fastcall IsSameSite(const TSessionData *Default);
+	bool __fastcall IsInFolderOrWorkspace(const UnicodeString& Name);
 	UnicodeString __fastcall GenerateSessionUrl(unsigned int Flags);
 	bool __fastcall HasRawSettingsForUrl();
 	bool __fastcall HasSessionName();
@@ -735,20 +735,20 @@ public:
 	UnicodeString GetSessionPasswordEncryptionKey() const;
 
 	UnicodeString __fastcall GenerateOpenCommandArgs(bool Rtf);
-	void __fastcall GenerateAssemblyCode(TAssemblyLanguage Language, UnicodeString & Head, UnicodeString & Tail, int & Indent);
+	void __fastcall GenerateAssemblyCode(TAssemblyLanguage Language, UnicodeString& Head, UnicodeString& Tail, int& Indent);
 	void __fastcall LookupLastFingerprint();
 	bool __fastcall IsSecure();
 	static void __fastcall ValidatePath(const UnicodeString Path);
 	static void __fastcall ValidateName(const UnicodeString Name);
-	static UnicodeString __fastcall MakeValidName(const UnicodeString & Name);
-	static UnicodeString __fastcall ExtractLocalName(const UnicodeString & Name);
-	static UnicodeString __fastcall ExtractFolderName(const UnicodeString & Name);
-	static UnicodeString __fastcall ComposePath(const UnicodeString & Path, const UnicodeString & Name);
-	static bool __fastcall IsSensitiveOption(const UnicodeString & Option, const UnicodeString & Value);
-	static bool __fastcall IsOptionWithParameters(const UnicodeString & Option);
-	static bool __fastcall MaskPasswordInOptionParameter(const UnicodeString & Option, UnicodeString & Param);
-	static UnicodeString __fastcall FormatSiteKey(const UnicodeString & HostName, int PortNumber);
-	static TStrings * GetAllOptionNames(bool PuttyExport);
+	static UnicodeString __fastcall MakeValidName(const UnicodeString& Name);
+	static UnicodeString __fastcall ExtractLocalName(const UnicodeString& Name);
+	static UnicodeString __fastcall ExtractFolderName(const UnicodeString& Name);
+	static UnicodeString __fastcall ComposePath(const UnicodeString& Path, const UnicodeString& Name);
+	static bool __fastcall IsSensitiveOption(const UnicodeString& Option, const UnicodeString& Value);
+	static bool __fastcall IsOptionWithParameters(const UnicodeString& Option);
+	static bool __fastcall MaskPasswordInOptionParameter(const UnicodeString& Option, UnicodeString& Param);
+	static UnicodeString __fastcall FormatSiteKey(const UnicodeString& HostName, int PortNumber);
+	static TStrings *GetAllOptionNames(bool PuttyExport);
 
 	__property UnicodeString HostName = { read = FHostName, write = SetHostName };
 	__property UnicodeString HostNameExpanded = { read = GetHostNameExpanded };

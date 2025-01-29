@@ -353,7 +353,7 @@ static struct kexinit_algorithm *ssh2_kexinit_addalg_pl(
     struct kexinit_algorithm *entry = &list->algs[list->nalgs++];
     entry->name = name;
     return entry;
-        }
+}
 
 static struct kexinit_algorithm *ssh2_kexinit_addalg(
     struct kexinit_algorithm_list *list, const char *name)
@@ -1244,7 +1244,7 @@ static ScanKexinitsResult ssh2_scan_kexinits(
     if (kexinit_keyword_found(
             we_are_server ? clists[KEXLIST_KEX] : slists[KEXLIST_KEX],
             we_are_server ? ext_info_c : ext_info_s))
-                *can_send_ext_info = true;
+        *can_send_ext_info = true;
 
     /*
      * Check whether the other side advertised support for kex-strict.
@@ -1536,10 +1536,10 @@ static void ssh2_transport_process_queue(PacketProtocolLayer *ppl)
             filter_outgoing_kexinit(s);
         }
 
-    pktout = ssh_bpp_new_pktout(s->ppl.bpp, SSH2_MSG_KEXINIT);
-    put_data(pktout, s->outgoing_kexinit->u + 1,
+        pktout = ssh_bpp_new_pktout(s->ppl.bpp, SSH2_MSG_KEXINIT);
+        put_data(pktout, s->outgoing_kexinit->u + 1,
                  s->outgoing_kexinit->len - 1); /* omit type byte */
-    pq_push(s->ppl.out_pq, pktout);
+        pq_push(s->ppl.out_pq, pktout);
     }
 
     /*
@@ -2520,9 +2520,9 @@ static void ssh2_transport_reconfigure(PacketProtocolLayer *ppl, Conf *conf)
     for (i = 0; i < CIPHER_MAX; i++)
         if (conf_get_int_int(s->conf, CONF_ssh_cipherlist, i) !=
             conf_get_int_int(conf, CONF_ssh_cipherlist, i)) {
-        rekey_reason = "cipher settings changed";
-        rekey_mandatory = true;
-    }
+            rekey_reason = "cipher settings changed";
+            rekey_mandatory = true;
+        }
     if (conf_get_bool(s->conf, CONF_ssh2_des_cbc) !=
         conf_get_bool(conf, CONF_ssh2_des_cbc)) {
         rekey_reason = "cipher settings changed";

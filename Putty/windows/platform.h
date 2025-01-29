@@ -662,7 +662,7 @@ struct handle *handle_output_new(struct callback_set * callback_set, HANDLE hand
                                  void *privdata, int flags);
 size_t handle_write(struct handle *h, const void *data, size_t len);
 void handle_write_eof(struct handle *h);
-void handle_free(struct handle *h);
+void handle_free(struct handle *h); // WINSCP
 void handle_unthrottle(struct handle *h, size_t backlog);
 size_t handle_backlog(struct handle *h);
 void *handle_get_privdata(struct handle *h);

@@ -2,7 +2,7 @@
 
 /*
 	Borland C++ Builder string types, constants and helper classes/functions
-	NOTE: This is just bare minimum implementation to get winscp stuff compiled!
+	NOTE: This is just bare minimum implementation to get WinScp stuff compiled!
 */
 
 #include <string>
@@ -76,6 +76,8 @@ namespace bcb
 	/* Types aliases */
 	using TStrings = std::vector<UnicodeString>;
 	using TStream = std::ifstream;
+	using TDateTime = ULONGLONG;
+	using TNotifyEvent = void(*)(void*);
 	using TCriticalSection = std::mutex;
 
 	/* Enumeration types */

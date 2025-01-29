@@ -1496,7 +1496,7 @@ typedef struct ecdh_key_w {
     const struct eckex_extra *extra;
     const struct ec_curve *curve;
     mp_int *private;
-        WeierstrassPoint *w_public;
+    WeierstrassPoint *w_public;
 
     ecdh_key ek;
 } ecdh_key_w;
@@ -1505,7 +1505,7 @@ typedef struct ecdh_key_m {
     const struct eckex_extra *extra;
     const struct ec_curve *curve;
     mp_int *private;
-        MontgomeryPoint *m_public;
+    MontgomeryPoint *m_public;
 
     ecdh_key ek;
 } ecdh_key_m;
@@ -1824,7 +1824,7 @@ const ssh_kexes ssh_gssk5_ecdh_kex = {
  */
 
 const ssh_keyalg *ec_alg_by_oid(int len, const void *oid,
-                                        const struct ec_curve **curve)
+                                const struct ec_curve **curve)
 {
     static const ssh_keyalg *algs_with_oid[] = {
         &ssh_ecdsa_nistp256,

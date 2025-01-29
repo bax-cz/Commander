@@ -1558,7 +1558,7 @@ const char *nullseat_get_x_display(Seat *seat);
 bool nullseat_get_windowid(Seat *seat, long *id_out);
 bool nullseat_get_window_pixel_size(Seat *seat, int *width, int *height);
 StripCtrlChars *nullseat_stripctrl_new(
-        Seat *seat, BinarySink *bs_out, SeatInteractionContext sic);
+    Seat *seat, BinarySink *bs_out, SeatInteractionContext sic);
 void nullseat_set_trust_status(Seat *seat, bool trusted);
 bool nullseat_can_set_trust_status_yes(Seat *seat);
 bool nullseat_can_set_trust_status_no(Seat *seat);
@@ -1588,7 +1588,7 @@ SeatPromptResult console_confirm_weak_cached_hostkey(
     Seat *seat, SeatDialogText *text,
     void (*callback)(void *ctx, SeatPromptResult result), void *ctx);
 StripCtrlChars *console_stripctrl_new(
-        Seat *seat, BinarySink *bs_out, SeatInteractionContext sic);
+    Seat *seat, BinarySink *bs_out, SeatInteractionContext sic);
 void console_set_trust_status(Seat *seat, bool trusted);
 bool console_can_set_trust_status(Seat *seat);
 bool console_has_mixed_input_stream(Seat *seat);
@@ -2235,7 +2235,7 @@ char *term_get_ttymode(Terminal *term, const char *mode);
 SeatPromptResult term_get_userpass_input(Terminal *term, prompts_t *p);
 void term_set_trust_status(Terminal *term, bool trusted);
 void term_keyinput(Terminal *, int codepage, const void *buf, int len);
-void term_keyinputw(Terminal *, const wchar_t * widebuf, int len);
+void term_keyinputw(Terminal *, const wchar_t *widebuf, int len);
 void term_get_cursor_position(Terminal *term, int *x, int *y);
 void term_setup_window_titles(Terminal *term, const char *title_hostname);
 void term_notify_minimised(Terminal *term, bool minimised);
@@ -2504,7 +2504,7 @@ int check_compose(int first, int second);
 int decode_codepage(const char *cp_name);
 const char *cp_enumerate (int index);
 const char *cp_name(int codepage);
-void get_unitab(int codepage, wchar_t * unitab, int ftype);
+void get_unitab(int codepage, wchar_t *unitab, int ftype);
 
 /*
  * Exports from wcwidth.c

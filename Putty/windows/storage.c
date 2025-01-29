@@ -260,7 +260,7 @@ int retrieve_host_key(const char *hostname, int port,
                     const char *keytype, char *key, int maxlen)
 #else
 int check_stored_host_key(const char *hostname, int port,
-                    const char *keytype, const char *key)
+                          const char *keytype, const char *key)
 #endif
 {
     /*
@@ -316,7 +316,7 @@ int check_stored_host_key(const char *hostname, int port,
                     put_byte(new, q[j ^ 3]);
                 q += nwords * 4;
                 if (*q) {
-                    q++;               /* eat the slash */
+                    q++;                 /* eat the slash */
                     put_byte(new, ',');  /* add a comma */
                 }
             }
@@ -342,8 +342,8 @@ int check_stored_host_key(const char *hostname, int port,
 #ifdef MPEXT
     if (otherstr)
     {
-    strncpy(key, otherstr, maxlen);
-    key[maxlen - 1] = '\0';
+        strncpy(key, otherstr, maxlen);
+        key[maxlen - 1] = '\0';
     }
     else
     {
@@ -368,7 +368,7 @@ int check_stored_host_key(const char *hostname, int port,
 
 #ifndef MPEXT
 bool have_ssh_host_key(const char *hostname, int port,
-                      const char *keytype)
+                       const char *keytype)
 {
     /*
      * If we have a host key, check_stored_host_key will return 0 or 2.
@@ -590,9 +590,9 @@ static HANDLE access_random_seed(int action)
                 bool success = try_random_seed(regpath, action, &rethandle);
                 sfree(regpath);
                 if (success)
-                return rethandle;
+                    return rethandle;
+            }
         }
-    }
     }
 
     /*

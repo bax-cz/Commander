@@ -336,7 +336,7 @@ void ssh2kex_coroutine(struct ssh2_transport_state *s, bool *aborted)
             s->ebuf = strbuf_new_nm();
             ecdh_key_getpublic(s->ecdh_key, BinarySink_UPCAST(s->ebuf));
         } else {
-        s->e = dh_create_e(s->dh_ctx);
+            s->e = dh_create_e(s->dh_ctx);
         }
 
         if (s->shgss->lib->gsslogmsg)
@@ -404,7 +404,7 @@ void ssh2kex_coroutine(struct ssh2_transport_state *s, bool *aborted)
                 if (s->ecdh_key) {
                     put_stringpl(pktout, ptrlen_from_strbuf(s->ebuf));
                 } else {
-                put_mp_ssh2(pktout, s->e);
+                    put_mp_ssh2(pktout, s->e);
                 }
                 pq_push(s->ppl.out_pq, pktout);
                 s->shgss->lib->free_tok(s->shgss->lib, &s->gss_sndtok);
@@ -435,7 +435,7 @@ void ssh2kex_coroutine(struct ssh2_transport_state *s, bool *aborted)
                 if (s->ecdh_key) {
                     s->fbuf = strbuf_dup_nm(get_string(pktin));
                 } else {
-                s->f = get_mp_ssh2(pktin);
+                    s->f = get_mp_ssh2(pktin);
                 }
                 data = get_string(pktin);
                 s->mic.value = (char *)data.ptr;
@@ -532,17 +532,17 @@ void ssh2kex_coroutine(struct ssh2_transport_state *s, bool *aborted)
             put_stringpl(s->exhash, ptrlen_from_strbuf(s->ebuf));
             put_stringpl(s->exhash, ptrlen_from_strbuf(s->fbuf));
         } else {
-        if (dh_is_gex(s->kex_alg)) {
-            /* min,  preferred, max */
-            put_uint32(s->exhash, s->pbits);
-            put_uint32(s->exhash, s->pbits);
-            put_uint32(s->exhash, s->pbits * 2);
+            if (dh_is_gex(s->kex_alg)) {
+                /* min, preferred, max */
+                put_uint32(s->exhash, s->pbits);
+                put_uint32(s->exhash, s->pbits);
+                put_uint32(s->exhash, s->pbits * 2);
 
-            put_mp_ssh2(s->exhash, s->p);
-            put_mp_ssh2(s->exhash, s->g);
-        }
-        put_mp_ssh2(s->exhash, s->e);
-        put_mp_ssh2(s->exhash, s->f);
+                put_mp_ssh2(s->exhash, s->p);
+                put_mp_ssh2(s->exhash, s->g);
+            }
+            put_mp_ssh2(s->exhash, s->e);
+            put_mp_ssh2(s->exhash, s->f);
         }
 
         /*
@@ -556,13 +556,13 @@ void ssh2kex_coroutine(struct ssh2_transport_state *s, bool *aborted)
             strbuf_free(s->ebuf); s->ebuf = NULL;
             strbuf_free(s->fbuf); s->fbuf = NULL;
         } else {
-        dh_cleanup(s->dh_ctx);
-        s->dh_ctx = NULL;
-        mp_free(s->f); s->f = NULL;
-        if (dh_is_gex(s->kex_alg)) {
-            mp_free(s->g); s->g = NULL;
-            mp_free(s->p); s->p = NULL;
-        }
+            dh_cleanup(s->dh_ctx);
+            s->dh_ctx = NULL;
+            mp_free(s->f); s->f = NULL;
+            if (dh_is_gex(s->kex_alg)) {
+                mp_free(s->g); s->g = NULL;
+                mp_free(s->p); s->p = NULL;
+            }
         }
 #endif
     } else {
@@ -893,15 +893,15 @@ void ssh2kex_coroutine(struct ssh2_transport_state *s, bool *aborted)
                 }
             }
 
-                ssh2_userkey uk; // WINSCP
-                uk.key = s->hkey; // WINSCP
-                uk.comment = NULL; // WINSCP
-                char **fingerprints = ssh2_all_fingerprints(s->hkey);
+            ssh2_userkey uk; // WINSCP
+            uk.key = s->hkey; // WINSCP
+            uk.comment = NULL; // WINSCP
+            char **fingerprints = ssh2_all_fingerprints(s->hkey);
 
-                FingerprintType fptype_default =
-                    ssh2_pick_default_fingerprint(fingerprints);
-                ppl_logevent("Host key fingerprint is:");
-                ppl_logevent("%s", fingerprints[fptype_default]);
+            FingerprintType fptype_default =
+                ssh2_pick_default_fingerprint(fingerprints);
+            ppl_logevent("Host key fingerprint is:");
+            ppl_logevent("%s", fingerprints[fptype_default]);
 
             /*
              * Authenticate remote host: verify host key, either by
@@ -993,14 +993,14 @@ void ssh2kex_coroutine(struct ssh2_transport_state *s, bool *aborted)
                 ssh2_free_all_fingerprints(fingerprints);
                 sfree(keydisp);
 #ifdef FUZZING
-            s->spr = SPR_OK;
+                s->spr = SPR_OK;
 #endif
-            crMaybeWaitUntilV(s->spr.kind != SPRK_INCOMPLETE);
-            if (spr_is_abort(s->spr)) {
-                *aborted = true;
-                ssh_spr_close(s->ppl.ssh, s->spr, "host key verification");
-                return;
-            }
+                crMaybeWaitUntilV(s->spr.kind != SPRK_INCOMPLETE);
+                if (spr_is_abort(s->spr)) {
+                    *aborted = true;
+                    ssh_spr_close(s->ppl.ssh, s->spr, "host key verification");
+                    return;
+                }
 
                 if (ssh_key_alg(s->hkey)->is_certificate) {
                     /*

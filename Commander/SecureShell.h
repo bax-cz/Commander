@@ -24,7 +24,7 @@ struct TPuttyTranslation;
 enum TSshImplementation { sshiUnknown, sshiOpenSSH, sshiProFTPD, sshiBitvise, sshiTitan, sshiOpenVMS, sshiCerberus };
 struct ScpLogPolicy;
 struct ScpSeat;
-
+enum TSecureShellMode { ssmNone, ssmUploading, ssmDownloading };
 //---------------------------------------------------------------------------
 enum TFSCommand { fsNull = 0, fsVarValue, fsLastLine, fsFirstLine,
   fsCurrentDirectory, fsChangeDirectory, fsListDirectory, fsListCurrentDirectory,
@@ -94,14 +94,14 @@ public:
 	SOCKET FSocket;
 	HANDLE FSocketEvent;
 	TSockets FPortFwdSockets;
-	//  TSessionUI *FUI;
+//	TSessionUI *FUI;
 	TSessionData *FSessionData;
 	bool FActive;
 	TSessionInfo FSessionInfo;
 	bool FSessionInfoValid;
-	ULONGLONG FLastDataSent;
+	TDateTime FLastDataSent;
 	Backend *FBackendHandle;
-	void(*FOnReceive)(void*);
+	TNotifyEvent FOnReceive;
 	bool FFrozen;
 	bool FDataWhileFrozen;
 	bool FStoredPasswordTried;
@@ -117,13 +117,13 @@ public:
 	int FWaitingForData;
 	TSshImplementation FSshImplementation;
 
-	size_t PendLen;
-	size_t PendSize;
-	size_t OutLen;
+	/*unsigned*/size_t PendLen;
+	/*unsigned*/size_t PendSize;
+	/*unsigned*/size_t OutLen;
 	unsigned char *OutPtr;
 	unsigned char *Pending;
-	//  TSessionLog *FLog;
-	//  TConfiguration *FConfiguration;
+//	TSessionLog *FLog;
+//	TConfiguration *FConfiguration;
 	bool FAuthenticating;
 	bool FAuthenticated;
 	UnicodeString FStdErrorTemp;
@@ -135,14 +135,14 @@ public:
 	bool FUtfStrings;
 	DWORD FLastSendBufferUpdate;
 	int FSendBuf;
-	std::unique_ptr<callback_set> FCallbackSet;
+	/*callback_set*/std::unique_ptr<callback_set> FCallbackSet;
 	ScpLogPolicy *FLogPolicy;
 	ScpSeat *FSeat;
 	LogContext *FLogCtx;
 	std::set<UnicodeString> FLoggedKnownHostKeys;
 
 	void /*__fastcall*/ Init();
-	void __fastcall SetActive(bool value);
+	void /*__fastcall*/ SetActive(bool value);
 	void inline /*__fastcall*/ CheckConnection(int Message = -1);
 	void /*__fastcall*/ WaitForData();
 	void /*__fastcall*/ Discard();
@@ -161,7 +161,7 @@ public:
 	bool /*__fastcall*/ GetReady();
 	void /*__fastcall*/ DispatchSendBuffer(size_t BufSize);
 	void /*__fastcall*/ SendBuffer(unsigned int& Result);
-	//unsigned int /*__fastcall*/ TimeoutPrompt(TQueryParamsTimerEvent PoolEvent);
+//	unsigned int /*__fastcall*/ TimeoutPrompt(TQueryParamsTimerEvent PoolEvent);
 	void TimeoutAbort(unsigned int Answer);
 	bool /*__fastcall*/ TryFtp();
 	UnicodeString /*__fastcall*/ ConvertInput(const RawByteString& Input);
@@ -170,9 +170,9 @@ public:
 	bool HaveAcceptNewHostKeyPolicy();
 	THierarchicalStorage *GetHostKeyStorage();
 	bool VerifyCachedHostKey(
-		const UnicodeString & StoredKeys, const UnicodeString & KeyStr, const UnicodeString & FingerprintMD5, const UnicodeString & FingerprintSHA256);
+		const UnicodeString& StoredKeys, const UnicodeString& KeyStr, const UnicodeString& FingerprintMD5, const UnicodeString& FingerprintSHA256);
 	UnicodeString StoreHostKey(
-		const UnicodeString & Host, int Port, const UnicodeString & KeyType, const UnicodeString & KeyStr);
+		const UnicodeString& Host, int Port, const UnicodeString& KeyType, const UnicodeString& KeyStr);
 	bool HasLocalProxy();
 
 //protected:
@@ -248,12 +248,12 @@ public:
 	void /*__fastcall*/ AddStdError(const char *Data, size_t Length);
 	const UnicodeString& /*__fastcall*/ GetStdError();
 	void /*__fastcall*/ VerifyHostKey(
-		const UnicodeString & Host, int Port, const UnicodeString & KeyType, const UnicodeString & KeyStr,
-		const UnicodeString & FingerprintSHA256, const UnicodeString & FingerprintMD5,
+		const UnicodeString& Host, int Port, const UnicodeString& KeyType, const UnicodeString& KeyStr,
+		const UnicodeString& FingerprintSHA256, const UnicodeString& FingerprintMD5,
 		bool IsCertificate, int CACount, bool AlreadyVerified);
 	bool /*__fastcall*/ HaveHostKey(UnicodeString Host, int Port, const UnicodeString KeyType);
-	void AskAlg(const UnicodeString & AlgType, const UnicodeString & AlgName, int WeakCryptoReason);
-	void /*__fastcall*/ DisplayBanner(const UnicodeString & Banner);
+	void AskAlg(const UnicodeString& AlgType, const UnicodeString& AlgName, int WeakCryptoReason);
+	void /*__fastcall*/ DisplayBanner(const UnicodeString& Banner);
 	void /*__fastcall*/ PuttyLogEvent(const char *Str);
 	UnicodeString /*__fastcall*/ ConvertFromPutty(const char *Str, size_t Length);
 	struct callback_set *GetCallbackSet();
@@ -267,6 +267,7 @@ public:
 	__property bool Simple = { read = FSimple, write = FSimple };
 	__property TSshImplementation SshImplementation = { read = FSshImplementation };
 	__property bool UtfStrings = { read = FUtfStrings, write = FUtfStrings };*/
+	TSecureShellMode Mode;
 };
 //---------------------------------------------------------------------------
 } // namespace bcb
