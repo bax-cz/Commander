@@ -39,6 +39,7 @@ namespace Commander
 			FMT_WIM,
 			FMT_DMG,
 			FMT_ISO,
+			FMT_NRG,
 			FMT_RPM,
 			FMT_DEB,
 			FMT_XAR,
@@ -92,8 +93,10 @@ namespace Commander
 				return EArchType::FMT_LZMA;
 			else if( StringUtils::endsWith( fileName, L".ppmd" ) )
 				return EArchType::FMT_PPMD;
-			else if( StringUtils::endsWith( fileName, L".iso" ) || StringUtils::endsWith( fileName, L".nrg" ) )
+			else if( StringUtils::endsWith( fileName, L".iso" ) )
 				return EArchType::FMT_ISO;
+			else if( StringUtils::endsWith( fileName, L".nrg" ) )
+				return EArchType::FMT_NRG;
 			else if( StringUtils::endsWith( fileName, L".tar" ) )
 				return EArchType::FMT_TAR;
 			else if( StringUtils::endsWith( fileName, L".tar.gz" ) || StringUtils::endsWith( fileName, L".tgz" ) )
@@ -155,9 +158,9 @@ namespace Commander
 			case EArchType::FMT_DMG:
 				upArchiver = std::make_unique<CArchDmg>();
 				break;
-		//	case EArchType::FMT_ISO:
-		//		upArchiver = std::make_unique<CArchIso>();
-		//		break;
+			case EArchType::FMT_NRG:
+				upArchiver = std::make_unique<CArchIso>();
+				break;
 			case EArchType::FMT_TAR:
 				upArchiver = std::make_unique<CArchTar>( TarLib::ECompressionType::tarNone );
 				break;

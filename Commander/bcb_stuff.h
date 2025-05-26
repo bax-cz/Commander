@@ -79,6 +79,7 @@ namespace bcb
 	using TDateTime = ULONGLONG;
 	using TNotifyEvent = void(*)(void*);
 	using TCriticalSection = std::mutex;
+	using TQueryParamsTimerEvent = std::function<void(unsigned int& result)>;
 
 	/* Enumeration types */
 	enum TEOLType { eolLF /* \n */, eolCRLF /* \r\n */, eolCR /* \r */ };
@@ -308,8 +309,40 @@ namespace bcb
 		char *Data;
 	};
 
+	/* Value restorer */
+	template<typename T>
+	class TValueRestorer
+	{
+	public:
+		inline TValueRestorer( T& target, const T& value ) : _target( target ), _value( target ), _armed( true ) { _target = value; }
+		inline TValueRestorer( T& target ) : _target( _target ), _value( target ), _armed( true ) {}
+		inline ~TValueRestorer() { Release(); }
+
+		inline void Release()
+		{
+			if( _armed )
+			{
+				_target = _value;
+				_armed = false;
+			}
+		}
+
+	protected:
+		T& _target;
+		T _value;
+		bool _armed;
+	};
+
+	/* Nesting auto counter */
+	class TAutoNestingCounter : public TValueRestorer<int>
+	{
+	public:
+		inline TAutoNestingCounter( int& target ) : TValueRestorer<int>( target, target + 1 ) { DebugAssert( _value >= 0 ); }
+		inline ~TAutoNestingCounter() { DebugAssert( !_armed || ( _target == ( _value + 1 ) ) ); }
+	};
+
 	/* Helper functions */
-	ULONGLONG Now();
+	TDateTime Now();
 	void Abort();
 	bool FileExists( UnicodeString& fileName );
 	bool SameStr( const UnicodeString& str1, const UnicodeString& str2 );

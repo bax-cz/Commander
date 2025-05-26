@@ -39,9 +39,9 @@ ULONG _mediaChangeNotifyId = 0;
 using namespace Commander;
 
 #if defined(_DEBUG) || defined(FC_ENABLE_LOGGING)
-// Write debugging information into debug output window and/or a log file
+// Write debugging information into the debug output window and/or a log file
 // (Called through PrintDebug macro)
-void printDebug( const wchar_t *funcName, const wchar_t *fmt, ... )
+void _printDebugImpl( const wchar_t *funcName, const wchar_t *fmt, ... )
 {
 	std::wstring strOut = L"[";
 	strOut += funcName;
@@ -74,7 +74,7 @@ void printDebug( const wchar_t *funcName, const wchar_t *fmt, ... )
 
 // Format string - printf style
 // (Called through FORMAT macro)
-std::wstring Commander::formatStr( const wchar_t *fmt, ... )
+std::wstring Commander::formatStrImpl( const wchar_t *fmt, ... )
 {
 	va_list args;
 	va_start( args, fmt );

@@ -100,6 +100,7 @@ namespace bcb {
 	}
 	ResetConnection();
 	CloseHandle(FSocketEvent);
+//	delete FCallbackSet;
 }
 //---------------------------------------------------------------------------
 void /*__fastcall*/ TSecureShell::ResetConnection()
@@ -206,7 +207,7 @@ Conf /*__fastcall*/ *TSecureShell::StoreToConfig(TSessionData *Data, bool Simple
 		case cipArcfour: pcipher = CIPHER_ARCFOUR; break;
 		case cipChaCha20: pcipher = CIPHER_CHACHA20; break;
 		case cipAESGCM: pcipher = CIPHER_AESGCM; break;
-		default: DebugFail();
+		default: DebugFail(); pcipher = NULL; // shut up
 		}
 		conf_set_int_int(conf, CONF_ssh_cipherlist, c, pcipher);
 	}
@@ -227,7 +228,9 @@ Conf /*__fastcall*/ *TSecureShell::StoreToConfig(TSessionData *Data, bool Simple
 		case kexRSA: pkex = KEX_RSA; break;
 		case kexECDH: pkex = KEX_ECDH; break;
 		case kexNTRUHybrid: pkex = KEX_NTRU_HYBRID; break;
-		default: DebugFail();
+		case kexMLKEM25519Hybrid: pkex = KEX_MLKEM_25519_HYBRID; break;
+		case kexMLKEMNISTHybrid: pkex = KEX_MLKEM_NIST_HYBRID; break;
+		default: DebugFail(); pkex = NULL; // shutup 
 		}
 		conf_set_int_int(conf, CONF_ssh_kexlist, k, pkex);
 	}
@@ -251,15 +254,15 @@ Conf /*__fastcall*/ *TSecureShell::StoreToConfig(TSessionData *Data, bool Simple
 		}
 		conf_set_int_int(conf, CONF_ssh_gsslist, g, pgsslib);
 	}
-	Filename *GssLibCustomFileName = filename_from_str(UTF8String(Data->FGssLibCustom).c_str());
+	Filename *GssLibCustomFileName = filename_from_utf8(UTF8String(Data->FGssLibCustom).c_str());
 	conf_set_filename(conf, CONF_ssh_gss_custom, GssLibCustomFileName);
 	filename_free(GssLibCustomFileName);
 
-	Filename * AFileName = filename_from_str(UTF8String(Data->ResolvePublicKeyFile()).c_str());
+	Filename *AFileName = filename_from_utf8(UTF8String(Data->ResolvePublicKeyFile()).c_str());
 	conf_set_filename(conf, CONF_keyfile, AFileName);
 	filename_free(AFileName);
 
-	AFileName = filename_from_str(UTF8String(ExpandEnvironmentVariables(Data->FDetachedCertificate)).c_str());
+	AFileName = filename_from_utf8(UTF8String(ExpandEnvironmentVariables(Data->FDetachedCertificate)).c_str());
 	conf_set_filename(conf, CONF_detached_cert, AFileName);
 	filename_free(AFileName);
 
@@ -426,7 +429,7 @@ void /*__fastcall*/ TSecureShell::Open()
 
 	FAuthenticationLog = L"";
 	FNoConnectionResponse = false;
-//	FUI->Information(LoadStr(STATUS_LOOKUPHOST), true);
+//	FUI->Information(LoadStr(STATUS_LOOKUPHOST));
 
 	try
 	{
@@ -458,7 +461,7 @@ void /*__fastcall*/ TSecureShell::Open()
 		{
 			PuttyFatalError(InitError);
 		}
-	//	FUI->Information(LoadStr(STATUS_CONNECT), true);
+	//	FUI->Information(LoadStr(STATUS_CONNECT));
 		FAuthenticationCancelled = false;
 		if (!FActive && DebugAlwaysTrue(HasLocalProxy()))
 		{
@@ -489,7 +492,7 @@ void /*__fastcall*/ TSecureShell::Open()
 
 	FAuthenticating = false;
 	FAuthenticated = true;
-//	FUI->Information(LoadStr(STATUS_AUTHENTICATED), true);
+//	FUI->Information(LoadStr(STATUS_AUTHENTICATED));
 
 	ResetSessionInfo();
 
@@ -818,7 +821,7 @@ bool FUIPromptUser(TSessionData *FSessionData, TPromptKind Kind, UnicodeString N
 bool /*__fastcall*/ TSecureShell::PromptUser(bool /*ToServer*/,
 	UnicodeString AName, bool /*NameRequired*/,
 	UnicodeString Instructions, bool InstructionsRequired,
-	TStrings * Prompts, TStrings * Results)
+	TStrings *Prompts, TStrings *Results)
 {
 	// there can be zero prompts!
 
@@ -964,7 +967,7 @@ bool /*__fastcall*/ TSecureShell::PromptUser(bool /*ToServer*/,
 			FLAGCLEAR(int(Prompts->Objects[0]), pupEcho)*/)
 		{
 			LogEvent(L"Using stored password.");
-		//	FUI->Information(LoadStr(AUTH_PASSWORD), false);
+		//	FUI->Information(LoadStr(AUTH_PASSWORD));
 			Result = true;
 			Results->at(0) = NormalizeString(FSessionData->FPassword);
 			FStoredPasswordTriedForKI = true;
@@ -980,7 +983,7 @@ bool /*__fastcall*/ TSecureShell::PromptUser(bool /*ToServer*/,
 		if (!FSessionData->FPassword.IsEmpty() && !FStoredPasswordTried)
 		{
 			LogEvent(L"Using stored password.");
-		//	FUI->Information(LoadStr(AUTH_PASSWORD), false);
+		//	FUI->Information(LoadStr(AUTH_PASSWORD));
 			Result = true;
 			Results->at(0) = NormalizeString(FSessionData->FPassword);
 			FStoredPasswordTried = true;
@@ -1000,7 +1003,7 @@ bool /*__fastcall*/ TSecureShell::PromptUser(bool /*ToServer*/,
 	{
 		if (FSessionData->FChangePassword)
 		{
-		//	FUI->Information(LoadStr(AUTH_CHANGING_PASSWORD), false);
+		//	FUI->Information(LoadStr(AUTH_CHANGING_PASSWORD));
 
 			if (!FSessionData->FPassword.IsEmpty() && !FSessionData->FNewPassword.IsEmpty() && !FStoredPasswordTried)
 			{
@@ -1056,7 +1059,7 @@ void /*__fastcall*/ TSecureShell::GotHostKey()
 		FAuthenticating = true;
 		if (!FSessionData->FChangePassword)
 		{
-		//	FUI->Information(LoadStr(STATUS_AUTHENTICATE), true);
+		//	FUI->Information(LoadStr(STATUS_AUTHENTICATE));
 		}
 	}
 }
@@ -1084,7 +1087,7 @@ void /*__fastcall*/ TSecureShell::CWrite(const char *Data, size_t Length)
 			FAuthenticationLog += (FAuthenticationLog.IsEmpty() ? L"" : L"\n") + Line;
 		}
 
-	//	FUI->Information(Line, false);
+	//	FUI->Information(Line);
 	}
 }
 //---------------------------------------------------------------------------
@@ -1295,7 +1298,7 @@ std::wstring /*__fastcall*/ TSecureShell::ReceiveLine()
 	return Result.get();
 }
 //---------------------------------------------------------------------------
-UnicodeString /*__fastcall*/ TSecureShell::ConvertInput(const RawByteString & Input)
+UnicodeString /*__fastcall*/ TSecureShell::ConvertInput(const RawByteString& Input)
 {
 	UnicodeString Result;
 	if (FUtfStrings)
@@ -1321,14 +1324,14 @@ void /*__fastcall*/ TSecureShell::SendSpecial(int Code)
 	FLastDataSent = Now();
 }
 //---------------------------------------------------------------------------
-/*unsigned int __fastcall TSecureShell::TimeoutPrompt(TQueryParamsTimerEvent PoolEvent)
+unsigned int /*__fastcall*/ TSecureShell::TimeoutPrompt(TQueryParamsTimerEvent PoolEvent)
 {
 	FWaiting++;
 
 	unsigned int Answer;
-	try
+//	try
 	{
-		TQueryParams Params(qpFatalAbort | qpAllowContinueOnError | qpIgnoreAbort);
+		/*TQueryParams Params(qpFatalAbort | qpAllowContinueOnError | qpIgnoreAbort);
 		Params.HelpKeyword = HELP_MESSAGE_HOST_IS_NOT_COMMUNICATING;
 		Params.Timer = 500;
 		Params.TimerEvent = PoolEvent;
@@ -1342,14 +1345,17 @@ void /*__fastcall*/ TSecureShell::SendSpecial(int Code)
 			Params.TimeoutResponse = qaNo;
 		}
 		Answer = FUI->QueryUser(MainInstructions(FMTLOAD(CONFIRM_PROLONG_TIMEOUT3, (FSessionData->Timeout))),
-			NULL, qaRetry | qaAbort, &Params);
+			NULL, qaRetry | qaAbort, &Params);*/
+		auto res = MessageBox(pWorker->getHwnd(), MainInstructions(FMTLOAD(CONFIRM_PROLONG_TIMEOUT3,
+			(IntToStr(FSessionData->FTimeout)))).c_str(), L"PuTTY Connection Timed Out", MB_ICONQUESTION | MB_ABORTRETRYIGNORE);
+		Answer = (res == IDABORT ? qaAbort : (res == IDRETRY ? qaRetry : qaOK));
 	}
-	__finally
+//	__finally
 	{
 		FWaiting--;
 	}
 	return Answer;
-}*/
+}
 //---------------------------------------------------------------------------
 void /*__fastcall*/ TSecureShell::SendBuffer(unsigned int& Result)
 {
@@ -1374,14 +1380,28 @@ void /*__fastcall*/ TSecureShell::SendBuffer(unsigned int& Result)
 	}
 }
 //---------------------------------------------------------------------------
-void TSecureShell::TimeoutAbort(unsigned int Answer)
+void TSecureShell::TimeoutAbort(unsigned int Answer, bool Sending)
 {
+	UnicodeString CounterName;
+	if (Mode == ssmUploading)
+	{
+		CounterName = Sending ? L"TimeoutUploadingSending" : L"TimeoutUploadingReceiving";
+	}
+	else if (Mode == ssmDownloading)
+	{
+		CounterName = Sending ? L"TimeoutDownloadingSending" : L"TimeoutDownloadingReceiving";
+	}
+	if (!CounterName.IsEmpty())
+	{
+	//	Configuration->Usage->Inc(CounterName);
+	}
+
 	FatalError(MainInstructions(LoadStr(Answer == qaAbort ? USER_TERMINATED : TIMEOUT_ERROR)));
 }
 //---------------------------------------------------------------------------
 void /*__fastcall*/ TSecureShell::DispatchSendBuffer(size_t BufSize)
 {
-	ULONGLONG Start = Now();
+	TDateTime Start = Now();
 	do
 	{
 		CheckConnection();
@@ -1398,10 +1418,10 @@ void /*__fastcall*/ TSecureShell::DispatchSendBuffer(size_t BufSize)
 			LogEvent(FORMAT(L"There are %zu bytes remaining in the send buffer", BufSize));
 	//	}
 
-		if (Now() - Start > (ULONGLONG)((double)(FSessionData->FTimeout) / SecsPerDay))
+		if (Now() - Start > (TDateTime)((double)(FSessionData->FTimeout) / SecsPerDay))
 		{
 			LogEvent(L"Waiting for dispatching send buffer timed out, asking user what to do.");
-			unsigned int Answer = qaOK;//TimeoutPrompt(SendBuffer);
+			unsigned int Answer = TimeoutPrompt(std::bind(&TSecureShell::SendBuffer, this, std::placeholders::_1));
 			switch (Answer)
 			{
 			case qaRetry:
@@ -1418,7 +1438,7 @@ void /*__fastcall*/ TSecureShell::DispatchSendBuffer(size_t BufSize)
 
 			case qaAbort:
 			case qaNo:
-				TimeoutAbort(Answer);
+				TimeoutAbort(Answer, true);
 				return;
 			}
 		}
@@ -2107,14 +2127,14 @@ void /*__fastcall*/ TSecureShell::WaitForData()
 		if (!IncomingData)
 		{
 			DebugAssert(FWaitingForData == 0);
-			FWaitingForData++;//TAutoNestingCounter NestingCounter(FWaitingForData);
+			TAutoNestingCounter NestingCounter(FWaitingForData);
 
 			WSANETWORKEVENTS Events;
 			memset(&Events, 0, sizeof(Events));
 			TPoolForDataEvent Event(this, Events);
 
 			LogEvent(L"Waiting for data timed out, asking user what to do.");
-			unsigned int Answer = qaOK;//TimeoutPrompt(Event.PoolForData);
+			unsigned int Answer = TimeoutPrompt(std::bind(&TPoolForDataEvent::PoolForData, Event, std::placeholders::_1));
 			switch (Answer)
 			{
 			case qaRetry:
@@ -2135,7 +2155,7 @@ void /*__fastcall*/ TSecureShell::WaitForData()
 
 			case qaAbort:
 			case qaNo:
-				TimeoutAbort(Answer);
+				TimeoutAbort(Answer, false);
 				break;
 			}
 		}
@@ -2608,7 +2628,7 @@ void __fastcall TPasteKeyHandler::Paste(TObject *Sender, unsigned int& Answer)
 }*/
 //---------------------------------------------------------------------------
 bool TSecureShell::VerifyCachedHostKey(
-	const UnicodeString & StoredKeys, const UnicodeString & KeyStr, const UnicodeString & FingerprintMD5, const UnicodeString & FingerprintSHA256)
+	const UnicodeString& StoredKeys, const UnicodeString& KeyStr, const UnicodeString& FingerprintMD5, const UnicodeString& FingerprintSHA256)
 {
 	bool Result = false;
 	UnicodeString Buf = StoredKeys;
@@ -2654,7 +2674,7 @@ UnicodeString TSecureShell::StoreHostKey(const UnicodeString& Host, int Port, co
 //	std::unique_ptr<THierarchicalStorage> Storage(GetHostKeyStorage());
 //	Storage->AccessMode = smReadWrite;
 //	PuttyStorage = Storage.get();
-	store_host_key(AnsiString(Host).c_str(), Port, AnsiString(KeyType).c_str(), AnsiString(KeyStr).c_str());
+	store_host_key(FSeat, AnsiString(Host).c_str(), Port, AnsiString(KeyType).c_str(), AnsiString(KeyStr).c_str());
 	return L"";//Storage->Source;
 }
 //---------------------------------------------------------------------------
@@ -2784,7 +2804,7 @@ void /*__fastcall*/ TSecureShell::VerifyHostKey(
 				if (ExpectedKey == L"*")
 				{
 				//	UnicodeString Message = LoadStr(ANY_HOSTKEY);
-				//	FUI->Information(Message, true);
+				//	FUI->Information(Message);
 				//	FLog->Add(llException, Message);
 					Result = true;
 				}
@@ -2819,7 +2839,7 @@ void /*__fastcall*/ TSecureShell::VerifyHostKey(
 	//			LogEvent(FORMAT(L"Warning: Stored new host key to %ls - This should occur only on the first connection", StorageSource.c_str()));
 	//			Result = true;
 	//		}
-	//		catch (Exception & E)
+	//		catch (Exception& E)
 	//		{
 	//			FUI->FatalError(&E, LoadStr(STORE_NEW_HOSTKEY_ERROR));
 	//		}
@@ -3025,7 +3045,7 @@ bool /*__fastcall*/ TSecureShell::HaveHostKey(UnicodeString Host, int Port, cons
 	return Result;
 }
 //---------------------------------------------------------------------------
-void TSecureShell::AskAlg(const UnicodeString & AAlgType, const UnicodeString & AlgName, int WeakCryptoReason)
+void TSecureShell::AskAlg(const UnicodeString& AAlgType, const UnicodeString& AlgName, int WeakCryptoReason)
 {
 	// beware of changing order
 	static const TPuttyTranslation AlgTranslation[] = {

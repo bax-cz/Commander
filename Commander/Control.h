@@ -4,16 +4,6 @@
 	Abstract class for panel's UI controls
 */
 
-// Edit-control exstyle - when compiling against older SDKs
-#ifndef EM_SETEXTENDEDSTYLE
-  #define EM_SETEXTENDEDSTYLE ECM_FIRST + 10
-#endif // EM_SETEXTENDEDSTYLE
-
-// Edit-control extened messages
-#ifndef ES_EX_ZOOMABLE
-  #define ES_EX_ZOOMABLE 0x0010L
-#endif // ES_EX_ZOOMABLE
-
 namespace Commander
 {
 	// forward declaration

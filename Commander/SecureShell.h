@@ -148,7 +148,8 @@ public:
 	void /*__fastcall*/ Discard();
 	void /*__fastcall*/ FreeBackend();
 	void /*__fastcall*/ PoolForData(WSANETWORKEVENTS& Events, unsigned int& Result);
-	inline void /*__fastcall*/ CaptureOutput(TLogLineType Type, const UnicodeString& Line);
+	inline void /*__fastcall*/ CaptureOutput(TLogLineType Type,
+		const UnicodeString& Line);
 	void /*__fastcall*/ ResetConnection();
 	void /*__fastcall*/ ResetSessionInfo();
 	void /*__fastcall*/ SocketEventSelect(SOCKET Socket, HANDLE Event, bool Enable);
@@ -161,8 +162,8 @@ public:
 	bool /*__fastcall*/ GetReady();
 	void /*__fastcall*/ DispatchSendBuffer(size_t BufSize);
 	void /*__fastcall*/ SendBuffer(unsigned int& Result);
-//	unsigned int /*__fastcall*/ TimeoutPrompt(TQueryParamsTimerEvent PoolEvent);
-	void TimeoutAbort(unsigned int Answer);
+	unsigned int /*__fastcall*/ TimeoutPrompt(TQueryParamsTimerEvent PoolEvent);
+	void TimeoutAbort(unsigned int Answer, bool Sending);
 	bool /*__fastcall*/ TryFtp();
 	UnicodeString /*__fastcall*/ ConvertInput(const RawByteString& Input);
 	void /*__fastcall*/ GetRealHost(UnicodeString& Host, int& Port);
@@ -176,8 +177,7 @@ public:
 	bool HasLocalProxy();
 
 //protected:
-//	TCaptureOutputEvent FOnCaptureOutput;
-	std::function<void(const std::wstring& str, TCaptureOutputType sutputType)> FOnCaptureOutput;
+	TCaptureOutputEvent FOnCaptureOutput;
 
 	// TODO: SCP specific - move somewhere else
 	std::vector<std::wstring> SendCommandFull( TFSCommand cmd,
@@ -200,7 +200,7 @@ protected:
 	int /*__fastcall*/ TranslateAuthenticationMessage(UnicodeString& Message, UnicodeString *HelpKeyword = NULL);
 	int /*__fastcall*/ TranslateErrorMessage(UnicodeString& Message, UnicodeString *HelpKeyword = NULL);
 	void /*__fastcall*/ AddStdErrorLine(const UnicodeString& Str);
-	void /*__fastcall*/ /*inline*/ LogEvent(const UnicodeString& Str);
+	void /*__fastcall*/ inline LogEvent(const UnicodeString& Str);
 	void /*__fastcall*/ FatalError(UnicodeString Error, UnicodeString HelpKeyword = L"");
 	UnicodeString /*__fastcall*/ FormatKeyStr(UnicodeString KeyStr);
 	void ParseFingerprint(const UnicodeString& Fingerprint, UnicodeString& SignKeyType, UnicodeString& Hash);
@@ -228,7 +228,7 @@ public:
 	unsigned long /*__fastcall*/ MaxPacketSize();
 	void /*__fastcall*/ ClearStdError();
 	bool /*__fastcall*/ GetStoredCredentialsTried();
-	//  void /*__fastcall*/ CollectUsage();
+//	void /*__fastcall*/ CollectUsage();
 	bool /*__fastcall*/ CanChangePassword();
 
 	void /*__fastcall*/ RegisterReceiveHandler(void(*Handler)(void*));
@@ -238,7 +238,6 @@ public:
 	void /*__fastcall*/ UpdateSocket(SOCKET value, bool Enable);
 	void /*__fastcall*/ UpdatePortFwdSocket(SOCKET value, bool Enable);
 	void /*__fastcall*/ PuttyFatalError(UnicodeString Error);
-	TPromptKind /*__fastcall*/ IdentifyPromptKind(UnicodeString& Name);
 	bool /*__fastcall*/ PromptUser(bool ToServer,
 		UnicodeString AName, bool NameRequired,
 		UnicodeString Instructions, bool InstructionsRequired,
@@ -256,6 +255,7 @@ public:
 	void /*__fastcall*/ DisplayBanner(const UnicodeString& Banner);
 	void /*__fastcall*/ PuttyLogEvent(const char *Str);
 	UnicodeString /*__fastcall*/ ConvertFromPutty(const char *Str, size_t Length);
+	TPromptKind /*__fastcall*/ IdentifyPromptKind(UnicodeString& Name);
 	struct callback_set *GetCallbackSet();
 
 	/*__property bool Active = { read = FActive };

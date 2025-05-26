@@ -6,6 +6,8 @@
 #include "MiscUtils.h"
 #include "MenuUtils.h"
 
+#include <dwmapi.h>
+
 namespace Commander
 {
 	CSshOutput::CSshOutput()
@@ -25,6 +27,10 @@ namespace Commander
 	void CSshOutput::onInit()
 	{
 		_worker.init( [this] { return _workerProc(); }, _hDlg, UM_STATUSNOTIFY );
+
+		// set dark mode
+		BOOL value = TRUE;
+		DwmSetWindowAttribute( _hDlg, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof( value ) );
 
 		SetWindowSubclass( GetDlgItem( _hDlg, IDE_SECURESHELL_INPUT ), wndProcEditSubclass, 0, reinterpret_cast<DWORD_PTR>( this ) );
 

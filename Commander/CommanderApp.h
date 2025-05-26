@@ -17,7 +17,25 @@
 #include <map>
 #include <set>
 
+// Dark mode support messages
+#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
+#define DWMWA_USE_IMMERSIVE_DARK_MODE   20
+#endif
+
+// Edit-control exstyle - when compiling against older SDKs
+#ifndef EM_SETEXTENDEDSTYLE
+#define EM_SETEXTENDEDSTYLE ECM_FIRST + 10
+#endif // EM_SETEXTENDEDSTYLE
+
+// Edit-control extened messages
+#ifndef ES_EX_ZOOMABLE
+#define ES_EX_ZOOMABLE 0x0010L
+#endif // ES_EX_ZOOMABLE
+
+
+///////////////////////////////////////////////////////////
 // Commander user message definitions
+///////////////////////////////////////////////////////////
 #define UM_FIRSTMESSAGE       WM_USER + 10
 
 #define UM_CHANGENOTIFY       UM_FIRSTMESSAGE + 0

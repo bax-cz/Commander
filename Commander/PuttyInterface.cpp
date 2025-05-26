@@ -29,7 +29,6 @@ extern const bool share_can_be_downstream = false;
 extern const bool share_can_be_upstream = false;
 namespace bcb {
 using namespace Commander;
-THierarchicalStorage *PuttyStorage = NULL;
 //---------------------------------------------------------------------------
 //extern "C"
 //{
@@ -235,15 +234,13 @@ static SeatPromptResult get_userpass_input(Seat *seat, prompts_t *p)
 	try
 	{
 		UnicodeString Name = UTF8ToString(p->name);
-		UnicodeString AName = Name;
-		TPromptKind PromptKind = SecureShell->IdentifyPromptKind(AName);
-		bool UTF8Prompt = (PromptKind != pkPassphrase);
+		TPromptKind PromptKind = SecureShell->IdentifyPromptKind(Name);
 
 		for (int Index = 0; Index < int(p->n_prompts); Index++)
 		{
 			prompt_t *Prompt = p->prompts[Index];
 			UnicodeString S;
-			if (UTF8Prompt)
+			if (p->utf8)
 			{
 				S = UTF8ToString(Prompt->prompt);
 			}
@@ -307,7 +304,7 @@ static SeatPromptResult get_userpass_input(Seat *seat, prompts_t *p)
 			{
 				prompt_t *Prompt = p->prompts[Index];
 				RawByteString S;
-				if (UTF8Prompt)
+				if (p->utf8)
 				{
 					S = RawByteString(UTF8String(Results->at(Index)));
 				}
@@ -339,6 +336,13 @@ static void connection_fatal(Seat *seat, const char *message)
 
 	TSecureShell *SecureShell = static_cast<ScpSeat*>(seat)->SecureShell;
 	SecureShell->PuttyFatalError(UnicodeString(AnsiString(message)));
+}
+//---------------------------------------------------------------------------
+static void nonfatal(Seat *, const char *message)
+{
+	// there's no place in our putty code, where this is called
+	DebugFail();
+	AppLog(UnicodeString(AnsiString(message)).c_str());
 }
 //---------------------------------------------------------------------------
 SeatPromptResult confirm_ssh_host_key(Seat *seat, const char *host, int port, const char *keytype,
@@ -396,6 +400,7 @@ const SeatDialogPromptDescriptions *prompt_descriptions(Seat *)
 		/*.hk_connect_once_action =*/ "",
 		/*.hk_cancel_action =*/ "",
 		/*.hk_cancel_action_Participle =*/ "",
+		NULL, NULL,
 	};
 	return &descs;
 }
@@ -413,17 +418,7 @@ size_t banner(Seat *seat, const void *data, size_t len)
 	return 0; // PuTTY never uses the value
 }
 //---------------------------------------------------------------------------
-/*uintmax_t strtoumax(const char *nptr, char **endptr, int base)
-{
-	if (DebugAlwaysFalse(endptr != NULL) ||
-		DebugAlwaysFalse(base != 10))
-	{
-		Abort();
-	}
-	return StrToInt64(UnicodeString(AnsiString(nptr)));
-}*/
-//---------------------------------------------------------------------------
-static void SSHFatalError(const char *Format, va_list Param)
+NORETURN static void SSHFatalError(const char *Format, va_list Param)
 {
 	char Buf[200];
 	vsnprintf(Buf, LENOF(Buf), Format, Param);
@@ -513,6 +508,7 @@ static const SeatVtable ScpSeatVtable =
 	nullseat_notify_remote_exit,
 	nullseat_notify_remote_disconnect,
 	connection_fatal,
+	nonfatal,
 	nullseat_update_specials_menu,
 	nullseat_get_ttymode,
 	nullseat_set_busy_status,
@@ -541,20 +537,37 @@ ScpSeat::ScpSeat(TSecureShell *ASecureShell)
 	vt = &ScpSeatVtable;
 }
 //---------------------------------------------------------------------------
-static std::unique_ptr<TCriticalSection> PuttyRegistrySection(TraceInitPtr(new TCriticalSection()));
+std::unique_ptr<TCriticalSection> PuttyStorageSection(TraceInitPtr(new TCriticalSection()));
+THierarchicalStorage *PuttyStorage = NULL;
 enum TPuttyRegistryMode { prmPass, prmRedirect, prmCollect, prmFail };
 static TPuttyRegistryMode PuttyRegistryMode = prmRedirect;
 typedef std::map<UnicodeString, unsigned long> TPuttyRegistryTypes;
-TPuttyRegistryTypes PuttyRegistryTypes;
-HKEY RandSeedFileStorage = reinterpret_cast<HKEY>(1);
+static TPuttyRegistryTypes PuttyRegistryTypes;
+static HKEY RandSeedFileStorage = reinterpret_cast<HKEY>(1);
 //---------------------------------------------------------------------------
 } // namespace bcb
 /*int reg_override_winscp()
 {
 	return (PuttyRegistryMode != prmPass);
+}*/
+//---------------------------------------------------------------------------
+extern "C" void putty_registry_pass(bool enable)
+{
+	if (enable)
+	{
+	//	PuttyStorageSection->Enter();
+		DebugAssert(PuttyRegistryMode == prmRedirect);
+		PuttyRegistryMode = prmPass;
+	}
+	else
+	{
+		DebugAssert(PuttyRegistryMode == prmPass);
+		PuttyRegistryMode = prmRedirect;
+	//	PuttyStorageSection->Leave();
+	}
 }
 //---------------------------------------------------------------------------
-HKEY open_regkey_fn_winscp(bool Create, bool Write, HKEY Key, const char *Path, ...)
+/*HKEY open_regkey_fn_winscp(bool Create, bool Write, HKEY Key, const char *Path, ...)
 {
 	DebugUsedParam(Write);
 	HKEY Result;
@@ -565,7 +578,7 @@ HKEY open_regkey_fn_winscp(bool Create, bool Write, HKEY Key, const char *Path, 
 	}
 	else if (PuttyRegistryMode == prmFail)
 	{
-		Result = false;
+		Result = reinterpret_cast<HKEY>(false);
 	}
 	else if (PuttyRegistryMode == prmRedirect)
 	{
@@ -774,7 +787,7 @@ TKeyType KeyType(UnicodeString FileName)
 	DebugAssert(ktSSHCom == SSH_KEYTYPE_SSHCOM);
 	DebugAssert(ktSSH2PublicOpenSSH == SSH_KEYTYPE_SSH2_PUBLIC_OPENSSH);
 	UTF8String UtfFileName = UTF8String(FileName);
-	Filename *KeyFile = filename_from_str(UtfFileName.c_str());
+	Filename *KeyFile = filename_from_utf8(UtfFileName.c_str());
 	TKeyType Result = (TKeyType)key_type(KeyFile);
 	filename_free(KeyFile);
 	return Result;
@@ -785,7 +798,7 @@ bool IsKeyEncrypted(TKeyType KeyType, const UnicodeString& FileName, UnicodeStri
 	UTF8String UtfFileName = UTF8String(FileName);
 	bool Result;
 	char *CommentStr = NULL;
-	Filename *KeyFile = filename_from_str(UtfFileName.c_str());
+	Filename *KeyFile = filename_from_utf8(UtfFileName.c_str());
 	try
 	{
 		switch (KeyType)
@@ -829,7 +842,7 @@ bool IsKeyEncrypted(TKeyType KeyType, const UnicodeString& FileName, UnicodeStri
 TPrivateKey *LoadKey(TKeyType KeyType, const UnicodeString& FileName, const UnicodeString& Passphrase, UnicodeString& Error)
 {
 	UTF8String UtfFileName = UTF8String(FileName);
-	Filename *KeyFile = filename_from_str(UtfFileName.c_str());
+	Filename *KeyFile = filename_from_utf8(UtfFileName.c_str());
 	struct ssh2_userkey *Ssh2Key = NULL;
 	const char *ErrorStr = NULL;
 	AnsiString AnsiPassphrase = Passphrase;
@@ -934,7 +947,7 @@ void AddCertificateToKey(TPrivateKey *PrivateKey, const UnicodeString& Certifica
 	}
 
 	UTF8String UtfCertificateFileName = UTF8String(CertificateFileName);
-	Filename *CertFilename = filename_from_str(UtfCertificateFileName.c_str());
+	Filename *CertFilename = filename_from_utf8(UtfCertificateFileName.c_str());
 
 	LoadedFile *CertLoadedFile;
 	try
@@ -1025,7 +1038,7 @@ void SaveKey(TKeyType KeyType, const UnicodeString& FileName,
 	const UnicodeString& Passphrase, TPrivateKey *PrivateKey)
 {
 	UTF8String UtfFileName = UTF8String(FileName);
-	Filename *KeyFile = filename_from_str(UtfFileName.c_str());
+	Filename *KeyFile = filename_from_utf8(UtfFileName.c_str());
 	try
 	{
 		struct ssh2_userkey *Ssh2Key = reinterpret_cast<struct ssh2_userkey*>(PrivateKey);
@@ -1078,7 +1091,7 @@ RawByteString LoadPublicKey(
 {
 	RawByteString Result;
 	UTF8String UtfFileName = UTF8String(FileName);
-	Filename *KeyFile = filename_from_str(UtfFileName.c_str());
+	Filename *KeyFile = filename_from_utf8(UtfFileName.c_str());
 	try
 	{
 		char *AlgorithmStr = NULL;
@@ -1127,7 +1140,7 @@ bool /*__fastcall*/ HasGSSAPI(UnicodeString CustomPath)
 		ssh_gss_liblist *List = NULL;
 		try
 		{
-			Filename *filename = filename_from_str(UTF8String(CustomPath).c_str());
+			Filename *filename = filename_from_utf8(UTF8String(CustomPath).c_str());
 			conf_set_filename(conf, CONF_ssh_gss_custom, filename);
 			filename_free(filename);
 			List = ssh_gss_setup(conf, NULL);
@@ -1427,7 +1440,7 @@ struct TCipherGroup
 	int CipherGroup;
 	const ssh2_ciphers *Cipher;
 };
-TCipherGroup Ciphers[] =
+static TCipherGroup Ciphers[] =
 {
 	{ CIPHER_AES, &ssh2_aes },
 	{ CIPHER_CHACHA20, &ssh2_ccp },
@@ -1478,7 +1491,7 @@ TStrings *SshKexList()
 	// Same order as DefaultKexList
 	const ssh_kexes *Kexes[] = {
 		&ssh_gssk5_ecdh_kex, &ssh_gssk5_sha2_kex, &ssh_gssk5_sha1_kex,
-		&ssh_ntru_hybrid_kex, &ssh_ecdh_kex, &ssh_diffiehellman_gex,
+		&ssh_ntru_hybrid_kex, &ssh_mlkem_curve25519_hybrid_kex, &ssh_mlkem_nist_hybrid_kex, &ssh_ecdh_kex, &ssh_diffiehellman_gex,
 		&ssh_diffiehellman_group18, &ssh_diffiehellman_group17, &ssh_diffiehellman_group16, &ssh_diffiehellman_group15, &ssh_diffiehellman_group14,
 		&ssh_rsa_kex, &ssh_diffiehellman_group1 };
 	for (unsigned int Index = 0; Index < LENOF(Kexes); Index++)
@@ -1538,7 +1551,7 @@ TStrings *SshHostKeyList()
 TStrings *SshMacList()
 {
 	std::unique_ptr<TStrings> Result(new TStrings());
-	const struct ssh2_macalg ** Macs = NULL;
+	const struct ssh2_macalg *const *Macs = NULL;
 	int Count = 0;
 	get_macs(&Count, &Macs);
 
@@ -1585,9 +1598,8 @@ void WritePuttySettings(THierarchicalStorage *Storage, const UnicodeString& ASet
 {
 	if (PuttyRegistryTypes.empty())
 	{
-		TGuard Guard(PuttyRegistrySection.get());
-	//	TValueRestorer<TPuttyRegistryMode> PuttyRegistryModeRestorer(PuttyRegistryMode);
-		PuttyRegistryMode = prmCollect;
+		TGuard Guard(PuttyStorageSection.get());
+		TValueRestorer<TPuttyRegistryMode> PuttyRegistryModeRestorer(PuttyRegistryMode, prmCollect);
 		Conf *conf = conf_new();
 		try
 		{
@@ -1616,7 +1628,7 @@ void WritePuttySettings(THierarchicalStorage *Storage, const UnicodeString& ASet
 		if (IType != PuttyRegistryTypes.end())
 		{
 			/*UnicodeString Value = Settings->ValueFromIndex[Index];
-			int I;
+			int I = 0; // shut up
 			if (IType->second == REG_SZ)
 			{
 				Storage->WriteStringRaw(Name, Value);
@@ -1632,17 +1644,15 @@ void WritePuttySettings(THierarchicalStorage *Storage, const UnicodeString& ASet
 //---------------------------------------------------------------------------
 void PuttyDefaults(Conf *conf)
 {
-	TGuard Guard(PuttyRegistrySection.get());
-//	TValueRestorer<TPuttyRegistryMode> PuttyRegistryModeRestorer(PuttyRegistryMode);
-	PuttyRegistryMode = prmFail;
+	TGuard Guard(PuttyStorageSection.get());
+	TValueRestorer<TPuttyRegistryMode> PuttyRegistryModeRestorer(PuttyRegistryMode, prmFail);
 	do_defaults(NULL, conf);
 }
 //---------------------------------------------------------------------------
 void SavePuttyDefaults(const UnicodeString& Name)
 {
-	TGuard Guard(PuttyRegistrySection.get());
-//	TValueRestorer<TPuttyRegistryMode> PuttyRegistryModeRestorer(PuttyRegistryMode);
-	PuttyRegistryMode = prmPass;
+	TGuard Guard(PuttyStorageSection.get());
+	TValueRestorer<TPuttyRegistryMode> PuttyRegistryModeRestorer(PuttyRegistryMode, prmPass);
 	Conf *conf = conf_new();
 	try
 	{

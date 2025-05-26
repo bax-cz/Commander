@@ -244,7 +244,7 @@ void __fastcall TConfiguration::Default()
 	FParallelDurationThreshold = 10;
 	FMimeTypes = UnicodeString();
 	FCertificateStorage = EmptyStr;
-	FAWSMetadataService = EmptyStr;
+	FAWSAPI = EmptyStr;
 	FChecksumCommands = EmptyStr;
 	FDontReloadMoreThanSessions = 1000;
 	FScriptProgressFileNameLimit = 25;
@@ -277,7 +277,7 @@ void __fastcall TConfiguration::Default()
 	FLogActionsRequired = false;
 	FActionsLogFileName = L"%TEMP%\\!S.xml";
 	FPermanentActionsLogFileName = FActionsLogFileName;
-	FProgramIniPathWrittable = -1;
+	FProgramIniPathWritable = -1;
 	FCustomIniFileStorageName = LoadCustomIniFileStorageName();
 
 	Changed();
@@ -399,7 +399,7 @@ UnicodeString __fastcall TConfiguration::PropertyToKey(const UnicodeString& Prop
 		KEY(String,   SynchronizationChecksumAlgs); \
 		KEY(Bool,     CollectUsage); \
 		KEY(String,   CertificateStorage); \
-		KEY(String,   AWSMetadataService); \
+		KEY(String,   AWSAPI); \
 	); \
 	BLOCK(L"Logging", CANCREATE, \
 		KEYEX(Bool,  PermanentLogging, L"Logging"); \
@@ -955,7 +955,7 @@ void __fastcall TConfiguration::CleanupRegistry(const UnicodeString& RegistryPat
 		Registry->UnmungedRoot = RegistryStorageSubKey;
 
 		AppLogFmt(L"Cleaning up registry key %s", (RegistryPath));
-		UnicodeString ARegistryPath = TPath::Combine(RegistryStorageSubKey, RegistryPath);
+		UnicodeString ARegistryPath = CombinePaths(RegistryStorageSubKey, RegistryPath);
 		UnicodeString Buf = ARegistryPath;
 		while (!Buf.IsEmpty())
 		{
@@ -995,9 +995,9 @@ TStrings *TConfiguration::GetCaches()
 	Result->Add(FtpsCertificateStorageKey);
 	Result->Add(HttpsCertificateStorageKey);
 	Result->Add(DirectoryStatisticsCacheKey);
-	Result->Add(TPath::Combine(ConfigurationSubKey, CDCacheKey));
-	Result->Add(TPath::Combine(ConfigurationSubKey, BannersKey));
-	Result->Add(TPath::Combine(ConfigurationSubKey, LastFingerprintsStorageKey));
+	Result->Add(CombinePaths(ConfigurationSubKey, CDCacheKey));
+	Result->Add(CombinePaths(ConfigurationSubKey, BannersKey));
+	Result->Add(CombinePaths(ConfigurationSubKey, LastFingerprintsStorageKey));
 	return Result.release();
 }
 //---------------------------------------------------------------------------
@@ -1466,14 +1466,14 @@ UnicodeString __fastcall TConfiguration::GetAutomaticIniFileStorageName(bool Rea
 		else
 		{
 			// avoid expensive test if we are interested in existing files only
-			if (!ReadingOnly && (FProgramIniPathWrittable < 0))
+			if (!ReadingOnly && (FProgramIniPathWritable < 0))
 			{
 				UnicodeString ProgramDir = ExtractFilePath(ProgramPath);
-				FProgramIniPathWrittable = IsDirectoryWriteable(ProgramDir) ? 1 : 0;
+				FProgramIniPathWritable = IsDirectoryWriteable(ProgramDir) ? 1 : 0;
 			}
 
 			// does not really matter what we return when < 0
-			IniPath = (FProgramIniPathWrittable == 0) ? AppDataIniPath : ProgramIniPath;
+			IniPath = (FProgramIniPathWritable == 0) ? AppDataIniPath : ProgramIniPath;
 		}
 	}
 
@@ -1681,27 +1681,35 @@ static TStoredSessionList *CreateSessionsForImport(TStoredSessionList *Sessions)
 	return Result.release();
 }
 //---------------------------------------------------------------------
+void TConfiguration::SelectSessionsToImportIfAny(
+	TStoredSessionList *ImportSessionList, TStoredSessionList *Sessions,
+	UnicodeString& Error, const UnicodeString& NoSessionsError)
+{
+	if (ImportSessionList->Count > 0)
+	{
+		ImportSessionList->SelectSessionsToImport(Sessions, true);
+	}
+	else
+	{
+		Error = NoSessionsError;
+	}
+}
+//--------------------------------------------------------------------- 
 TStoredSessionList __fastcall *TConfiguration::SelectFilezillaSessionsForImport(
 	TStoredSessionList *Sessions, UnicodeString& Error)
 {
 	std::unique_ptr<TStoredSessionList> ImportSessionList(CreateSessionsForImport(Sessions));
 
 	UnicodeString AppDataPath = GetShellFolderPath(CSIDL_APPDATA);
-	UnicodeString FilezillaSiteManagerFile = TPath::Combine(AppDataPath, L"FileZilla\\sitemanager.xml");
-	UnicodeString FilezillaConfigurationFile = TPath::Combine(AppDataPath, L"FileZilla\\filezilla.xml");
+	UnicodeString FilezillaSiteManagerFile = CombinePaths(AppDataPath, L"FileZilla\\sitemanager.xml");
+	UnicodeString FilezillaConfigurationFile = CombinePaths(AppDataPath, L"FileZilla\\filezilla.xml");
 
 	if (FileExists(ApiPath(FilezillaSiteManagerFile)))
 	{
 		ImportSessionList->ImportFromFilezilla(FilezillaSiteManagerFile, FilezillaConfigurationFile);
 
-		if (ImportSessionList->Count > 0)
-		{
-			ImportSessionList->SelectSessionsToImport(Sessions, true);
-		}
-		else
-		{
-			Error = FMTLOAD(FILEZILLA_NO_SITES, (FilezillaSiteManagerFile));
-		}
+		UnicodeString NoSessionsError = FMTLOAD(FILEZILLA_NO_SITES, (FilezillaSiteManagerFile));
+		SelectSessionsToImportIfAny(ImportSessionList.get(), Sessions, Error, NoSessionsError);
 	}
 	else
 	{
@@ -1728,7 +1736,7 @@ bool __fastcall TConfiguration::AnyFilezillaSessionForImport(TStoredSessionList 
 UnicodeString GetOpensshFolder()
 {
 	UnicodeString ProfilePath = GetShellFolderPath(CSIDL_PROFILE);
-	UnicodeString Result = TPath::Combine(ProfilePath, OpensshFolderName);
+	UnicodeString Result = CombinePaths(ProfilePath, OpensshFolderName);
 	return Result;
 }
 //---------------------------------------------------------------------
@@ -1736,7 +1744,7 @@ TStoredSessionList __fastcall *TConfiguration::SelectKnownHostsSessionsForImport
 	TStoredSessionList *Sessions, UnicodeString& Error)
 {
 	std::unique_ptr<TStoredSessionList> ImportSessionList(CreateSessionsForImport(Sessions));
-	UnicodeString KnownHostsFile = TPath::Combine(GetOpensshFolder(), L"known_hosts");
+	UnicodeString KnownHostsFile = CombinePaths(GetOpensshFolder(), L"known_hosts");
 
 	try
 	{
@@ -1780,7 +1788,7 @@ TStoredSessionList *TConfiguration::SelectOpensshSessionsForImport(
 	TStoredSessionList *Sessions, UnicodeString& Error)
 {
 	std::unique_ptr<TStoredSessionList> ImportSessionList(CreateSessionsForImport(Sessions));
-	UnicodeString ConfigFile = TPath::Combine(GetOpensshFolder(), L"config");
+	UnicodeString ConfigFile = CombinePaths(GetOpensshFolder(), L"config");
 
 	try
 	{
@@ -1805,7 +1813,7 @@ TStoredSessionList *TConfiguration::SelectOpensshSessionsForImport(
 							// If path does not exist, try if it works relatively to .ssh/
 							if (!FileExists(ApiPath(IncludePath)))
 							{
-								IncludePath = TPath::Combine(GetOpensshFolder(), IncludePath);
+								IncludePath = CombinePaths(GetOpensshFolder(), IncludePath);
 							}
 
 							if (FileExists(ApiPath(IncludePath)))
@@ -1826,14 +1834,8 @@ TStoredSessionList *TConfiguration::SelectOpensshSessionsForImport(
 
 			ImportSessionList->ImportFromOpenssh(Lines.get());
 
-			if (ImportSessionList->Count > 0)
-			{
-				ImportSessionList->SelectSessionsToImport(Sessions, true);
-			}
-			else
-			{
-				throw Exception(LoadStr(OPENSSH_CONFIG_NO_SITES));
-			}
+			UnicodeString NoSessionsError = FORMAT(L"%ls\n(%ls)", LoadStr(OPENSSH_CONFIG_NO_SITES).c_str(), ConfigFile.c_str());
+			SelectSessionsToImportIfAny(ImportSessionList.get(), Sessions, Error, NoSessionsError);
 		}
 		else
 		{
@@ -1843,6 +1845,39 @@ TStoredSessionList *TConfiguration::SelectOpensshSessionsForImport(
 	catch (Exception& E)
 	{
 		Error = FORMAT(L"%ls\n(%ls)", E.Message.c_str(), ConfigFile.c_str());
+	}
+
+	return ImportSessionList.release();
+}
+//--------------------------------------------------------------------------- 
+TStoredSessionList *TConfiguration::SelectSessionsForImport(
+	TStoredSessionList *Sessions, const UnicodeString& FileName, UnicodeString& Error)
+{
+	std::unique_ptr<TStoredSessionList> ImportSessionList(CreateSessionsForImport(Sessions));
+
+	try
+	{
+		if (FileName.IsEmpty())
+		{
+			throw Exception(LoadStr(INI_SELECT));
+		}
+		else
+		{
+			std::unique_ptr<THierarchicalStorage> ImportStorage(TIniFileStorage::CreateFromPath(FileName));
+			ImportStorage->AccessMode = smRead;
+
+			if (ImportStorage->OpenSubKey(Configuration->StoredSessionsSubKey, false))
+			{
+				ImportSessionList->Load(ImportStorage.get());
+			}
+
+			UnicodeString NoSessionsError = FMTLOAD(INI_NO_SITES, (FileName));
+			SelectSessionsToImportIfAny(ImportSessionList.get(), Sessions, Error, NoSessionsError);
+		}
+	}
+	catch (Exception& E)
+	{
+		Error = E.Message;
 	}
 
 	return ImportSessionList.release();
@@ -1975,7 +2010,7 @@ UnicodeString TConfiguration::GetCertificateStorageExpanded()
 	UnicodeString Result = FCertificateStorage;
 	if (Result.IsEmpty())
 	{
-		UnicodeString DefaultCertificateStorage = TPath::Combine(ExtractFilePath(ModuleFileName()), L"cacert.pem");
+		UnicodeString DefaultCertificateStorage = CombinePaths(ExtractFilePath(ModuleFileName()), L"cacert.pem");
 		if (FileExists(DefaultCertificateStorage))
 		{
 			Result = DefaultCertificateStorage;
@@ -1984,9 +2019,9 @@ UnicodeString TConfiguration::GetCertificateStorageExpanded()
 	return Result;
 }
 //---------------------------------------------------------------------
-void TConfiguration::SetAWSMetadataService(const UnicodeString& value)
+void TConfiguration::SetAWSAPI(const UnicodeString& value)
 {
-	SET_CONFIG_PROPERTY(AWSMetadataService);
+	SET_CONFIG_PROPERTY(AWSAPI);
 }
 //---------------------------------------------------------------------
 void __fastcall TConfiguration::SetTryFtpWhenSshFails(bool value)

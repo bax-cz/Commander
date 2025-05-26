@@ -12,12 +12,13 @@
 
 #define TBCMD_DIFFPREVIOUS     101
 #define TBCMD_DIFFNEXT         102
-#define TBCMD_DIFFFIRST        103
-#define TBCMD_DIFFLAST         104
-#define TBCMD_IGNORECASE       105
-#define TBCMD_IGNOREWHITESPACE 106
-#define TBCMD_IGNOREEOL        107
-#define TBCMD_REFRESH          108
+#define TBCMD_DIFFCURRENT      103
+#define TBCMD_DIFFFIRST        104
+#define TBCMD_DIFFLAST         105
+#define TBCMD_IGNORECASE       106
+#define TBCMD_IGNOREWHITESPACE 107
+#define TBCMD_IGNOREEOL        108
+#define TBCMD_REFRESH          109
 
 namespace Commander
 {
@@ -142,8 +143,9 @@ namespace Commander
 		// populate array of button describing structures
 		std::vector<TBBUTTON> tbb;
 
-		INSERT_TOOLBAR_BUTTON( BTNS_BUTTON/*BTNS_DROPDOWN*/, TBCMD_DIFFPREVIOUS, L"Previous Diff (F7)", 16 );
-		INSERT_TOOLBAR_BUTTON( BTNS_BUTTON/*BTNS_DROPDOWN*/, TBCMD_DIFFNEXT, L"Next Diff (F8)", 17 );
+		INSERT_TOOLBAR_BUTTON( BTNS_BUTTON, TBCMD_DIFFPREVIOUS, L"Previous Diff (F7)", 16 );
+		INSERT_TOOLBAR_BUTTON( BTNS_BUTTON, TBCMD_DIFFCURRENT, L"Current Diff (Alt+Enter)", 15 );
+		INSERT_TOOLBAR_BUTTON( BTNS_BUTTON, TBCMD_DIFFNEXT, L"Next Diff (F8)", 17 );
 		INSERT_TOOLBAR_BUTTON( BTNS_SEP, 0, 0, 0 );
 		INSERT_TOOLBAR_BUTTON( BTNS_BUTTON, TBCMD_DIFFFIRST, L"First Diff (Alt+Home)", 7 );
 		INSERT_TOOLBAR_BUTTON( BTNS_BUTTON, TBCMD_DIFFLAST, L"Last Diff (Alt+End)", 8 );
@@ -315,11 +317,18 @@ namespace Commander
 
 	void CCompareFiles::updateGuiStatus()
 	{
-		BOOL enable = ( _diffs.GetSize() > 0 ? TRUE : FALSE );
-		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFPREVIOUS, MAKELPARAM( enable && _curDiff > 0, 0 ) );
-		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFNEXT, MAKELPARAM( enable && _curDiff < _diffs.GetSize(), 0 ) );
-		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFFIRST, MAKELPARAM( enable, 0 ) );
-		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFLAST, MAKELPARAM( enable, 0 ) );
+		bool enablePrev = _diffs.GetSize() > 0 && _curDiff > 0;
+		bool enableNext = _diffs.GetSize() > 0 && _curDiff + 1 < _diffs.GetSize();
+
+		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFPREVIOUS, MAKELPARAM( enablePrev, 0 ) );
+		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFNEXT, MAKELPARAM( enableNext, 0 ) );
+		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFCURRENT, MAKELPARAM( _curDiff != -1, 0 ) );
+		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFFIRST, MAKELPARAM( enablePrev, 0 ) );
+		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_DIFFLAST, MAKELPARAM( enableNext, 0 ) );
+
+		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_IGNORECASE, MAKELPARAM( !_binaryMode, 0 ) );
+		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_IGNOREWHITESPACE, MAKELPARAM( !_binaryMode, 0 ) );
+		SendMessage( _hToolBar, TB_ENABLEBUTTON, TBCMD_IGNOREEOL, MAKELPARAM( !_binaryMode, 0 ) );
 	}
 
 	void CCompareFiles::updateOptions()
@@ -674,10 +683,12 @@ namespace Commander
 
 		for( size_t i = 0; i < bytesPerLine; ++i )
 		{
-			if( buf2.size() > idx + i && buf1[idx+i] != buf2[idx+i] )
+			if( buf1.size() <= idx + i ) // ghost char
+				strOut += "\\cf4\\highlight3 ";
+			else if( buf2.size() > idx + i && buf1[idx+i] != buf2[idx+i] )
 				strOut += "\\cf4\\highlight2 ";
 
-			char ch = CFileViewer::getPrintableChar( buf1[idx+i] );
+			char ch = ( buf1.size() > idx + i ? CFileViewer::getPrintableChar( buf1[idx+i] ) : ' ' );
 
 			// escapeRtfControlChars
 			if( ch == '\\' || ch == '{' || ch == '}' )
@@ -685,7 +696,7 @@ namespace Commander
 
 			strOut += ch;
 
-			if( buf2.size() > idx + i && buf1[idx+i] != buf2[idx+i] )
+			if( buf1.size() <= idx + i || ( buf2.size() > idx + i && buf1[idx+i] != buf2[idx+i] ) )
 				strOut += "\\cf0\\highlight0 ";
 		}
 
@@ -699,14 +710,10 @@ namespace Commander
 		outBuff += "{\\colortbl ;\\red255\\green0\\blue0;\\red0\\green77\\blue187;\\red128\\green128\\blue128;\\red0\\green255\\blue0;}";
 
 		LARGE_INTEGER fileSize; fileSize.QuadPart = offset;
-		size_t bytesPerLine = BYTES_ROW;
 
-		for( size_t idx = 0; _worker.isRunning(); idx += BYTES_ROW )
+		for( size_t idx = 0; ( idx < buf1.size() || idx < buf2.size() ) && _worker.isRunning(); idx += BYTES_ROW )
 		{
-			if( idx < buf1.size() )
-				bytesPerLine = min( buf1.size() - idx, BYTES_ROW );
-			else
-				break;
+			size_t bytesPerLine = min( max( buf1.size(), buf2.size() ) - idx, BYTES_ROW );
 
 			outBuff += "\\fs21\\pard ";
 
@@ -722,10 +729,18 @@ namespace Commander
 				// write out one BYTE
 				if( i < bytesPerLine + 1 )
 				{
-					if( buf2.size() > idx + i - 1 && buf1[idx+i-1] != buf2[idx+i-1] )
-						sstr << "\\cf4\\highlight2 " << std::setw( 2 ) << ( buf1[idx+i-1] & 0xFF ) << "\\cf0\\highlight0  ";
+					if( buf1.size() <= idx + i - 1 )
+					{
+						// ghost byte
+						sstr << "\\cf4\\highlight3  \r \\cf0\\highlight0  ";
+					}
 					else
-						sstr << std::setw( 2 ) << ( buf1[idx+i-1] & 0xFF ) << " ";
+					{
+						if( buf2.size() > idx + i - 1 && buf1[idx+i-1] != buf2[idx+i-1] )
+							sstr << "\\cf4\\highlight2 " << std::setw( 2 ) << ( buf1[idx+i-1] & 0xFF ) << "\\cf0\\highlight0  ";
+						else
+							sstr << std::setw( 2 ) << ( buf1[idx+i-1] & 0xFF ) << " ";
+					}
 				}
 				else
 					sstr << "   ";
@@ -855,17 +870,6 @@ namespace Commander
 		return false;
 	}
 
-	/*bool compareChunks( const std::string& buf1, const std::string& buf2, std::streamsize len )
-	{
-		uLong crc1 = crc32( 0L, Z_NULL, 0 );
-		uLong crc2 = crc32( 0L, Z_NULL, 0 );
-
-		crc1 = crc32( crc1, reinterpret_cast<const Bytef*>( &buf1[0] ), static_cast<uInt>( len ) );
-		crc2 = crc32( crc2, reinterpret_cast<const Bytef*>( &buf2[0] ), static_cast<uInt>( len ) );
-
-		return crc1 == crc2;
-	}*/
-
 	std::streamoff findOffsetBinary( const std::string& buf1, const std::string& buf2, std::streamsize len )
 	{
 		_ASSERTE( buf1.size() >= len );
@@ -884,17 +888,14 @@ namespace Commander
 		return off;
 	}
 
-	std::streamoff CCompareFiles::findDiffBinary( std::streamoff startOffset, bool reverse )
+	bool CCompareFiles::findDiffBinary( std::ifstream& fs1, std::ifstream& fs2, std::streamoff& offset )
 	{
-		std::ifstream fs1( PathUtils::getExtendedPath( _path1 ), std::ios::binary );
-		std::ifstream fs2( PathUtils::getExtendedPath( _path2 ), std::ios::binary );
-
-		std::string buf1( 0x10000, 0 );
-		std::string buf2( 0x10000, 0 );
-
 		if( fs1.is_open() && fs2.is_open() )
 		{
-			std::streamoff offRel = 0, offAbs = 0;
+			std::string buf1( 0x10000, 0 );
+			std::string buf2( 0x10000, 0 );
+
+			std::streamoff offAbs = 0;
 			std::streamoff size1, size2;
 
 			while( _worker.isRunning() )
@@ -907,33 +908,46 @@ namespace Commander
 				if( size1 == 0 || size1 != size2 || !!memcmp( &buf1[0], &buf2[0], size1 ) )
 				{
 					// find the offset of the first difference in both chunks
-					offRel = findOffsetBinary( buf1, buf2, min( size1, size2 ) );
-
-					return offAbs + offRel;
+					offset = offAbs + findOffsetBinary( buf1, buf2, min( size1, size2 ) );
+					return true;
 				}
 
 				offAbs += size1;
 			}
 		}
 
-		return -1ll;
+		return false;
 	}
 
 	bool CCompareFiles::compareFilesBinary()
 	{
-		//	auto ticks = GetTickCount();
-		auto offsetDiff = findDiffBinary( 0 );
+		std::ifstream fs1( PathUtils::getExtendedPath( _path1 ), std::ios::binary );
+		std::ifstream fs2( PathUtils::getExtendedPath( _path2 ), std::ios::binary );
 
-		// elapsed time - test
-		//	std::wstring text = StringUtils::formatTime( GetTickCount() - ticks );
-		//	MessageBox( NULL, text.c_str(), L"Elapsed time", MB_ICONINFORMATION | MB_OK );
+		std::streamoff offset = 0ll;
 
-		// a difference has been found at the offset 'offsetDiff'
-		if( offsetDiff != -1ll )
+		// a difference has been found at offset
+		if( findDiffBinary( fs1, fs2, offset ) )
 		{
+			offset = offset / BYTES_ROW * BYTES_ROW;
+			offset = max( 0ll, offset - BYTES_ROW ); // one row before the difference
+
+			fs1.clear(); fs1.seekg( offset, std::ios::beg );
+			fs2.clear(); fs2.seekg( offset, std::ios::beg );
+
+			std::string buf1; buf1.resize( BYTES_ROW * 256 );
+			std::string buf2; buf2.resize( BYTES_ROW * 256 );
+
+			// read chunks
+			auto size1 = fs1.read( reinterpret_cast<char*>( &buf1[0] ), buf1.size() ).gcount();
+			auto size2 = fs2.read( reinterpret_cast<char*>( &buf2[0] ), buf2.size() ).gcount();
+
+			buf1.resize( size1 );
+			buf2.resize( size2 );
+
 			// write out rtf documents
-	//		writeRtfDocumentHex( bufLeft, bufRight, offAbs + offset, _diffLeft );
-	//		writeRtfDocumentHex( bufRight, bufLeft, offAbs + offset, _diffRight );
+			writeRtfDocumentHex( buf1, buf2, offset, _diffLeft );
+			writeRtfDocumentHex( buf2, buf1, offset, _diffRight );
 
 			//	std::ofstream fs1( "C:\\Users\\bax\\Documents\\out1.rtf", std::ios::binary );
 			//	fs1 << _diffLeft;
@@ -947,7 +961,7 @@ namespace Commander
 		return false;
 	}
 
-	// TODO: move this funciton somewhere else
+	// TODO: move this function somewhere else
 	bool replaceByte( const std::wstring& path, ULONGLONG offset, BYTE byte )
 	{
 		HANDLE hFile = CreateFile( PathUtils::getExtendedPath( path ).c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL );
@@ -987,8 +1001,8 @@ namespace Commander
 		else
 		{
 			// TODO: binary compare
-			_binaryMode = compareFilesBinary();
-			return _binaryMode;
+			_binaryMode = true;
+			return compareFilesBinary();
 		}
 
 		return false;
@@ -1010,6 +1024,8 @@ namespace Commander
 
 		SendMessage( GetDlgItem( _hDlg, IDC_COMPARERICHEDIT_LEFT ), EM_LINESCROLL, 0, off1 );
 		SendMessage( GetDlgItem( _hDlg, IDC_COMPARERICHEDIT_RIGHT ), EM_LINESCROLL, 0, off2 );
+
+		updateGuiStatus();
 	}
 
 	void CCompareFiles::focusDiffPrev()
@@ -1030,6 +1046,18 @@ namespace Commander
 		{
 			DIFFRANGE dr;
 			if( _diffs.GetDiff( ++_curDiff, dr ) )
+			{
+				focusLine( dr.dbegin );
+			}
+		}
+	}
+
+	void CCompareFiles::focusDiffCurrent()
+	{
+		if( _curDiff != -1 )
+		{
+			DIFFRANGE dr;
+			if( _diffs.GetDiff( _curDiff, dr ) )
 			{
 				focusLine( dr.dbegin );
 			}
@@ -1082,41 +1110,6 @@ namespace Commander
 			refresh();
 		}
 	}
-
-	//
-	// Toolbar's dropdown arrow clicked - TODO?
-	//
-	/*LRESULT CCompareFiles::handleDiffList( LPNMTOOLBAR tbNotifMsg )
-	{
-		// get backward/forward history list
-		bool goBack = tbNotifMsg->iItem == TBCMD_DIFFPREVIOUS;
-	//	auto list = getActiveTab()->getHistoryList( goBack );
-		std::vector<std::wstring> list { L"test" };
-
-		// construct popup menu with history elements from the list
-		auto hMenu = CreatePopupMenu();
-
-		for( size_t i = 0; i < list.size(); ++i )
-			AppendMenu( hMenu, MF_STRING, i + 1, list[i].c_str() );
-
-		// get screen coordinates for popup menu
-		POINT pt{ tbNotifMsg->rcButton.left, tbNotifMsg->rcButton.bottom };
-		ClientToScreen( _hDlg, &pt );
-
-		// show the menu and wait for input
-		auto cmd = TrackPopupMenu( hMenu,
-			TPM_NONOTIFY | TPM_RETURNCMD | TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL,
-			pt.x, pt.y, 0, _hDlg, NULL );
-
-		DestroyMenu( hMenu );
-
-		// navigate through history
-	//	if( cmd )
-	//		getActiveTab()->navigateThroughHistory(
-	//			goBack ? EFcCommand::HistoryBackward : EFcCommand::HistoryForward, cmd );
-
-		return TBDDRET_DEFAULT;
-	}*/
 
 	void CCompareFiles::onFindDialogNotify( int cmd )
 	{
@@ -1196,6 +1189,9 @@ namespace Commander
 				case TBCMD_DIFFNEXT:
 					focusDiffNext();
 					break;
+				case TBCMD_DIFFCURRENT:
+					focusDiffCurrent();
+					break;
 				case TBCMD_DIFFFIRST:
 					focusDiffFirst();
 					break;
@@ -1215,11 +1211,6 @@ namespace Commander
 			break;
 
 		case WM_NOTIFY:
-			//if( reinterpret_cast<LPNMHDR>( lParam )->hwndFrom == _hToolBar &&
-			//	reinterpret_cast<LPNMHDR>( lParam )->code == TBN_DROPDOWN )
-			//{
-			//	return handleDiffList( reinterpret_cast<LPNMTOOLBAR>( lParam ) );
-			//}
 			break;
 
 		case UM_REPORTMSGBOX:
@@ -1314,6 +1305,9 @@ namespace Commander
 					return 0;
 				case VK_DOWN:
 					focusDiffNext();
+					return 0;
+				case VK_RETURN:
+					focusDiffCurrent();
 					return 0;
 				case VK_HOME:
 					focusDiffFirst();

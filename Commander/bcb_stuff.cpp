@@ -152,7 +152,7 @@ namespace bcb
 	}
 
 	/* Helper functions */
-	ULONGLONG Now()
+	TDateTime Now()
 	{
 		SYSTEMTIME st;
 		GetSystemTime( &st );

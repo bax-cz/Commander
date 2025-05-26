@@ -5,7 +5,7 @@ struct TSessionInfo
 {
 	inline TSessionInfo() { LoginTime = Now(); CertificateVerifiedManually = false; }
 
-	ULONGLONG LoginTime;
+	TDateTime LoginTime;
 	UnicodeString ProtocolBaseName;
 	UnicodeString ProtocolName;
 	UnicodeString SecurityProtocolName;
@@ -34,6 +34,6 @@ enum TLogAction
 	laStat, laChecksum, laCwd, laDifference
 };
 enum TCaptureOutputType { cotOutput, cotError, cotExitCode };
-typedef void(*TCaptureOutputEvent)(const UnicodeString& Str, TCaptureOutputType OutputType);
+using TCaptureOutputEvent = std::function<void(const std::wstring& str, TCaptureOutputType outputType)>;
 //---------------------------------------------------------------------------
 } // namespace bcb

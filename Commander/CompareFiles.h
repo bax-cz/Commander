@@ -55,9 +55,9 @@ namespace Commander
 		void createToolbar();
 		void addToolbarButtons();
 		void handleDropFiles( HDROP hDrop, bool leftRichEdit );
-	//	LRESULT handleDiffList( LPNMTOOLBAR tbNotifMsg );
 		void focusDiffPrev();
 		void focusDiffNext();
+		void focusDiffCurrent();
 		void focusDiffFirst();
 		void focusDiffLast();
 		void focusLine( int lineIdx );
@@ -73,7 +73,7 @@ namespace Commander
 		bool compareFilesBinary();
 
 	private:
-		std::streamoff findDiffBinary( std::streamoff startOffset, bool reverse = false );
+		bool findDiffBinary( std::ifstream& fs1, std::ifstream& fs2, std::streamoff& offset );
 
 	private:
 		void onFindDialogNotify( int cmd );

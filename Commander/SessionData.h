@@ -20,7 +20,7 @@ enum TFSProtocol { fsSCPonly = 0, fsSFTP = 1, fsSFTPonly = 2, fsFTP = 5, fsWebDA
 #define FSPROTOCOL_COUNT (fsS3+1)
 extern const wchar_t *ProxyMethodNames;
 enum TProxyMethod { pmNone, pmSocks4, pmSocks5, pmHTTP, pmTelnet, pmCmd };
-enum TKex { kexWarn, kexDHGroup1, kexDHGroup14, kexDHGroup15, kexDHGroup16, kexDHGroup17, kexDHGroup18, kexDHGEx, kexRSA, kexECDH, kexNTRUHybrid, kexCount };
+enum TKex { kexWarn, kexDHGroup1, kexDHGroup14, kexDHGroup15, kexDHGroup16, kexDHGroup17, kexDHGroup18, kexDHGEx, kexRSA, kexECDH, kexNTRUHybrid, kexMLKEM25519Hybrid, kexMLKEMNISTHybrid, kexCount };
 #define KEX_COUNT (kexCount) 
 enum THostKey { hkWarn, hkRSA, hkDSA, hkECDSA, hkED25519, hkED448, hkCount };
 #define HOSTKEY_COUNT (hkCount) 
@@ -43,6 +43,7 @@ enum TTlsVersion { ssl2 = 2, ssl3 = 3, tls10 = 10, tls11 = 11, tls12 = 12, tls13
 // has to match libs3 S3UriStyle
 enum TS3UrlStyle { s3usVirtualHost, s3usPath };
 enum TSessionSource { ssNone, ssStored, ssStoredModified };
+const int SFTPMaxVersionAuto = -1;
 enum TSessionUrlFlags
 {
   sufSpecific = 0x01,
@@ -66,7 +67,7 @@ enum TParseUrlFlags
 // Update also order in SshCipherList() 
 const TCipher DefaultCipherList[CIPHER_COUNT] = { cipAES, cipChaCha20, cipAESGCM, cip3DES, cipWarn, cipDES, cipBlowfish, cipArcfour };
 // Update also order in SshKexList()
-const TKex DefaultKexList[KEX_COUNT] = { kexNTRUHybrid, kexECDH, kexDHGEx, kexDHGroup18, kexDHGroup17, kexDHGroup16, kexDHGroup15, kexDHGroup14, kexRSA, kexWarn, kexDHGroup1 };
+const TKex DefaultKexList[KEX_COUNT] = { kexNTRUHybrid, kexMLKEM25519Hybrid, kexMLKEMNISTHybrid, kexECDH, kexDHGEx, kexDHGroup18, kexDHGroup17, kexDHGroup16, kexDHGroup15, kexDHGroup14, kexRSA, kexWarn, kexDHGroup1 };
 const THostKey DefaultHostKeyList[HOSTKEY_COUNT] = { hkED448, hkED25519, hkECDSA, hkRSA, hkDSA, hkWarn };
 const TGssLib DefaultGssLibList[GSSLIB_COUNT] = { gssGssApi32, gssSspi, gssCustom };
 
@@ -151,7 +152,7 @@ public:
 	UnicodeString FCustomParam2;
 	bool FResolveSymlinks;
 	bool FFollowDirectorySymlinks;
-	ULONGLONG FTimeDifference;
+	TDateTime FTimeDifference;
 	bool FTimeDifferenceAuto;
 	int FSFTPDownloadQueue;
 	int FSFTPUploadQueue;
@@ -202,6 +203,8 @@ public:
 	int FInternalEditorEncoding;
 	UnicodeString FS3DefaultRegion;
 	UnicodeString FS3SessionToken;
+	UnicodeString FS3RoleArn;
+	UnicodeString FS3RoleSessionName;
 	UnicodeString FS3Profile;
 	TS3UrlStyle FS3UrlStyle;
 	TAutoSwitch FS3MaxKeys;
@@ -397,6 +400,8 @@ public:
 	void __fastcall SetInternalEditorEncoding(int value);
 	void __fastcall SetS3DefaultRegion(UnicodeString value);
 	void __fastcall SetS3SessionToken(UnicodeString value);
+	void __fastcall SetS3RoleArn(UnicodeString value);
+	void __fastcall SetS3RoleSessionName(UnicodeString value);
 	void __fastcall SetS3Profile(UnicodeString value);
 	void __fastcall SetS3UrlStyle(TS3UrlStyle value);
 	void __fastcall SetS3MaxKeys(TAutoSwitch value);
@@ -419,7 +424,7 @@ public:
 	UnicodeString __fastcall GetLocalName();
 	UnicodeString __fastcall GetFolderName();
 	void __fastcall Modify();
-	UnicodeString __fastcall GetSource();
+	UnicodeString __fastcall GetSourceName();
 	void __fastcall DoLoad(THierarchicalStorage *Storage, bool PuttyImport, bool& RewritePassword, bool Unsafe, bool RespectDisablePasswordStoring);
 	void __fastcall DoSave(THierarchicalStorage *Storage,
 		bool PuttyExport, const TSessionData *Default, bool DoNotEncryptPasswords);
@@ -491,7 +496,7 @@ public:
 		FChangePassword = false;
 		FPingInterval = 30;
 		FPingType = ptOff;
-		FTimeout = 15;
+		FTimeout = 30;
 		FTryAgent = true;
 		FAgentFwd = false;
 		FAuthKI = true;
@@ -603,6 +608,8 @@ public:
 		// S3
 		FS3DefaultRegion = EmptyStr;
 		FS3SessionToken = EmptyStr;
+		FS3RoleArn = EmptyStr;
+		FS3RoleSessionName = EmptyStr;
 		FS3Profile = EmptyStr;
 		FS3UrlStyle = s3usVirtualHost;
 		FS3MaxKeys = asAuto;
@@ -902,6 +909,8 @@ public:
 	__property int InternalEditorEncoding = { read = FInternalEditorEncoding, write = SetInternalEditorEncoding };
 	__property UnicodeString S3DefaultRegion = { read = FS3DefaultRegion, write = SetS3DefaultRegion };
 	__property UnicodeString S3SessionToken = { read = FS3SessionToken, write = SetS3SessionToken };
+	__property UnicodeString S3RoleArn = { read = FS3RoleArn, write = SetS3RoleArn };
+	__property UnicodeString S3RoleSessionName = { read = FS3RoleSessionName, write = SetS3RoleSessionName };
 	__property UnicodeString S3Profile = { read = FS3Profile, write = SetS3Profile };
 	__property TS3UrlStyle S3UrlStyle = { read = FS3UrlStyle, write = SetS3UrlStyle };
 	__property TAutoSwitch S3MaxKeys = { read = FS3MaxKeys, write = SetS3MaxKeys };
@@ -925,7 +934,8 @@ public:
 	__property int OrigPortNumber = { read = FOrigPortNumber };
 	__property UnicodeString LocalName = { read = GetLocalName };
 	__property UnicodeString FolderName = { read = GetFolderName };
-	__property UnicodeString Source = { read = GetSource };
+	__property TSessionSource Source = { read = FSource };
+	__property UnicodeString SourceName = { read = GetSourceName };
 	__property bool SaveOnly = { read = FSaveOnly };*/
 };
 } // namespace bcb

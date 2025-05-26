@@ -14,13 +14,13 @@
 #include "CommanderApp.h"
 
 #if defined(_DEBUG) || defined(FC_ENABLE_LOGGING)
-  #define PrintDebug( format, ... ) printDebug( __FUNCTIONW__, _T(format), __VA_ARGS__ )
+  #define PrintDebug( format, ... ) _printDebugImpl( __FUNCTIONW__, _T(format), __VA_ARGS__ )
 #else
   #define PrintDebug __noop
 #endif
 
 #if defined(_DEBUG) || defined(FC_ENABLE_LOGGING)
-void printDebug( const wchar_t *funcName, const wchar_t *fmt, ... );
+void _printDebugImpl( const wchar_t *funcName, const wchar_t *fmt, ... );
 #endif
 
 #include "SystemUtils.h"
@@ -30,7 +30,7 @@ void printDebug( const wchar_t *funcName, const wchar_t *fmt, ... );
 #endif
 
 /* Format string - printf style */
-#define FORMAT( format, ... ) formatStr( (format), __VA_ARGS__ )
+#define FORMAT( format, ... ) formatStrImpl( (format), __VA_ARGS__ )
 
 namespace Commander
 {
@@ -41,7 +41,7 @@ namespace Commander
 	LRESULT CALLBACK wndProcFcMain( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 
 	// Format string helper function
-	std::wstring formatStr( const wchar_t *fmt, ... );
+	std::wstring formatStrImpl( const wchar_t *fmt, ... );
 
 	// Responsible for Menu/Toolbar command processing
 	bool processMenuCommand( WORD itemId );
