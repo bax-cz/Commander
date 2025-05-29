@@ -5,9 +5,9 @@
 	NOTE: This is just bare minimum implementation to get WinScp stuff compiled!
 */
 
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
 
 #define DebugAssert(p) _ASSERTE(p)
 #define DebugCheck(p) (p)
@@ -79,7 +79,6 @@ namespace bcb
 	using TDateTime = ULONGLONG;
 	using TNotifyEvent = void(*)(void*);
 	using TCriticalSection = std::mutex;
-	using TQueryParamsTimerEvent = std::function<void(unsigned int& result)>;
 
 	/* Enumeration types */
 	enum TEOLType { eolLF /* \n */, eolCRLF /* \r\n */, eolCR /* \r */ };

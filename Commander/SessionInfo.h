@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace bcb {
 struct TSessionInfo
 {
@@ -35,5 +37,6 @@ enum TLogAction
 };
 enum TCaptureOutputType { cotOutput, cotError, cotExitCode };
 using TCaptureOutputEvent = std::function<void(const std::wstring& str, TCaptureOutputType outputType)>;
+using TQueryParamsTimerEvent = std::function<void(unsigned int& result)>;
 //---------------------------------------------------------------------------
 } // namespace bcb

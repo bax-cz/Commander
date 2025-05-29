@@ -8,6 +8,10 @@
 
 #include <dwmapi.h>
 
+#if _MSC_VER <= 1900
+#define DWMWA_USE_IMMERSIVE_DARK_MODE   20
+#endif
+
 namespace Commander
 {
 	CSshOutput::CSshOutput()

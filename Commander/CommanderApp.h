@@ -17,11 +17,6 @@
 #include <map>
 #include <set>
 
-// Dark mode support messages
-#ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
-#define DWMWA_USE_IMMERSIVE_DARK_MODE   20
-#endif
-
 // Edit-control exstyle - when compiling against older SDKs
 #ifndef EM_SETEXTENDEDSTYLE
 #define EM_SETEXTENDEDSTYLE ECM_FIRST + 10
