@@ -1337,18 +1337,18 @@ unsigned int /*__fastcall*/ TSecureShell::TimeoutPrompt(TQueryParamsTimerEvent P
 		Params.TimerEvent = PoolEvent;
 		Params.TimerMessage = MainInstructionsFirstParagraph(FMTLOAD(TIMEOUT_STILL_WAITING3, (FSessionData->Timeout)));
 		Params.TimerAnswers = qaAbort;
-		Params.TimerQueryType = qtInformation;
-		if (FConfiguration->SessionReopenAutoStall > 0)
-		{
-			Params.Timeout = FConfiguration->SessionReopenAutoStall;
-			Params.TimeoutAnswer = qaAbort;
-			Params.TimeoutResponse = qaNo;
-		}
-		Answer = FUI->QueryUser(MainInstructions(FMTLOAD(CONFIRM_PROLONG_TIMEOUT3, (FSessionData->Timeout))),
-			NULL, qaRetry | qaAbort, &Params);*/
-		auto res = MessageBox(pWorker->getHwnd(), MainInstructions(FMTLOAD(CONFIRM_PROLONG_TIMEOUT3,
-			(IntToStr(FSessionData->FTimeout)))).c_str(), L"PuTTY Connection Timed Out", MB_ICONQUESTION | MB_ABORTRETRYIGNORE);
-		Answer = (res == IDABORT ? qaAbort : (res == IDRETRY ? qaRetry : qaOK));
+		Params.TimerQueryType = qtInformation;*/
+	//	if (FConfiguration->SessionReopenAutoStall > 0)
+	//	{
+	//		Params.Timeout = FConfiguration->SessionReopenAutoStall;
+	//		Params.TimeoutAnswer = qaAbort;
+	//		Params.TimeoutResponse = qaNo;
+	//	}
+	//	Answer = FUI->QueryUser(MainInstructions(FMTLOAD(CONFIRM_PROLONG_TIMEOUT3, (FSessionData->Timeout))),
+	//		NULL, qaRetry | qaAbort, &Params);
+//		auto res = MessageBox(pWorker->getHwnd(), MainInstructions(FMTLOAD(CONFIRM_PROLONG_TIMEOUT3,
+//			(IntToStr(FSessionData->FTimeout)))).c_str(), L"PuTTY Connection Timed Out", MB_ICONQUESTION | MB_ABORTRETRYIGNORE);
+		Answer = /*(res == IDABORT ? qaAbort : (res == IDRETRY ?*/ qaRetry /*: qaOK))*/;
 	}
 //	__finally
 	{

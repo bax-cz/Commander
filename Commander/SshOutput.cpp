@@ -44,6 +44,8 @@ namespace Commander
 
 		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
 		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_SHUTDOWN, L"Shutdown" );
+		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
+		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_CURRENTDIR, L"Current Directory" );
 		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_CLEAR, L"Clear" );
 		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
 		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_STRING, IDM_OPTIONS_ALWAYSONTOP, L"Always on Top" );
@@ -78,7 +80,7 @@ namespace Commander
 		_secureShellText += sstr.str();
 		_secureShellText += L"\r\n";
 
-		updateCommandsList();
+		updateCommandList();
 		updateWindowTitle( _currentCommand );
 
 		_worker.start();
@@ -125,12 +127,10 @@ namespace Commander
 	{
 		_upSshData->shell.SendCommand( bcb::fsFirstLine, SSH_FIRST_LINE );
 
-		std::wstring line;
-
 		// read until "fsFirstLine"
 		while( _worker.isRunning() )
 		{
-			line = _upSshData->shell.ReceiveLine();
+			auto line = _upSshData->shell.ReceiveLine();
 
 			if( _upSshData->shell.isLastLine( line ) )
 				break;
@@ -157,6 +157,8 @@ namespace Commander
 				_upSshData->shell.FSimple = true;
 				_upSshData->shell.Open();
 
+				_upSshData->shell.FUtfStrings = true;
+
 				// report connection attempt result
 				_worker.sendNotify( 2, _upSshData->shell.FOpened );
 
@@ -169,8 +171,6 @@ namespace Commander
 			}
 			else
 			{
-				_upSshData->shell.FUtfStrings = true;
-
 				auto ret = _upSshData->shell.SendCommandFull( bcb::fsAnyCommand, _currentCommand );
 				auto cwd = _upSshData->shell.SendCommandFull( bcb::fsCurrentDirectory );
 
@@ -193,15 +193,23 @@ namespace Commander
 		return true;
 	}
 
+	std::wstring CSshOutput::getCurrentDirectory() const
+	{
+		// get the parent panel's current working directory in an UNIX-style format
+		auto cwd = PathUtils::stripDelimiter( _spPanel->getDataManager()->getCurrentDirectory() );
+		cwd = cwd.substr( wcslen( ReaderType::getModePrefix( EReadMode::Putty ) ) );
+		PathUtils::unifyDelimiters( cwd, false );
+
+		return cwd;
+	}
+
 	void CSshOutput::setParent( std::shared_ptr<CPanelTab> spPanel )
 	{
 		if( spPanel )
 		{
 			_spPanel = spPanel;
 
-			_currentDirectory = PathUtils::stripDelimiter( spPanel->getDataManager()->getCurrentDirectory() );
-			_currentDirectory = _currentDirectory.substr( wcslen( ReaderType::getModePrefix( EReadMode::Putty ) ) );
-			PathUtils::unifyDelimiters( _currentDirectory, false );
+			_currentDirectory = getCurrentDirectory();
 
 			// copy session data
 			_upSshData->session = spPanel->getDataManager()->getSshSession();
@@ -242,7 +250,7 @@ namespace Commander
 		EnableWindow( GetDlgItem( _hDlg, IDOK ), res && _upSshData->shell.FOpened && !_worker.isRunning() );
 	}
 
-	void CSshOutput::updateCommandsList()
+	void CSshOutput::updateCommandList()
 	{
 		auto it = std::find( _commandList.begin(), _commandList.end(), _currentCommand );
 
@@ -348,6 +356,10 @@ namespace Commander
 			case IDM_SECURESHELL_CLEAR:
 				_secureShellText.clear();
 				updateSecureShellWindow();
+				break;
+			case IDM_SECURESHELL_CURRENTDIR:
+				_currentCommand = FORMAT( bcb::DefaultCommandSet[bcb::fsChangeDirectory].Command, getCurrentDirectory().c_str() );
+				_worker.start();
 				break;
 			case IDM_SECURESHELL_SHUTDOWN:
 				_currentCommand = L"echo ";

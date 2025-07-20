@@ -27,12 +27,15 @@ namespace Commander
 		void setParent( std::shared_ptr<CPanelTab> spPanel = nullptr );
 
 	private:
+		std::wstring getCurrentDirectory() const;
+
+	private:
 		void readStartupMessage();
 		void onCaptureOutput( const std::wstring& str, bcb::TCaptureOutputType outputType );
 		void updateWindowTitle( const std::wstring& command = L"" );
 		void updateSecureShellWindow();
 		void updateSendButtonStatus();
-		void updateCommandsList();
+		void updateCommandList();
 		void summonCommandFromList( bool prev = true );
 
 	private:

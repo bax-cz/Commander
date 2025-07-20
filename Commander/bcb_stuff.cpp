@@ -154,13 +154,11 @@ namespace bcb
 	/* Helper functions */
 	TDateTime Now()
 	{
-		SYSTEMTIME st;
-		GetSystemTime( &st );
-
 		FILETIME ft;
-		SystemTimeToFileTime( &st, &ft );
+		GetSystemTimeAsFileTime( &ft );
 
-		return ULARGE_INTEGER{ ft.dwLowDateTime, ft.dwHighDateTime }.QuadPart;
+		// return time in seconds
+		return ULARGE_INTEGER{ ft.dwLowDateTime, ft.dwHighDateTime }.QuadPart / 10000000ull;
 	}
 
 	void Abort() { abort(); }
@@ -373,25 +371,76 @@ namespace bcb
 		return str;
 	}
 
+	// NOTE: this function deals with 1-letter long fmt characters only (%d, %s, etc.)
+	std::vector<std::pair<size_t, size_t>> getFmtOffsets( const std::wstring& str )
+	{
+		std::vector<std::pair<size_t, size_t>> offsetOut;
+		size_t off = 0;
+
+		while( ( off = str.find_first_of( L'%', off ) ) != std::wstring::npos )
+		{
+			size_t i = off;
+			while( i++ < str.length() )
+			{
+				if( IsCharAlpha( str[i] ) || std::iswspace( str[i] ) || str[i] == L'%' )
+				{
+					offsetOut.push_back( { off, i - off } );
+					break;
+				}
+			}
+
+			// TODO: handle invalid state when '%' is at the end of the string
+
+			off++;
+		}
+
+		return offsetOut;
+	}
+
 	UnicodeString fmtLoadStr( UINT strId, StrArray<UnicodeString>& vals )
 	{
 		std::wstring str = LoadStr( strId ).get();
 
-		size_t off = 0;
-		for( int i = 0; i < vals.size(); i++ )
+		auto fmtOffs = getFmtOffsets( str );
+
+		_ASSERTE( vals.size() != 0 );
+
+		int i = 0;
+
+		// expand %s and %d with values from the StrArray
+		for( auto it = fmtOffs.rbegin(); it != fmtOffs.rend(); ++it, ++i )
 		{
-			// expand %s and %d with values from the StrArray
-			off = str.find_first_of( L'%', off );
-			if( off != std::wstring::npos && off != str.length() - 1 )
+			// when there are less vals than fmt substrings - reuse the last one
+			i = min( i, vals.size() - 1 ); // TODO: bcb really works like this??
+
+			if( str[it->first + it->second] == L's' || str[it->first + it->second] == L'd' )
 			{
-				// we treat %d as string since FMTLOAD macro expects UnicodeString args anyway
-				if( str[off+1] == L's' || str[off+1] == L'd' )
-					str.replace( off, 2, vals.at( i ).c_str() );
-				else
+				if( it->second > 1 ) // TODO: '%d' only for now
 				{
-					PrintDebug("Unsupported format element: '%%%lc'", str[off + 1]);
-					off++;
+					_ASSERTE( str[it->first + it->second] == L'd' );
+
+					int val = 0;
+					if( TryStrToInt( vals.at( i ), val ) )
+					{
+						WCHAR outStr[MAX_PATH];
+						wsprintf( outStr, str.substr( it->first, it->second ).c_str(), val );
+						str.replace( it->first, it->second + 1, outStr );
+					}
+					else
+					{
+						PrintDebug("Invalid integer value: '%ls'", vals.at( i ).c_str());
+					}
 				}
+				else // treat '%d' as string since FMTLOAD macro expects UnicodeString args anyway
+					str.replace( it->first, it->second + 1, vals.at( i ).c_str() );
+			}
+			else if( str[it->first + 1] == L'%' )
+			{
+				str.erase( it->first );
+			}
+			else
+			{
+				PrintDebug("Unsupported format element: '%%%lc'", str[it->first + 1]);
 			}
 		}
 
@@ -445,7 +494,7 @@ namespace bcb
 
 	UnicodeString ReplaceStr( const UnicodeString& str, const wchar_t *from, const wchar_t *to )
 	{
-		std::wstring strOut = const_cast<UnicodeString&>( str) .get();
+		std::wstring strOut = const_cast<UnicodeString&>( str ).get();
 		StringUtils::replaceAll( strOut, from, to );
 
 		return strOut;
