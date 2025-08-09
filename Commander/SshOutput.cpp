@@ -38,17 +38,17 @@ namespace Commander
 
 		SetWindowSubclass( GetDlgItem( _hDlg, IDE_SECURESHELL_INPUT ), wndProcEditSubclass, 0, reinterpret_cast<DWORD_PTR>( this ) );
 
-		// init system menu
-		HMENU hSysMenu = GetSystemMenu( _hDlg, FALSE );
-		int idx = GetMenuItemCount( hSysMenu ) - 1;
+		// initialize system menu items
+		_hSystemMenu = GetSystemMenu( _hDlg, FALSE );
+		int idx = GetMenuItemCount( _hSystemMenu ) - 1;
 
-		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
-		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_SHUTDOWN, L"Shutdown" );
-		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
-		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_CURRENTDIR, L"Current Directory" );
-		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_CLEAR, L"Clear" );
-		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
-		InsertMenu( hSysMenu, idx, MF_BYPOSITION | MF_STRING, IDM_OPTIONS_ALWAYSONTOP, L"Always on Top" );
+		InsertMenu( _hSystemMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
+		InsertMenu( _hSystemMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_SHUTDOWN, L"Shutdown" );
+		InsertMenu( _hSystemMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
+		InsertMenu( _hSystemMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_CURRENTDIR, L"Current Directory" );
+		InsertMenu( _hSystemMenu, idx, MF_BYPOSITION | MF_STRING, IDM_SECURESHELL_CLEAR, L"Clear" );
+		InsertMenu( _hSystemMenu, idx, MF_BYPOSITION | MF_SEPARATOR, 0, NULL );
+		InsertMenu( _hSystemMenu, idx, MF_BYPOSITION | MF_STRING, IDM_OPTIONS_ALWAYSONTOP, L"Always on Top" );
 
 		// limit maximum command length
 		SendDlgItemMessage( _hDlg, IDE_SECURESHELL_INPUT, EM_SETLIMITTEXT, SSH_COMMAND_LENGTH_MAX, 0 );
@@ -64,6 +64,7 @@ namespace Commander
 		MiscUtils::centerOnWindow( FCS::inst().getFcWindow(), _hDlg );
 
 		updateSendButtonStatus();
+		updateSecureShellWindow();
 	}
 
 	bool CSshOutput::onOk()
@@ -83,7 +84,7 @@ namespace Commander
 		updateCommandList();
 		updateWindowTitle( _currentCommand );
 
-		_worker.start();
+		executeCommand();
 
 		return false;
 	}
@@ -141,6 +142,14 @@ namespace Commander
 				_secureShellText += L"\r\n";
 			}
 		}
+	}
+
+	void CSshOutput::executeCommand()
+	{
+		MenuUtils::enableItem( _hSystemMenu, IDM_SECURESHELL_CURRENTDIR, false );
+		MenuUtils::enableItem( _hSystemMenu, IDM_SECURESHELL_SHUTDOWN, false );
+
+		_worker.start();
 	}
 
 	bool CSshOutput::_workerProc()
@@ -217,7 +226,7 @@ namespace Commander
 			// update window title
 			updateWindowTitle();
 
-			_worker.start();
+			executeCommand();
 		}
 	}
 
@@ -242,12 +251,20 @@ namespace Commander
 
 		auto cnt = SendDlgItemMessage( _hDlg, IDE_SECURESHELL_OUTPUT, EM_GETLINECOUNT, 0, 0 );
 		SendDlgItemMessage( _hDlg, IDE_SECURESHELL_OUTPUT, EM_LINESCROLL, 0, (LPARAM)cnt );
+
+		bool shellAvailable = ( _upSshData->shell.FOpened && !_worker.isRunning() );
+
+		MenuUtils::enableItem( _hSystemMenu, IDM_SECURESHELL_CURRENTDIR, shellAvailable );
+		MenuUtils::enableItem( _hSystemMenu, IDM_SECURESHELL_SHUTDOWN, shellAvailable );
+		MenuUtils::enableItem( _hSystemMenu, IDM_SECURESHELL_CLEAR, !_secureShellText.empty() );
 	}
 
 	void CSshOutput::updateSendButtonStatus()
 	{
-		BOOL res = GetWindowTextLength( GetDlgItem( _hDlg, IDE_SECURESHELL_INPUT ) );
-		EnableWindow( GetDlgItem( _hDlg, IDOK ), res && _upSshData->shell.FOpened && !_worker.isRunning() );
+		bool inputNotEmpty = GetWindowTextLength( GetDlgItem( _hDlg, IDE_SECURESHELL_INPUT ) ) > 0;
+		bool shellAvailable = ( _upSshData->shell.FOpened && !_worker.isRunning() );
+
+		EnableWindow( GetDlgItem( _hDlg, IDOK ), inputNotEmpty && shellAvailable );
 	}
 
 	void CSshOutput::updateCommandList()
@@ -340,16 +357,15 @@ namespace Commander
 			{
 			case IDM_OPTIONS_ALWAYSONTOP:
 			{
-				HMENU hSysMenu = GetSystemMenu( _hDlg, FALSE );
-				if( MenuUtils::checkItem( hSysMenu, IDM_OPTIONS_ALWAYSONTOP ) )
+				if( MenuUtils::checkItem( _hSystemMenu, IDM_OPTIONS_ALWAYSONTOP ) )
 				{
 					SetWindowPos( _hDlg, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-					CheckMenuItem( hSysMenu, IDM_OPTIONS_ALWAYSONTOP, MF_CHECKED );
+					CheckMenuItem( _hSystemMenu, IDM_OPTIONS_ALWAYSONTOP, MF_CHECKED );
 				}
 				else
 				{
 					SetWindowPos( _hDlg, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-					CheckMenuItem( hSysMenu, IDM_OPTIONS_ALWAYSONTOP, MF_UNCHECKED );
+					CheckMenuItem( _hSystemMenu, IDM_OPTIONS_ALWAYSONTOP, MF_UNCHECKED );
 				}
 				break;
 			}
@@ -359,13 +375,13 @@ namespace Commander
 				break;
 			case IDM_SECURESHELL_CURRENTDIR:
 				_currentCommand = FORMAT( bcb::DefaultCommandSet[bcb::fsChangeDirectory].Command, getCurrentDirectory().c_str() );
-				_worker.start();
+				executeCommand();
 				break;
 			case IDM_SECURESHELL_SHUTDOWN:
 				_currentCommand = L"echo ";
 				_currentCommand += _upSshData->session.FPassphrase.get();
 				_currentCommand += L" | sudo -S shutdown -h now";
-				_worker.start();
+				executeCommand();
 				break;
 			}
 			break;

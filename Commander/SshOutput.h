@@ -36,6 +36,7 @@ namespace Commander
 		void updateSecureShellWindow();
 		void updateSendButtonStatus();
 		void updateCommandList();
+		void executeCommand();
 		void summonCommandFromList( bool prev = true );
 
 	private:
@@ -47,6 +48,7 @@ namespace Commander
 
 		std::shared_ptr<CPanelTab> _spPanel;
 
+		HMENU _hSystemMenu;
 		WCHAR _buf[SSH_COMMAND_LENGTH_MAX + 1];
 
 		std::vector<std::wstring> _commandList;

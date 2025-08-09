@@ -1461,6 +1461,7 @@ namespace Commander
 		case IDM_VIEWER_ENCODING_ISO88591:
 		case IDM_VIEWER_ENCODING_CP1251:
 		case IDM_VIEWER_ENCODING_ISO88595:
+		case IDM_VIEWER_ENCODING_CP866:
 		case IDM_VIEWER_ENCODING_KOI8:
 		case IDM_VIEWER_ENCODING_IBM437:
 			viewFileAnsi( menuId );
@@ -1478,6 +1479,7 @@ namespace Commander
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_ISO88591, _useCodePage == 28591 );
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_ISO88592, _useCodePage == 28592 );
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_ISO88595, _useCodePage == 28595 );
+		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_CP866, _useCodePage == 866 );
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_KOI8, _useCodePage == 20866 );
 		MenuUtils::checkItem( hMenu4, IDM_VIEWER_ENCODING_IBM437, _useCodePage == 437 );
 
@@ -1507,6 +1509,9 @@ namespace Commander
 			break;
 		case IDM_VIEWER_ENCODING_ISO88595:
 			_useCodePage = 28595;
+			break;
+		case IDM_VIEWER_ENCODING_CP866:
+			_useCodePage = 866;
 			break;
 		case IDM_VIEWER_ENCODING_KOI8:
 			_useCodePage = 20866;
