@@ -285,6 +285,7 @@ namespace Commander
 			case FC_ARCHDONEFAIL:
 			{
 				std::wostringstream sstr;
+				sstr << _processingVolume << L"\r\n\r\n";
 				sstr << _upArchiver->getErrorMessage();
 				MessageBox( NULL, sstr.str().c_str(), L"Error Extracting File", MB_ICONEXCLAMATION | MB_OK );
 				// fall-through

@@ -601,7 +601,7 @@ namespace bcb
 		while( StringUtils::endsWith( ws, L"=" ) )
 			ws.pop_back();
 
-		// See https://en.wikipedia.org/wiki/Base64#Implementations_and_history
+		// See https://en.wikipedia.org/wiki/Base64#Variants
 		std::replace( ws.begin(), ws.end(), L'+', L'-' );
 		std::replace( ws.begin(), ws.end(), L'/', L'_' );
 

@@ -29,12 +29,12 @@ namespace Commander
 		DWORD readLine();
 		inline std::wstring& getLineRef() { return _lineOut; } // reference to the converted unicode line
 		inline std::string& getLineRefA() { return _lineIn; }  // reference to the original ANSI line
-		inline StringUtils::EUtfBom getEncoding() { return _useEncoding; }
-		inline StringUtils::EUtfBom getByteOrderMarker() { return _fileBom; }
-		inline StringUtils::EEol getEol() { return _fileEol; }
-		inline std::streamoff getFileSize() { return _fileSize; }
-		inline bool isEolEnding() { return _isEolEnding; } // EOL is present at the end of the line
-		inline bool isText() { return _isFileText; }
+		inline StringUtils::EUtfBom getEncoding() const { return _useEncoding; }
+		inline StringUtils::EUtfBom getByteOrderMarker() const { return _fileBom; }
+		inline StringUtils::EEol getEol() const { return _fileEol; }
+		inline std::streamoff getFileSize() const { return _fileSize; }
+		inline bool isEolEnding() const { return _isEolEnding; } // EOL is present at the end of the line
+		inline bool isText() const { return _isFileText; }
 
 	private:
 		template<typename T>

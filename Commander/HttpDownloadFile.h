@@ -60,9 +60,9 @@ namespace Commander
 		INTERNET_PORT _port;
 		DWORD _service;
 
-		bool _initialized;
-		bool _canceled;
-		bool _dataCorrupted;
+		bool _isInitialized;
+		bool _isCancelled;
+		bool _isDataCorrupted;
 		bool _zeroBytesReceived;
 
 		int _attemptCount; // consecutive download attempts counter
@@ -73,10 +73,11 @@ namespace Commander
 		LONGLONG _contentLength; // original content length
 		ULONGLONG _offset; // offset from which to start download
 		ULONGLONG _verifyBytes; // bytes to verify when resume
+		ULONGLONG _freeSpace; // free space on the target drive
 		bool _fileTypeText; // file is a text file
 
 		std::wstring _url;
-		std::wstring _curDir;
+		std::wstring _outDir;
 		std::wstring _fileName;
 		std::wstring _errorMsg;
 		std::wstring _dialogTitle;

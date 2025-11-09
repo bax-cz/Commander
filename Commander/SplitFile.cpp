@@ -79,7 +79,9 @@ namespace Commander
 
 	bool convert2Num( HWND hWnd, const std::wstring& str, ULONGLONG& result, bool silent = false )
 	{
-		auto strNum = StringUtils::removeAll( str, L' ' );
+		auto strNum = StringUtils::removeAll( str, L' ' );        // remove spaces
+		strNum = StringUtils::removeAll( strNum, (wchar_t)0xA0 ); // remove non-breaking spaces
+
 		auto idx = strNum.find_first_of( L'(' );
 
 		if( idx != std::wstring::npos )
@@ -298,6 +300,14 @@ namespace Commander
 			}
 			else
 				_errorMessage = SysUtils::getErrorMessage( GetLastError() );
+
+			if( !_worker.isRunning() )
+			{
+				// do not zero-out entire file when user cancelled
+				SetFilePointer( hFile, 0, NULL, FILE_BEGIN );
+				SetEndOfFile( hFile );
+				retVal = false;
+			}
 
 			CloseHandle( hFile );
 		}

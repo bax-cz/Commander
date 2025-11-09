@@ -573,6 +573,7 @@ Socket *new_connection(SockAddr *addr, const char *hostname,
 
         #ifdef WINSCP
         ps->proxy_addr = NULL;
+        ps->pn = NULL;
         #endif
 
         /*

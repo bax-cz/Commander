@@ -865,7 +865,10 @@ namespace Commander
 	{
 		if( _worker.isRunning() )
 		{
-			SetWindowText( _hStatusBar, MiscUtils::makeCompactPath( _hStatusBar, _currentPath, L"Searching: ", L"", 12 ).c_str() );
+			std::wostringstream sstr;
+			sstr << L"Searching (" << _foundItems.size() << L"): ";
+
+			SetWindowText( _hStatusBar, MiscUtils::makeCompactPath( _hStatusBar, _currentPath, sstr.str(), L"", 12 ).c_str() );
 
 			std::lock_guard<std::recursive_mutex> locker( _mutex );
 
@@ -1189,6 +1192,9 @@ namespace Commander
 			break;
 		case 0x41: // "A - select all"
 			LvUtils::selectAllItems( vKey->hdr.hwndFrom );
+			break;
+		case 0x4D: // "M - files list to clipboard"
+			MiscUtils::setClipboardText( FCS::inst().getFcWindow(), StringUtils::join( getSelectedItems( vKey->hdr.hwndFrom ), L"\r\n" ) );
 			break;
 		}
 	}

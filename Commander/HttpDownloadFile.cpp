@@ -29,21 +29,22 @@ namespace Commander
 		_hInternet = nullptr;
 		_hSession = nullptr;
 		_hUrl = nullptr;
-		_initialized = false;
-		_canceled = false;
+		_isInitialized = false;
+		_isCancelled = false;
 		_fileTypeText = false;
-		_dataCorrupted = false;
+		_isDataCorrupted = false;
 		_zeroBytesReceived = false;
 		_contentLength = -1ll;
 		_offset = 0ull;
 		_verifyBytes = 0ull;
+		_freeSpace = 0ull;
 		_attemptCount = FailedAttemptsMax; // 10 consecutive failed attempts stops the download process
 		_errorId = NO_ERROR;
 		_service = INTERNET_SERVICE_HTTP;
 		_port = INTERNET_DEFAULT_HTTPS_PORT;
 
 		auto url = MiscUtils::getClipboardText( _hDlg ); // https://a0.ww.np.dl.playstation.net/tpl/np/NPUA80662/NPUA80662-ver.xml
-		_curDir = FCS::inst().getApp().getActivePanel().getActiveTab()->getDataManager()->getCurrentDirectory();
+		_outDir = FCS::inst().getApp().getActivePanel().getActiveTab()->getDataManager()->getCurrentDirectory();
 
 		// set progress-bar style as indifferent
 		_progressStyle = GetWindowLongPtr( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_PROGRESS ), GWL_STYLE );
@@ -76,10 +77,10 @@ namespace Commander
 
 	void CHttpDownloadFile::startDownload()
 	{
-		updateDialogTitle( _initialized ? L"Connecting" : L"Reading HEAD" );
+		updateDialogTitle( _isInitialized ? L"Connecting" : L"Reading HEAD" );
 		updateGuiStatus( false );
 
-		_canceled = false;
+		_isCancelled = false;
 
 		_worker.start();
 	}
@@ -91,10 +92,10 @@ namespace Commander
 	{
 		if( !_worker.isRunning() )
 		{
-			if( !_initialized && MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ), _dlgResult ) )
+			if( !_isInitialized && MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ), _dlgResult ) )
 				_url = _dlgResult;
 
-			if( _initialized && MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), _dlgResult ) )
+			if( _isInitialized && MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), _dlgResult ) )
 				_fileName = _dlgResult;
 
 			// update the request headers content when the request tab is selected
@@ -117,7 +118,7 @@ namespace Commander
 
 	bool CHttpDownloadFile::onClose()
 	{
-		if( _worker.isRunning() && _initialized )
+		if( _worker.isRunning() && _isInitialized )
 		{
 			if( MessageBox( _hDlg, L"Cancel downloading file?", _dialogTitle.c_str(), MB_ICONQUESTION | MB_YESNO ) == IDNO )
 				return false;
@@ -170,26 +171,26 @@ namespace Commander
 	void CHttpDownloadFile::updateGuiStatus( bool enable )
 	{
 		// set progressbar style and status
-		SetWindowLongPtr( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_PROGRESS ), GWL_STYLE, _progressStyle | ( _initialized ? 0 : PBS_MARQUEE ) );
-		SendDlgItemMessage( _hDlg, IDC_DOWNLOADFILE_PROGRESS, PBM_SETMARQUEE, !_initialized, 0 );
+		SetWindowLongPtr( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_PROGRESS ), GWL_STYLE, _progressStyle | ( _isInitialized ? 0 : PBS_MARQUEE ) );
+		SendDlgItemMessage( _hDlg, IDC_DOWNLOADFILE_PROGRESS, PBM_SETMARQUEE, !_isInitialized, 0 );
 		SendDlgItemMessage( _hDlg, IDC_DOWNLOADFILE_PROGRESS, PBM_SETPOS, 0, 0 );
 		ShowWindow( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_PROGRESS ), enable ? SW_HIDE : SW_SHOWNORMAL );
 
 		// ok button status when text has been changed
 		bool enableOk = enable;
 		enableOk = enableOk && GetWindowTextLength( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ) ) > 0;
-		enableOk = enableOk && ( GetWindowTextLength( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ) ) > 0 || !_initialized );
+		enableOk = enableOk && ( GetWindowTextLength( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ) ) > 0 || !_isInitialized );
 
 		EnableWindow( GetDlgItem( _hDlg, IDOK ), enableOk );
-		EnableWindow( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), enable && _initialized );
-		EnableWindow( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_CHOOSEFILE ), enable && _initialized );
+		EnableWindow( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), enable && _isInitialized );
+		EnableWindow( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_CHOOSEFILE ), enable && _isInitialized );
 
 		auto tabId = TabCtrl_GetCurSel( GetDlgItem( _hDlg, IDC_DOWNLOADFILE_HEADERS ) );
 		Edit_SetReadOnly( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_HEADERS ), !enable || tabId == 0 );
 		Edit_SetReadOnly( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL), !enable );
 
 		SetDlgItemText( _hDlg, IDC_DOWNLOADFILE_STATUSTEXT, L"" );
-		SetDlgItemText( _hDlg, IDOK, _initialized ? L"Download" : L"Get HEAD" );
+		SetDlgItemText( _hDlg, IDOK, _isInitialized ? L"Download" : L"Get HEAD" );
 	}
 
 	void CHttpDownloadFile::updateHeaders( bool tabChanged )
@@ -209,7 +210,7 @@ namespace Commander
 	void CHttpDownloadFile::onChooseFileName()
 	{
 		std::wstring fname = _fileName;
-		std::wstring outdir = _curDir;
+		std::wstring outdir = _outDir;
 
 		// update the filename and directory from edit-box
 		if( MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_FILENAME ), _dlgResult ) )
@@ -229,7 +230,7 @@ namespace Commander
 		if( MiscUtils::saveFileDialog( _hDlg, outdir, fname ) )
 		{
 			_fileName = PathUtils::stripPath( fname );
-			_curDir = PathUtils::addDelimiter( PathUtils::stripFileName( fname ) );
+			_outDir = PathUtils::addDelimiter( PathUtils::stripFileName( fname ) );
 
 			SetDlgItemText( _hDlg, IDE_DOWNLOADFILE_FILENAME, _fileName.c_str() );
 		}
@@ -434,7 +435,7 @@ namespace Commander
 		}
 
 		if( !_worker.isRunning() )
-			_canceled = true; // canceled by user
+			_isCancelled = true; // canceled by user
 
 		return false;
 	}
@@ -499,7 +500,7 @@ namespace Commander
 		}
 
 		if( !_worker.isRunning() || mode == -1 )
-			_canceled = true; // canceled by user
+			_isCancelled = true; // canceled by user
 
 		return false;
 	}
@@ -541,7 +542,7 @@ namespace Commander
 
 			// always download as a binary file (even when _fileTypeText)
 			mode |= std::ios::binary;
-			std::fstream fs( PathUtils::getExtendedPath( _curDir + _fileName ), mode );
+			std::fstream fs( PathUtils::getExtendedPath( _outDir + _fileName ), mode );
 
 			ULONGLONG ticks = GetTickCount64();
 			BOOL verify = ( mode & std::ios::app ), ret = FALSE;
@@ -553,7 +554,7 @@ namespace Commander
 				{
 					if( _verifyBytes != dwBytesRead || !verifyContent( fs, _buff, dwBytesRead ) )
 					{
-						_dataCorrupted = true;
+						_isDataCorrupted = true;
 						return false;
 					}
 
@@ -578,7 +579,7 @@ namespace Commander
 
 				if( !_worker.isRunning() )
 				{
-					_canceled = true;
+					_isCancelled = true;
 					return false;
 				}
 			}
@@ -666,12 +667,14 @@ namespace Commander
 		{
 			LONGLONG bytesTotal = -1ll;
 			DWORD status = 0;
-			_dataCorrupted = false;
+			_isDataCorrupted = false;
 			_zeroBytesReceived = false;
 			_errorId = NO_ERROR;
 
-			if( !_initialized )
+			if( !_isInitialized )
 			{
+				_freeSpace = FsUtils::getDiskFreeSpace( FsUtils::getPathRoot( _outDir ) );
+
 				parseUrl();
 
 				// read and parse the raw http headers
@@ -687,7 +690,7 @@ namespace Commander
 			{
 				if( _errorId != NO_ERROR )
 					_errorMsg = SysUtils::getErrorMessage( _errorId, GetModuleHandle( L"wininet.dll" ) );
-				else if( _dataCorrupted )
+				else if( _isDataCorrupted )
 					_errorMsg = L"Unable to resume download because of data corruption.";
 				else
 				{
@@ -717,7 +720,7 @@ namespace Commander
 		ZeroMemory( &_wfd, sizeof( _wfd ) );
 		_offset = 0ull;
 
-		if( FsUtils::getFileInfo( _curDir + _fileName, _wfd ) )
+		if( FsUtils::getFileInfo( _outDir + _fileName, _wfd ) )
 		{
 			_offset = FsUtils::getFileSize( &_wfd );
 
@@ -871,7 +874,7 @@ namespace Commander
 		switch( message )
 		{
 		case UM_WORKERNOTIFY:
-			if( !_initialized )
+			if( !_isInitialized )
 			{
 				if( wParam == FC_ARCHDONEFAIL )
 				{
@@ -880,7 +883,7 @@ namespace Commander
 					MessageBox( _hDlg, sstr.str().c_str(), L"Download File Error", MB_ICONEXCLAMATION | MB_OK );
 				}
 				else
-					_initialized = true;
+					_isInitialized = true;
 
 				SetDlgItemText( _hDlg, IDE_DOWNLOADFILE_FILENAME, _fileName.c_str() );
 
@@ -919,10 +922,10 @@ namespace Commander
 					break;
 				}
 
-				if( wParam == FC_ARCHDONEFAIL && !_canceled )
+				if( wParam == FC_ARCHDONEFAIL && !_isCancelled )
 				{
 					// retry on error and/or when zero bytes received
-					if( _attemptCount && !_dataCorrupted && ( _zeroBytesReceived || _errorId != NO_ERROR ) )
+					if( _attemptCount && !_isDataCorrupted && ( _zeroBytesReceived || _errorId != NO_ERROR ) )
 					{
 						_attemptCount--;
 
@@ -943,7 +946,7 @@ namespace Commander
 				else if( wParam == FC_ARCHDONEOK )
 					MessageBox( _hDlg, L"File successfully downloaded.", L"Download File", MB_ICONINFORMATION | MB_OK );
 
-				_canceled = false;
+				_isCancelled = false;
 
 				updateHeaders();
 				updateGuiStatus();
@@ -964,7 +967,7 @@ namespace Commander
 			case IDE_DOWNLOADFILE_FILENAME:
 				if( HIWORD( wParam ) == EN_CHANGE )
 				{
-					if( _initialized && LOWORD( wParam ) == IDE_DOWNLOADFILE_URL )
+					if( _isInitialized && LOWORD( wParam ) == IDE_DOWNLOADFILE_URL )
 					{
 						std::wstring url;
 						MiscUtils::getWindowText( GetDlgItem( _hDlg, IDE_DOWNLOADFILE_URL ), url );
@@ -972,7 +975,7 @@ namespace Commander
 						if( url != _url )
 						{
 							// url has been changed - reinit
-							_initialized = false;
+							_isInitialized = false;
 
 							_rqstHeaders.clear();
 							updateHeaders();

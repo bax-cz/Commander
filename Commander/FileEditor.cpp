@@ -443,7 +443,7 @@ namespace Commander
 		CTextFileReader reader( inStream, &_worker, _useEncoding, _useCodePage, CTextFileReader::EOptions::forceAnsi );
 
 		// ask user what to do when text file is too big (over 16MB)
-		if( !reader.isText() && _fileSize > 0xFFFFFFll && MessageBox( _hDlg,
+		if( !reader.isText() && reader.getFileSize() > 0xFFFFFFll && MessageBox( _hDlg,
 				L"File appears to be a binary file.\nContinue displaying as text?", L"Binary File",
 				MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2 ) == IDNO )
 			return false;

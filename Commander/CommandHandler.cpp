@@ -201,7 +201,7 @@ namespace Commander
 			break;
 
 		case EFcCommand::MakeFileList:
-			MiscUtils::setClipboardText( FCS::inst().getFcWindow(), StringUtils::join( getSelectedItemsPathFull(), L"\n" ) );
+			MiscUtils::setClipboardText( FCS::inst().getFcWindow(), StringUtils::join( getSelectedItemsPathFull(), L"\r\n" ) );
 			break;
 
 		case EFcCommand::HistoryForward:
