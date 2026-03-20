@@ -45,6 +45,8 @@ namespace Commander
 		SetWindowPos( GetDlgItem( _hDlg, IDC_FIND_USECONTENT ), NULL, 0, 0, 400, 20, SWP_NOZORDER | SWP_NOMOVE );
 
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHARCHIVE ), FALSE ); // TODO: search archives
+		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHDOCUMENTS ), FALSE );
+		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_SKIPBINARY ), FALSE );
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_CONTAINCAPTION ), FALSE );
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_CONTENT ), FALSE );
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_RB_AUTO ), FALSE );

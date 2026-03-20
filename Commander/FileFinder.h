@@ -43,6 +43,7 @@ namespace Commander
 			: _searchSubdirs( false )
 			, _searchArchives( false )
 			, _searchDocuments( false )
+			, _skipBinary( false )
 			, _matchCase( false )
 			, _wholeWords( false )
 			, _hexMode( false )
@@ -89,7 +90,9 @@ namespace Commander
 		bool findTextInUnicodeString( const std::wstring& textToFind, bool words );
 		bool findTextAnsi( std::ifstream& fStream, const std::string& textToFind, bool words );
 		bool findTextAnsiRegex( std::ifstream& fStream, const std::string& textToFind, bool words );
-		bool findTextInFile( const std::wstring& fileName, StringUtils::EUtfBom& bom );
+		bool findTextInFile( std::ifstream& fStream, StringUtils::EUtfBom& bom );
+		bool findTextInDocument( const std::wstring& fileName );
+		bool findText( const std::wstring& fileName, StringUtils::EUtfBom& bom );
 		bool findItems( const std::wstring& mask, const std::wstring& dirName );
 		bool convertToAnsi( const std::wstring& text, std::string& outStr );
 		void searchArchive( const std::wstring& archiveName, const std::wstring& mask );
@@ -98,8 +101,8 @@ namespace Commander
 		void updateStatus();
 		void updateLayout( int width, int height );
 		void enableHexMode( bool enable );
-		void showSearchGroup( bool show = true );
-		void enableSearchGroup( bool enable = true );
+		void showContentSearchGroup( bool show = true );
+		void enableContentSearchGroup( bool enable = true );
 		void sortItems( int code );
 		int  findItemIndex( ItemDataPtr itemData );
 
@@ -151,7 +154,8 @@ namespace Commander
 
 		bool _searchSubdirs;
 		bool _searchArchives;
-		bool _searchDocuments; // TODO: ebooks etc.
+		bool _searchDocuments; // search text in ebooks etc.
+		bool _skipBinary; // skip the content search in binary files
 		bool _matchCase;
 		bool _wholeWords;
 		bool _hexMode;

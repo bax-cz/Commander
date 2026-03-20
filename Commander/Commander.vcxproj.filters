@@ -61,6 +61,9 @@
     <Filter Include="Source Files\7zip\Register">
       <UniqueIdentifier>{6ac54446-a733-4f0c-91b3-0a842f29a778}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\DataProviders">
+      <UniqueIdentifier>{5607761b-8f66-46f7-9b51-b3cb47eb57a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="TODO.txt" />
@@ -1100,35 +1103,11 @@
     <ClCompile Include="FileEditor.cpp">
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="ArchiveDataProvider.cpp">
-      <Filter>Source Files\FsReaders</Filter>
-    </ClCompile>
-    <ClCompile Include="DiskDataProvider.cpp">
-      <Filter>Source Files\FsReaders</Filter>
-    </ClCompile>
-    <ClCompile Include="FtpDataProvider.cpp">
-      <Filter>Source Files\FsReaders</Filter>
-    </ClCompile>
-    <ClCompile Include="PalmDataProvider.cpp">
-      <Filter>Source Files\FsReaders</Filter>
-    </ClCompile>
-    <ClCompile Include="RegistryDataProvider.cpp">
-      <Filter>Source Files\FsReaders</Filter>
-    </ClCompile>
-    <ClCompile Include="SshDataProvider.cpp">
-      <Filter>Source Files\FsReaders</Filter>
-    </ClCompile>
-    <ClCompile Include="MarkdownDataProvider.cpp">
-      <Filter>Source Files\FsReaders</Filter>
-    </ClCompile>
     <ClCompile Include="EpubViewer.cpp">
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
     <ClCompile Include="HtmlViewer.cpp">
       <Filter>Source Files\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="FictionBook2DataProvider.cpp">
-      <Filter>Source Files\FsReaders</Filter>
     </ClCompile>
     <ClCompile Include="..\Lzma\CPP\7zip\Archive\Cab\CabRegister.cpp">
       <Filter>Source Files\7zip\Register</Filter>
@@ -1273,6 +1252,30 @@
     </ClCompile>
     <ClCompile Include="..\Lzma\CPP\Common\Sha512Reg.cpp">
       <Filter>Source Files\7zip\Register</Filter>
+    </ClCompile>
+    <ClCompile Include="ArchiveDataProvider.cpp">
+      <Filter>Source Files\DataProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskDataProvider.cpp">
+      <Filter>Source Files\DataProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="FictionBook2DataProvider.cpp">
+      <Filter>Source Files\DataProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="FtpDataProvider.cpp">
+      <Filter>Source Files\DataProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="MarkdownDataProvider.cpp">
+      <Filter>Source Files\DataProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="PalmDataProvider.cpp">
+      <Filter>Source Files\DataProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryDataProvider.cpp">
+      <Filter>Source Files\DataProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="SshDataProvider.cpp">
+      <Filter>Source Files\DataProviders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

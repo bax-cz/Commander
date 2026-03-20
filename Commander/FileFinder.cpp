@@ -37,7 +37,7 @@ namespace Commander
 		CheckRadioButton( _hDlg, IDC_FIND_RB_AUTO, IDC_FIND_RB_UTF32, IDC_FIND_RB_AUTO );
 		CheckDlgButton( _hDlg, IDC_FIND_SEARCHSUBDIR, BST_CHECKED );
 
-		showSearchGroup( false );
+		showContentSearchGroup( false );
 
 		LvUtils::setExtStyle( GetDlgItem( _hDlg, IDC_FIND_RESULT ), LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT );
 		LvUtils::setImageList( GetDlgItem( _hDlg, IDC_FIND_RESULT ), FCS::inst().getApp().getSystemImageList(), LVSIL_SMALL );
@@ -97,17 +97,19 @@ namespace Commander
 	//
 	// Enable/disable search group windows
 	//
-	void CFileFinder::enableSearchGroup( bool enable )
+	void CFileFinder::enableContentSearchGroup( bool enable )
 	{
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_CONTAINCAPTION ), enable );
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_CONTENT ), enable );
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_RB_ANSI ), enable );
+		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SKIPBINARY ), enable );
 
 		if( !enable || ( enable && IsDlgButtonChecked( _hDlg, IDC_FIND_REGEXMODE ) == BST_UNCHECKED ) )
 			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_HEXMODE ), enable );
 
 		if( !enable || ( enable && IsDlgButtonChecked( _hDlg, IDC_FIND_HEXMODE ) == BST_UNCHECKED ) )
 		{
+			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHDOCUMENTS ), enable );
 			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_RB_AUTO ), enable );
 			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_RB_UTF8 ), enable );
 			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_RB_UTF16 ), enable );
@@ -121,8 +123,9 @@ namespace Commander
 	//
 	// Enable/disable search group windows
 	//
-	void CFileFinder::showSearchGroup( bool show )
+	void CFileFinder::showContentSearchGroup( bool show )
 	{
+		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHDOCUMENTS ), show );
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_CONTAINCAPTION ), show );
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_CONTENT ), show );
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_RB_AUTO ), show );
@@ -134,6 +137,7 @@ namespace Commander
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_WHOLEWORD ), show );
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_HEXMODE ), show );
 		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_REGEXMODE ), show );
+		ShowWindow( GetDlgItem( _hDlg, IDC_FIND_SKIPBINARY ), show );
 
 		RECT rct;
 		GetClientRect( _hDlg, &rct );
@@ -151,7 +155,9 @@ namespace Commander
 			CheckRadioButton( _hDlg, IDC_FIND_RB_AUTO, IDC_FIND_RB_UTF32, IDC_FIND_RB_ANSI );
 			CheckDlgButton( _hDlg, IDC_FIND_MATCHCASE, BST_CHECKED );
 			CheckDlgButton( _hDlg, IDC_FIND_WHOLEWORD, BST_UNCHECKED );
+			CheckDlgButton( _hDlg, IDC_FIND_SKIPBINARY, BST_UNCHECKED );
 
+			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHDOCUMENTS ), false );
 			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_RB_AUTO ), false );
 			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_RB_UTF8 ), false );
 			EnableWindow( GetDlgItem( _hDlg, IDC_FIND_RB_UTF16 ), false );
@@ -163,7 +169,7 @@ namespace Commander
 		else
 		{
 			CheckRadioButton( _hDlg, IDC_FIND_RB_AUTO, IDC_FIND_RB_UTF32, _encodingTemp );
-			enableSearchGroup();
+			enableContentSearchGroup();
 		}
 	}
 
@@ -224,7 +230,7 @@ namespace Commander
 
 		while( ( ( p - buf ) < len ) && ( p = reinterpret_cast<const char*>( memchr( p, str[0], static_cast<size_t>( len - ( p - buf ) ) ) ) ) )
 		{
-			size_t remainder = (size_t)( len - ( p - buf ) );
+			size_t remainder = static_cast<size_t>( len - ( p - buf ) );
 
 			if( remainder < str.length() )
 			{
@@ -308,7 +314,7 @@ namespace Commander
 
 		while( p && ( p - buf ) < len )
 		{
-			size_t remainder = (size_t)( len - ( p - buf ) );
+			size_t remainder = static_cast<size_t>( len - ( p - buf ) );
 
 			if( remainder < str.length() )
 			{
@@ -515,29 +521,12 @@ namespace Commander
 	//
 	// Find text in given file
 	//
-	bool CFileFinder::findTextInFile( const std::wstring& fileName, StringUtils::EUtfBom& bom )
+	bool CFileFinder::findTextInFile( std::ifstream& fStream, StringUtils::EUtfBom& bom )
 	{
-		// open file as binary stream
-		std::ifstream file( fileName.c_str(), std::ifstream::binary );
-
-		// TODO: add options to skip binary files
-		/*CTextFileReader reader( file, &_worker );
-
-		if( reader.isText() )
-		{
-			while( _worker.isRunning() && reader.readLine() == ERROR_SUCCESS )
-			{
-				if( StringUtils::findCaseInsensitive( reader.getLineRef(), _findTextW ) != std::wstring::npos )
-					return true;
-			}
-		}
-
-		return false;*/
-
+		// read file BOM
 		int bomLen = 0;
-
 		if( !_hexMode )
-			bom = FsUtils::readByteOrderMarker( file, bomLen );
+			bom = FsUtils::readByteOrderMarker( fStream, bomLen );
 
 		// disable whole words matching when there are non-alpha-numeric bounds in the source string
 		bool wholeWords = _wholeWords;
@@ -548,8 +537,8 @@ namespace Commander
 		// try ANSI system code-page first when Auto has been selected and no BOM detected
 		if( _hexMode || ( _encoding == IDC_FIND_RB_AUTO && bom == StringUtils::NOBOM && !_findTextA.empty() ) || _encoding == IDC_FIND_RB_ANSI )
 		{
-			if( ( !_regexMode && findTextAnsi( file, _findTextA, wholeWords ) )
-				|| _regexMode && findTextAnsiRegex( file, _findTextA, wholeWords ) )
+			if( ( !_regexMode && findTextAnsi( fStream, _findTextA, wholeWords ) )
+				|| _regexMode && findTextAnsiRegex( fStream, _findTextA, wholeWords ) )
 			{
 				bom = StringUtils::ANSI;
 				return true;
@@ -561,10 +550,10 @@ namespace Commander
 			// try according to BOM (UTF-8 when no BOM detected) on Auto, or according to user selection
 			auto textEncoding = ( _encoding != IDC_FIND_RB_AUTO ) ? _encoding : getTextEncoding( bom );
 
-			file.clear();
+			fStream.clear();
 
 			// skip BOM
-			file.seekg( bomLen, std::ios::beg );
+			fStream.seekg( bomLen, std::ios::beg );
 
 			_line.clear();
 			_strOut.clear();
@@ -574,23 +563,79 @@ namespace Commander
 			case IDC_FIND_RB_UTF8:
 				bom = StringUtils::UTF8;
 
-				return findTextUnicode<char>( 0x0A, file, _findTextW, wholeWords, bom );
+				return findTextUnicode<char>( 0x0A, fStream, _findTextW, wholeWords, bom );
 
 			case IDC_FIND_RB_UTF16:
 				if( bom != StringUtils::UTF16LE && bom != StringUtils::UTF16BE )
 					bom = StringUtils::UTF16LE;
 
-				return findTextUnicode<wchar_t>( ( bom == StringUtils::UTF16LE ? 0x0A : 0x0A00 ), file, _findTextW, wholeWords, bom );
+				return findTextUnicode<wchar_t>( ( bom == StringUtils::UTF16LE ? 0x0A : 0x0A00 ), fStream, _findTextW, wholeWords, bom );
 
 			case IDC_FIND_RB_UTF32:
 				if( bom != StringUtils::UTF32LE && bom != StringUtils::UTF32BE )
 					bom = StringUtils::UTF32LE;
 
-				return findTextUnicode<char32_t>( ( bom == StringUtils::UTF32LE ? 0x0A : 0x0A000000 ), file, _findTextW, wholeWords, bom );
+				return findTextUnicode<char32_t>( ( bom == StringUtils::UTF32LE ? 0x0A : 0x0A000000 ), fStream, _findTextW, wholeWords, bom );
 			}
 		}
 
 		return false;
+	}
+
+	bool CFileFinder::findTextInDocument( const std::wstring& fileName )
+	{
+		// TODO
+		/*switch( ViewerType::getType( fileName ) )
+		{
+			case EViewType::FMT_DJVU:
+			case EViewType::FMT_EPUB:
+			case EViewType::FMT_HTML:
+			case EViewType::FMT_MOBI:
+			case EViewType::FMT_FCBK2:
+			case EViewType::FMT_MARKD:
+			case EViewType::FMT_NFO:
+			case EViewType::FMT_PALM:
+			case EViewType::FMT_TEXT:
+			case EViewType::FMT_BINARY:
+			default:
+				break;
+		}*/
+
+		return false;
+	}
+
+	//
+	// Find text in a given file or document
+	//
+	bool CFileFinder::findText( const std::wstring& fileName, StringUtils::EUtfBom& bom )
+	{
+		// TODO: ebooks, zipped (docx, etc.)
+		if( _searchDocuments && !_hexMode )
+		{
+			auto type = ViewerType::getType( fileName );
+
+			if( type != ViewerType::EViewType::FMT_BINARY && type != ViewerType::EViewType::FMT_IMAGE )
+				return findTextInDocument( fileName );
+		}
+
+		// open file as binary stream
+		std::ifstream fstr( fileName.c_str(), std::ifstream::binary );
+
+		// skip binary files
+		if( _skipBinary )
+		{
+			CTextFileReader reader( fstr, &_worker );
+
+			if( !reader.isText() )
+				return false;
+
+			if( fstr.fail() )
+				fstr.clear();
+
+			fstr.seekg( 0, std::ios::beg );
+		}
+
+		return findTextInFile( fstr, bom );
 	}
 
 	//
@@ -637,7 +682,7 @@ namespace Commander
 
 						bom = StringUtils::NOBOM;
 
-						if( _findTextW.empty() || findTextInFile( PathUtils::getExtendedPath( pathFind + wfd.cFileName ), bom ) )
+						if( _findTextW.empty() || findText( PathUtils::getExtendedPath( pathFind + wfd.cFileName ), bom ) )
 						{
 							storeFoundItem( wfd, pathFind, bom );
 						}
@@ -648,10 +693,6 @@ namespace Commander
 					{
 						searchArchive( pathFind + wfd.cFileName, mask );
 					}
-
-					// TODO: ebooks, zipped (docx, etc.)
-					if( _searchDocuments )
-						;
 				}
 			} while( FindNextFile( hFile, &wfd ) && _worker.isRunning() );
 
@@ -693,7 +734,7 @@ namespace Commander
 							StringUtils::EUtfBom bom = StringUtils::NOBOM;
 							std::wstring tempName = FCS::inst().getTempPath() + entryName;
 
-							if( findTextInFile( tempName, bom ) )
+							if( findText( tempName, bom ) )
 								storeFoundItem( entry.wfd, archiveName, bom );
 
 							DeleteFile( tempName.c_str() );
@@ -946,7 +987,7 @@ namespace Commander
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHSUBDIR ), TRUE );
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHARCHIVE ), TRUE );
 
-		enableSearchGroup();
+		enableContentSearchGroup();
 
 		SetWindowText( _hStatusBar, status.str().c_str() );
 		SetDlgItemText( _hDlg, IDOK, L"&Find" );
@@ -1082,7 +1123,8 @@ namespace Commander
 		_encoding = MiscUtils::getCheckedRadio( _hDlg, { IDC_FIND_RB_AUTO, IDC_FIND_RB_ANSI, IDC_FIND_RB_UTF8, IDC_FIND_RB_UTF16, IDC_FIND_RB_UTF32 } );
 		_searchSubdirs = IsDlgButtonChecked( _hDlg, IDC_FIND_SEARCHSUBDIR ) == BST_CHECKED;
 		_searchArchives = IsDlgButtonChecked( _hDlg, IDC_FIND_SEARCHARCHIVE ) == BST_CHECKED;
-		_searchDocuments = false; // TODO: ebooks, zipped (docx, etc.)
+		_searchDocuments = IsDlgButtonChecked( _hDlg, IDC_FIND_SEARCHDOCUMENTS ) == BST_CHECKED;
+		_skipBinary = IsDlgButtonChecked( _hDlg, IDC_FIND_SKIPBINARY ) == BST_CHECKED;
 		_matchCase = IsDlgButtonChecked( _hDlg, IDC_FIND_MATCHCASE ) == BST_CHECKED;
 		_wholeWords = IsDlgButtonChecked( _hDlg, IDC_FIND_WHOLEWORD ) == BST_CHECKED;
 		_hexMode = IsDlgButtonChecked( _hDlg, IDC_FIND_HEXMODE ) == BST_CHECKED;
@@ -1111,7 +1153,7 @@ namespace Commander
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHSUBDIR ), FALSE );
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHARCHIVE ), FALSE );
 
-		enableSearchGroup( false );
+		enableContentSearchGroup( false );
 
 		SetTimer( _hDlg, FC_TIMER_GUI_ID, FC_TIMER_GUI_TICK, NULL );
 
@@ -1138,7 +1180,7 @@ namespace Commander
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHSUBDIR ), TRUE );
 		EnableWindow( GetDlgItem( _hDlg, IDC_FIND_SEARCHARCHIVE ), TRUE );
 
-		enableSearchGroup();
+		enableContentSearchGroup();
 
 		SetWindowText( _hStatusBar, L"Stopped" );
 		SetDlgItemText( _hDlg, IDOK, L"&Find" );
@@ -1494,7 +1536,7 @@ namespace Commander
 						MiscUtils::sanitizeHexText( GetDlgItem( _hDlg, IDC_FIND_CONTENT ), _fireEvent );
 					break;
 				case IDC_FIND_USECONTENT:
-					showSearchGroup( IsDlgButtonChecked( _hDlg, IDC_FIND_USECONTENT ) == BST_CHECKED );
+					showContentSearchGroup( IsDlgButtonChecked( _hDlg, IDC_FIND_USECONTENT ) == BST_CHECKED );
 					break;
 				case IDC_FIND_HEXMODE:
 					enableHexMode( IsDlgButtonChecked( _hDlg, IDC_FIND_HEXMODE ) == BST_CHECKED );
