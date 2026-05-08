@@ -199,6 +199,11 @@ namespace Commander
 				_path1 = FCS::inst().getApp().getActivePanel().getActiveTab()->getSelectedItemsPathFull()[0];
 				_path2 = FCS::inst().getApp().getActivePanel().getActiveTab()->getSelectedItemsPathFull()[1];
 			}
+			else if( entries.size() > 2 && isFile && isFileOpp )
+			{
+				_path1 = FCS::inst().getApp().getActivePanel().getActiveTab()->getSelectedItemsPathFull( false )[0];
+				_path2 = FCS::inst().getApp().getOppositePanel().getActiveTab()->getSelectedItemsPathFull( false )[0];
+			}
 		}
 
 		FCS::inst().getApp().getCompareFile1().clear();

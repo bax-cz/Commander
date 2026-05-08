@@ -460,8 +460,9 @@ namespace Commander
 			auto& entries = _dataManager.getMarkedEntries();
 
 			canCompareFiles = (!isMarked && !isMarkedOpp && isFile && isFileOpp)
-				|| (entries.size() == 1 && entriesOpp.size() == 1 && _dataManager.isEntryFile( entries[0] ) && dataManOpp->isEntryFile( entriesOpp[0] ))
-				|| (entries.size() == 2 && _dataManager.isEntryFile( entries[0] ) && _dataManager.isEntryFile( entries[1] ));
+				|| ( entries.size() == 1 && entriesOpp.size() == 1 && _dataManager.isEntryFile( entries[0] ) && dataManOpp->isEntryFile( entriesOpp[0] ) )
+				|| ( entries.size() == 2 && _dataManager.isEntryFile( entries[0] ) && _dataManager.isEntryFile( entries[1] ) )
+				|| ( entries.size() > 2 && isFile && isFileOpp );
 		}
 
 		_availableCommands[EFcCommand::SetAlwaysOnTop] = true;
